@@ -1,11 +1,11 @@
 # TODO — 未完成事項
 
-> 以下只列未完成工作。原有 Family Calendar System MVP + AI Co-Pilot 清單中的已完成項目已移至 [PROGRESS.md](PROGRESS.md)；該清單的雲端／舊架構工作須先對照現行 PRD V10.1，不能直接視為已批准的 TimeMem 方向。
+> 以下只列未完成工作。原有 Family Calendar System MVP + AI Co-Pilot 清單中的已完成項目已移至 [PROGRESS.md](PROGRESS.md)；該清單的雲端／舊架構工作須先對照現行 PRD V10.2（V10.1 已移至 `docs/archive/TimeMem-PRD-V10-1.md`），不能直接視為已批准的 TimeMem 方向。
 
 ## TimeMem gate 與後續工作
 
 > CR-002 / D-023 已決定 M0 範圍：五項 PRD setup 加 Tailnet 遠端驗證及 PWA app shell。
-- [ ] 完成六份 gate 文件 consistency review、Skill 實測及獨立 review；依 [M0-READY.md](M0-READY.md) 記錄 findings，Joe 未批准前不寫產品 code／migration／DB。
+- [ ] 完成六份 gate 文件 consistency review、Skill 實測及獨立 review；依 [M0-READY.md](../M0-READY.md) 記錄 findings，Joe 未批准前不寫產品 code／migration／DB。
 - [ ] M0 批准後，DEVELOP 第一步啟用 `M0 Gate` required check 及 Owner review；不得列為 M0 批准前置條件。
 - [ ] M0 批准後按 [TimeMem-Install-SOP-Lock-Version.md](TimeMem-Install-SOP-Lock-Version.md) 及 [TimeMem-Home-Hub-Physical-Setup.md](TimeMem-Home-Hub-Physical-Setup.md) 設定 JOE-SERVER；設備仍未 SETUP／READY，`D:\docker-data\timemem` 不入 Git。
 - [ ] 按已批准的 scope，在 Requirements／reviews 就緒及 M0 批准後，驗收 REQ-001 至 REQ-007；所有結果及證據記入 M0-READY。

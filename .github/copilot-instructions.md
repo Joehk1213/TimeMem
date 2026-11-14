@@ -3,7 +3,8 @@
 ## Project source of truth
 
 - `docs/` is the canonical source for TimeMem product and implementation decisions. Use [docs/README.md](../docs/README.md) to find the current documents.
-- `docs/TimeMem-PRD-V10-1.md` is the current product requirements document: PRD V10.1. Do not treat older drafts or archived notes as overriding it.
+- `docs/prd/TimeMem-PRD-V10-2.md` is the current product requirements document: PRD V10.2. V10.1 is archived at `docs/archive/TimeMem-PRD-V10-1.md`; do not treat archived notes as current requirements.
+- M0 remains Draft / NOT APPROVED. Joe alone has approval authority.
 - The Obsidian Vault is at `C:\Project\Obsidian-Hub\TimeMem`. It is for personal notes and daily records; repo docs remain authoritative for project decisions if the two overlap.
 - If canonical docs conflict or leave a decision open, stop and ask instead of guessing or silently resolving it.
 

@@ -3,6 +3,8 @@ title: M0 Luna Review Record
 date: 2026-11-14
 status: Pending Luna review
 ---
+> 歷史文件：本文撰寫時現行版為 V10.1；現行版已為 V10.2。
+
 
 # M0 Luna Review Record
 

@@ -1,3 +1,5 @@
+> 歷史文件：本文撰寫時現行版為 V10.1；現行版已為 V10.2。
+
 # Luna Consistency Review — 2026-11-15
 
 - **Reviewer:** Copilot AI assistant, performing the requested Luna consistency review

@@ -1,1 +1,1 @@
-powershell -ExecutionPolicy Bypass -File scripts\sync-skills.ps1
+已停用：`.github` 嗰套 Skills 已刪走，Skill Sync 已停用。只用 `.agents/skills/`，Luna 為主要工具。

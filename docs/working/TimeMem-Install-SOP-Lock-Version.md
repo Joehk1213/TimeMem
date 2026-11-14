@@ -1,6 +1,7 @@
 # TimeMem 安裝 SOP — Lock 版，唔使 BIOS，唔使 WOL
 
 **版本：V10.1，2026-11-09，取代 WOL 版**
+**產品要求以現行 PRD V10.2 為準；PRD V10.1 已移至 `docs/archive/TimeMem-PRD-V10-1.md`。本行 V10.1 是本 SOP 的原始版號。**
 **一句講晒：鎖定就可以，唔係熄機。唔使入 BIOS，唔使搞 WOL。**
 **目標：一個唔識 IT 嘅家人，10 分鐘，裝完即刻睇到 TEMPMEM BASIC 首頁，隨機相片 + 故事卡片。**
 

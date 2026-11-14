@@ -1,3 +1,5 @@
+> 歷史文件：本文撰寫時現行版為 V10.1；現行版已為 V10.2。
+
 Final Re-Review (Current State Only)
 
 Scope reviewed:
