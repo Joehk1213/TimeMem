@@ -1,0 +1,898 @@
+列出資料夾 PATH
+磁碟區序號為 000000B9 08D8:474B
+C:\PROJECT\TIMEMEM
+|   .env.example
+|   .gitignore
+|   README.md
+|   skills-lock.json
+|   
++---.agents
+|   +---skills
+|   |   +---agent-memory
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       memory_schema.json
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       hook_capture_discipline.md
+|   |   |   |       promotion_gate_design.md
+|   |   |   |       tiered_memory_canon.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           memory_core.py
+|   |   |           memory_extract.py
+|   |   |           memory_inspect.py
+|   |   |           memory_promote.py
+|   |   |           validate_examples.py
+|   |   |           
+|   |   +---capture
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---references
+|   |   |   |       complexity_matching.md
+|   |   |   |       voice_preservation.md
+|   |   |   |       workspace_detection.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           complexity_estimator.py
+|   |   |           dump_classifier.py
+|   |   |           workspace_inventory.py
+|   |   |           
+|   |   +---defuddle
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---engineering-skills
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---grill-me
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---references
+|   |   |   |       companion_tooling.md
+|   |   |   |       forcing_question_patterns.md
+|   |   |   |       when_to_stop_grilling.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           decision_tree_extractor.py
+|   |   |           grill_session_tracker.py
+|   |   |           question_generator.py
+|   |   |           
+|   |   +---human-gate
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       batch.v1.schema.json
+|   |   |   |       example_review_sidecar.md
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       feedback_batching.md
+|   |   |   |       human_in_the_loop_canon.md
+|   |   |   |       review_loop_discipline.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           feedback_parser.py
+|   |   |           human_gate.py
+|   |   |           review_page_builder.py
+|   |   |           
+|   |   +---joe-keywords
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---new-start-project-framework
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---obsidian-bases
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   \---references
+|   |   |           FUNCTIONS_REFERENCE.md
+|   |   |           
+|   |   +---obsidian-cli
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---obsidian-markdown
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   \---references
+|   |   |           CALLOUTS.md
+|   |   |           EMBEDS.md
+|   |   |           PROPERTIES.md
+|   |   |           
+|   |   +---obsidian-story-record
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---pr-review-expert
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---product-skills
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       sample_discovery_log.json
+|   |   |   |       sample_ost.json
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       ai_product_evals.md
+|   |   |   |       continuous_discovery_canon.md
+|   |   |   |       product_operating_model.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           discovery_cadence_tracker.py
+|   |   |           ost_linter.py
+|   |   |           product_goal_router.py
+|   |   |           
+|   |   \---timemem-workflow
+|   |           SKILL.md
+|   |           
+|   \---skills-cold
+|       +---agent-protocol
+|       |   |   SKILL.md
+|       |   |   
+|       |   \---references
+|       |           invocation-patterns.md
+|       |           
+|       +---agent-run-forensics
+|       |   |   SKILL.md
+|       |   |   
+|       |   +---assets
+|       |   |       claims_example.txt
+|       |   |       forensic_answer_template.md
+|       |   |       
+|       |   +---references
+|       |   |       claim_verification.md
+|       |   |       recorded_vs_inferred.md
+|       |   |       trace_sources.md
+|       |   |       
+|       |   \---scripts
+|       |           claim_checker.py
+|       |           trace_core.py
+|       |           trace_finder.py
+|       |           trace_timeline.py
+|       |           
+|       +---agent-workflow-designer
+|       |   |   SKILL.md
+|       |   |   
+|       |   +---references
+|       |   |       workflow-patterns.md
+|       |   |       
+|       |   \---scripts
+|       |           workflow_scaffolder.py
+|       |           
+|       +---book-to-skill
+|       |   |   SKILL.md
+|       |   |   
+|       |   +---assets
+|       |   |       chapter_template.md
+|       |   |       cheatsheet_template.md
+|       |   |       master_skill_template.md
+|       |   |       
+|       |   +---references
+|       |   |       conversion_workflow.md
+|       |   |       document_extraction_pipeline.md
+|       |   |       knowledge_extraction_canon.md
+|       |   |       progressive_disclosure_budgets.md
+|       |   |       rights_and_provenance.md
+|       |   |       
+|       |   \---scripts
+|       |       |   book_skill_validator.py
+|       |       |   extract_document.py
+|       |       |   skill_plugin_emitter.py
+|       |       |   token_budget_estimator.py
+|       |       |   
+|       |       \---book_to_skill
+|       |           |   config.py
+|       |           |   dependencies.py
+|       |           |   exceptions.py
+|       |           |   sanitize.py
+|       |           |   utils.py
+|       |           |   zip_safety.py
+|       |           |   __init__.py
+|       |           |   
+|       |           \---parsers
+|       |                   calibre.py
+|       |                   docx.py
+|       |                   epub.py
+|       |                   html_text.py
+|       |                   pdf.py
+|       |                   rtf.py
+|       |                   text.py
+|       |                   __init__.py
+|       |                   
+|       +---database-designer
+|       |   |   index_optimizer.py
+|       |   |   migration_generator.py
+|       |   |   README.md
+|       |   |   schema_analyzer.py
+|       |   |   SKILL.md
+|       |   |   
+|       |   +---assets
+|       |   |       sample_query_patterns.json
+|       |   |       sample_schema.json
+|       |   |       sample_schema.sql
+|       |   |       
+|       |   +---expected_outputs
+|       |   |       index_optimization_sample.txt
+|       |   |       migration_sample.txt
+|       |   |       schema_analysis_sample.txt
+|       |   |       
+|       |   \---references
+|       |           database-design-reference.md
+|       |           database_selection_decision_tree.md
+|       |           index_strategy_patterns.md
+|       |           normalization_guide.md
+|       |           
+|       +---database-schema-designer
+|       |   |   SKILL.md
+|       |   |   
+|       |   \---references
+|       |           full-schema-examples.md
+|       |           
+|       +---deep-learning-book
+|       |   |   cheatsheet.md
+|       |   |   glossary.md
+|       |   |   patterns.md
+|       |   |   SKILL.md
+|       |   |   
+|       |   +---assets
+|       |   |       chapter_worksheet.md
+|       |   |       example_layer_spec.json
+|       |   |       study_log_template.md
+|       |   |       
+|       |   +---chapters
+|       |   |       ch01-introduction.md
+|       |   |       ch02-linear-algebra.md
+|       |   |       ch03-probability-information-theory.md
+|       |   |       ch04-numerical-computation.md
+|       |   |       ch05-machine-learning-basics.md
+|       |   |       ch06-deep-feedforward-networks.md
+|       |   |       ch07-regularization.md
+|       |   |       ch08-optimization.md
+|       |   |       ch09-convolutional-networks.md
+|       |   |       ch10-sequence-modeling.md
+|       |   |       ch11-practical-methodology.md
+|       |   |       ch12-applications.md
+|       |   |       ch13-linear-factor-models.md
+|       |   |       ch14-autoencoders.md
+|       |   |       ch15-representation-learning.md
+|       |   |       ch16-structured-probabilistic-models.md
+|       |   |       ch17-monte-carlo-methods.md
+|       |   |       ch18-partition-function.md
+|       |   |       ch19-approximate-inference.md
+|       |   |       ch20-deep-generative-models.md
+|       |   |       
+|       |   +---references
+|       |   |       book_to_2026_delta.md
+|       |   |       prerequisite_map.md
+|       |   |       rights_and_use.md
+|       |   |       study_method_canon.md
+|       |   |       
+|       |   \---scripts
+|       |           capacity_planner.py
+|       |           model_arithmetic.py
+|       |           reading_path_planner.py
+|       |           training_diagnostics.py
+|       |           
+|       +---deep-work
+|       |   |   SKILL.md
+|       |   |   
+|       |   +---assets
+|       |   |       example_time_block_plan.md
+|       |   |       shutdown_checklist.md
+|       |   |       
+|       |   +---references
+|       |   |       deep_work_canon.md
+|       |   |       shallow_work_budget.md
+|       |   |       time_blocking_method.md
+|       |   |       
+|       |   \---scripts
+|       |           focus_session_logger.py
+|       |           shallow_work_auditor.py
+|       |           time_block_planner.py
+|       |           
+|       +---engineering-advanced-skills
+|       |       SKILL.md
+|       |       
+|       +---json-canvas
+|       |   |   SKILL.md
+|       |   |   
+|       |   \---references
+|       |           EXAMPLES.md
+|       |           
+|       +---knap
+|       |       SKILL.md
+|       |       
+|       +---migration-architect
+|       |   |   README.md
+|       |   |   SKILL.md
+|       |   |   
+|       |   +---assets
+|       |   |       database_schema_after.json
+|       |   |       database_schema_before.json
+|       |   |       sample_database_migration.json
+|       |   |       sample_service_migration.json
+|       |   |       
+|       |   +---expected_outputs
+|       |   |       rollback_runbook.json
+|       |   |       rollback_runbook.txt
+|       |   |       sample_database_migration_plan.json
+|       |   |       sample_database_migration_plan.txt
+|       |   |       sample_service_migration_plan.json
+|       |   |       sample_service_migration_plan.txt
+|       |   |       schema_compatibility_report.json
+|       |   |       schema_compatibility_report.txt
+|       |   |       
+|       |   +---references
+|       |   |       data_reconciliation_strategies.md
+|       |   |       migration_patterns_catalog.md
+|       |   |       zero_downtime_techniques.md
+|       |   |       
+|       |   \---scripts
+|       |           compatibility_checker.py
+|       |           migration_planner.py
+|       |           rollback_generator.py
+|       |           
+|       +---product-research
+|       |   |   SKILL.md
+|       |   |   
+|       |   +---assets
+|       |   |       research_plan_template.md
+|       |   |       
+|       |   +---references
+|       |   |       repository_and_synthesis.md
+|       |   |       research_methods_canon.md
+|       |   |       sampling_and_saturation.md
+|       |   |       
+|       |   \---scripts
+|       |           ar_evaluator.py
+|       |           config_loader.py
+|       |           insight_synthesizer.py
+|       |           onboard.py
+|       |           saturation_planner.py
+|       |           study_designer.py
+|       |           
+|       +---research-summarizer
+|       |   |   SKILL.md
+|       |   |   
+|       |   +---references
+|       |   |       citation-formats.md
+|       |   |       summary-templates.md
+|       |   |       
+|       |   \---scripts
+|       |           extract_citations.py
+|       |           format_summary.py
+|       |           
+|       +---self-improving-agent
+|       |       SKILL.md
+|       |       
+|       +---sql-database-assistant
+|       |   |   SKILL.md
+|       |   |   
+|       |   +---references
+|       |   |       optimization_guide.md
+|       |   |       orm_patterns.md
+|       |   |       query_patterns.md
+|       |   |       
+|       |   \---scripts
+|       |           migration_generator.py
+|       |           query_optimizer.py
+|       |           schema_explorer.py
+|       |           
+|       +---ux-researcher-designer
+|       |   |   SKILL.md
+|       |   |   
+|       |   +---assets
+|       |   |       research_plan_template.md
+|       |   |       
+|       |   +---references
+|       |   |       example-personas.md
+|       |   |       journey-mapping-guide.md
+|       |   |       persona-methodology.md
+|       |   |       usability-testing-frameworks.md
+|       |   |       
+|       |   \---scripts
+|       |           persona_generator.py
+|       |           
+|       \---weekly-review
+|           |   SKILL.md
+|           |   
+|           +---assets
+|           |       example_weekly_review.md
+|           |       weekly_review_checklist.md
+|           |       
+|           +---references
+|           |       gtd_weekly_review_canon.md
+|           |       open_loop_psychology.md
+|           |       review_cadence_design.md
+|           |       
+|           \---scripts
+|                   commitment_auditor.py
+|                   open_loop_scanner.py
+|                   weekly_review_gate.py
+|                   
++---.github
+|   |   copilot-instructions.md
+|   |   
+|   +---skills
+|   |   |   DO-NOT-EDIT.md
+|   |   |   
+|   |   +---agent-memory
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       memory_schema.json
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       hook_capture_discipline.md
+|   |   |   |       promotion_gate_design.md
+|   |   |   |       tiered_memory_canon.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           memory_core.py
+|   |   |           memory_extract.py
+|   |   |           memory_inspect.py
+|   |   |           memory_promote.py
+|   |   |           validate_examples.py
+|   |   |           
+|   |   +---capture
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---references
+|   |   |   |       complexity_matching.md
+|   |   |   |       voice_preservation.md
+|   |   |   |       workspace_detection.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           complexity_estimator.py
+|   |   |           dump_classifier.py
+|   |   |           workspace_inventory.py
+|   |   |           
+|   |   +---defuddle
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---engineering-skills
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---grill-me
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---references
+|   |   |   |       companion_tooling.md
+|   |   |   |       forcing_question_patterns.md
+|   |   |   |       when_to_stop_grilling.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           decision_tree_extractor.py
+|   |   |           grill_session_tracker.py
+|   |   |           question_generator.py
+|   |   |           
+|   |   +---human-gate
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       batch.v1.schema.json
+|   |   |   |       example_review_sidecar.md
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       feedback_batching.md
+|   |   |   |       human_in_the_loop_canon.md
+|   |   |   |       review_loop_discipline.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           feedback_parser.py
+|   |   |           human_gate.py
+|   |   |           review_page_builder.py
+|   |   |           
+|   |   +---joe-keywords
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---new-start-project-framework
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---obsidian-bases
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   \---references
+|   |   |           FUNCTIONS_REFERENCE.md
+|   |   |           
+|   |   +---obsidian-cli
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---obsidian-markdown
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   \---references
+|   |   |           CALLOUTS.md
+|   |   |           EMBEDS.md
+|   |   |           PROPERTIES.md
+|   |   |           
+|   |   +---obsidian-story-record
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---pr-review-expert
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---product-skills
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       sample_discovery_log.json
+|   |   |   |       sample_ost.json
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       ai_product_evals.md
+|   |   |   |       continuous_discovery_canon.md
+|   |   |   |       product_operating_model.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           discovery_cadence_tracker.py
+|   |   |           ost_linter.py
+|   |   |           product_goal_router.py
+|   |   |           
+|   |   \---timemem-workflow
+|   |           SKILL.md
+|   |           
+|   +---skills-cold
+|   |   +---agent-protocol
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   \---references
+|   |   |           invocation-patterns.md
+|   |   |           
+|   |   +---agent-run-forensics
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       claims_example.txt
+|   |   |   |       forensic_answer_template.md
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       claim_verification.md
+|   |   |   |       recorded_vs_inferred.md
+|   |   |   |       trace_sources.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           claim_checker.py
+|   |   |           trace_core.py
+|   |   |           trace_finder.py
+|   |   |           trace_timeline.py
+|   |   |           
+|   |   +---agent-workflow-designer
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---references
+|   |   |   |       workflow-patterns.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           workflow_scaffolder.py
+|   |   |           
+|   |   +---book-to-skill
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       chapter_template.md
+|   |   |   |       cheatsheet_template.md
+|   |   |   |       master_skill_template.md
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       conversion_workflow.md
+|   |   |   |       document_extraction_pipeline.md
+|   |   |   |       knowledge_extraction_canon.md
+|   |   |   |       progressive_disclosure_budgets.md
+|   |   |   |       rights_and_provenance.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |       |   book_skill_validator.py
+|   |   |       |   extract_document.py
+|   |   |       |   skill_plugin_emitter.py
+|   |   |       |   token_budget_estimator.py
+|   |   |       |   
+|   |   |       \---book_to_skill
+|   |   |           |   config.py
+|   |   |           |   dependencies.py
+|   |   |           |   exceptions.py
+|   |   |           |   sanitize.py
+|   |   |           |   utils.py
+|   |   |           |   zip_safety.py
+|   |   |           |   __init__.py
+|   |   |           |   
+|   |   |           \---parsers
+|   |   |                   calibre.py
+|   |   |                   docx.py
+|   |   |                   epub.py
+|   |   |                   html_text.py
+|   |   |                   pdf.py
+|   |   |                   rtf.py
+|   |   |                   text.py
+|   |   |                   __init__.py
+|   |   |                   
+|   |   +---database-designer
+|   |   |   |   index_optimizer.py
+|   |   |   |   migration_generator.py
+|   |   |   |   README.md
+|   |   |   |   schema_analyzer.py
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       sample_query_patterns.json
+|   |   |   |       sample_schema.json
+|   |   |   |       sample_schema.sql
+|   |   |   |       
+|   |   |   +---expected_outputs
+|   |   |   |       index_optimization_sample.txt
+|   |   |   |       migration_sample.txt
+|   |   |   |       schema_analysis_sample.txt
+|   |   |   |       
+|   |   |   \---references
+|   |   |           database-design-reference.md
+|   |   |           database_selection_decision_tree.md
+|   |   |           index_strategy_patterns.md
+|   |   |           normalization_guide.md
+|   |   |           
+|   |   +---database-schema-designer
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   \---references
+|   |   |           full-schema-examples.md
+|   |   |           
+|   |   +---deep-learning-book
+|   |   |   |   cheatsheet.md
+|   |   |   |   glossary.md
+|   |   |   |   patterns.md
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       chapter_worksheet.md
+|   |   |   |       example_layer_spec.json
+|   |   |   |       study_log_template.md
+|   |   |   |       
+|   |   |   +---chapters
+|   |   |   |       ch01-introduction.md
+|   |   |   |       ch02-linear-algebra.md
+|   |   |   |       ch03-probability-information-theory.md
+|   |   |   |       ch04-numerical-computation.md
+|   |   |   |       ch05-machine-learning-basics.md
+|   |   |   |       ch06-deep-feedforward-networks.md
+|   |   |   |       ch07-regularization.md
+|   |   |   |       ch08-optimization.md
+|   |   |   |       ch09-convolutional-networks.md
+|   |   |   |       ch10-sequence-modeling.md
+|   |   |   |       ch11-practical-methodology.md
+|   |   |   |       ch12-applications.md
+|   |   |   |       ch13-linear-factor-models.md
+|   |   |   |       ch14-autoencoders.md
+|   |   |   |       ch15-representation-learning.md
+|   |   |   |       ch16-structured-probabilistic-models.md
+|   |   |   |       ch17-monte-carlo-methods.md
+|   |   |   |       ch18-partition-function.md
+|   |   |   |       ch19-approximate-inference.md
+|   |   |   |       ch20-deep-generative-models.md
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       book_to_2026_delta.md
+|   |   |   |       prerequisite_map.md
+|   |   |   |       rights_and_use.md
+|   |   |   |       study_method_canon.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           capacity_planner.py
+|   |   |           model_arithmetic.py
+|   |   |           reading_path_planner.py
+|   |   |           training_diagnostics.py
+|   |   |           
+|   |   +---deep-work
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       example_time_block_plan.md
+|   |   |   |       shutdown_checklist.md
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       deep_work_canon.md
+|   |   |   |       shallow_work_budget.md
+|   |   |   |       time_blocking_method.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           focus_session_logger.py
+|   |   |           shallow_work_auditor.py
+|   |   |           time_block_planner.py
+|   |   |           
+|   |   +---engineering-advanced-skills
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---json-canvas
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   \---references
+|   |   |           EXAMPLES.md
+|   |   |           
+|   |   +---knap
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---migration-architect
+|   |   |   |   README.md
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       database_schema_after.json
+|   |   |   |       database_schema_before.json
+|   |   |   |       sample_database_migration.json
+|   |   |   |       sample_service_migration.json
+|   |   |   |       
+|   |   |   +---expected_outputs
+|   |   |   |       rollback_runbook.json
+|   |   |   |       rollback_runbook.txt
+|   |   |   |       sample_database_migration_plan.json
+|   |   |   |       sample_database_migration_plan.txt
+|   |   |   |       sample_service_migration_plan.json
+|   |   |   |       sample_service_migration_plan.txt
+|   |   |   |       schema_compatibility_report.json
+|   |   |   |       schema_compatibility_report.txt
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       data_reconciliation_strategies.md
+|   |   |   |       migration_patterns_catalog.md
+|   |   |   |       zero_downtime_techniques.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           compatibility_checker.py
+|   |   |           migration_planner.py
+|   |   |           rollback_generator.py
+|   |   |           
+|   |   +---product-research
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       research_plan_template.md
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       repository_and_synthesis.md
+|   |   |   |       research_methods_canon.md
+|   |   |   |       sampling_and_saturation.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           ar_evaluator.py
+|   |   |           config_loader.py
+|   |   |           insight_synthesizer.py
+|   |   |           onboard.py
+|   |   |           saturation_planner.py
+|   |   |           study_designer.py
+|   |   |           
+|   |   +---research-summarizer
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---references
+|   |   |   |       citation-formats.md
+|   |   |   |       summary-templates.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           extract_citations.py
+|   |   |           format_summary.py
+|   |   |           
+|   |   +---self-improving-agent
+|   |   |       SKILL.md
+|   |   |       
+|   |   +---sql-database-assistant
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---references
+|   |   |   |       optimization_guide.md
+|   |   |   |       orm_patterns.md
+|   |   |   |       query_patterns.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           migration_generator.py
+|   |   |           query_optimizer.py
+|   |   |           schema_explorer.py
+|   |   |           
+|   |   +---ux-researcher-designer
+|   |   |   |   SKILL.md
+|   |   |   |   
+|   |   |   +---assets
+|   |   |   |       research_plan_template.md
+|   |   |   |       
+|   |   |   +---references
+|   |   |   |       example-personas.md
+|   |   |   |       journey-mapping-guide.md
+|   |   |   |       persona-methodology.md
+|   |   |   |       usability-testing-frameworks.md
+|   |   |   |       
+|   |   |   \---scripts
+|   |   |           persona_generator.py
+|   |   |           
+|   |   \---weekly-review
+|   |       |   SKILL.md
+|   |       |   
+|   |       +---assets
+|   |       |       example_weekly_review.md
+|   |       |       weekly_review_checklist.md
+|   |       |       
+|   |       +---references
+|   |       |       gtd_weekly_review_canon.md
+|   |       |       open_loop_psychology.md
+|   |       |       review_cadence_design.md
+|   |       |       
+|   |       \---scripts
+|   |               commitment_auditor.py
+|   |               open_loop_scanner.py
+|   |               weekly_review_gate.py
+|   |               
+|   \---workflows
+|           Check-M0-Gate.yml
+|           Check-Skills-Sync.yml
+|           
++---docs
+|   |   ARCHITECTURE.md
+|   |   DECISIONS.md
+|   |   M0-READY.md
+|   |   README.md
+|   |   REQUIREMENTS.md
+|   |   RISKS.md
+|   |   TEST-PLAN.md
+|   |   
+|   +---archive
+|   |       IMPLEMENTATION_PLAN.md
+|   |       REUSE-PROPOSAL.md
+|   |       TimeMem-PRD-V10-1.md
+|   |       
+|   +---evidence
+|   |   \---M0-REQ-006
+|   |           iphone-11-pro-about-2026-11-14.jpg
+|   |           non-tailnet-denial-lte-2026-11-14.jpg
+|   |           router-admin-upnp-2026-11-14.png
+|   |           router-ddns-2026-11-14.png
+|   |           router-dmz-2026-11-14.png
+|   |           router-firewall-2026-11-14.png
+|   |           router-range-forward-2026-11-14.png
+|   |           router-range-trigger-2026-11-14.png
+|   |           router-single-2026-11-14.png
+|   |           tailnet-success-https-2026-11-14.jpg
+|   |           tailscale-off-2026-11-14.jpg
+|   |           tailscale-on-2026-11-14.jpg
+|   |           
+|   +---prd
+|   |       TimeMem-PRD-V10-2.md
+|   |       原構思 IDEA.txt
+|   |       
+|   +---reports
+|   |       2026-11-10-m0-ready.html
+|   |       
+|   +---reviews
+|   |       INDEPENDENT-REVIEW-2026-11-14.md
+|   |       INDEPENDENT-REVIEW-2026-11-15.md
+|   |       LUNA-REVIEW-2026-11-14.md
+|   |       LUNA-REVIEW-2026-11-15.md
+|   |       SKILL-FLOW-2026-11-14.md
+|   |       
+|   \---working
+|           ERROR_LOG.md
+|           PROGRESS.md
+|           TimeMem-Home-Hub-Packaging.md
+|           TimeMem-Home-Hub-Physical-Setup.md
+|           TimeMem-Install-SOP-Lock-Version.md
+|           TimeMem-Sprint-1-Wake-Test.md
+|           TODO.md
+|           
++---reference
+|   |   Architecture.jfif
+|   |   README-HOME-HUB-OVERVIEW.md
+|   |   README.md
+|   |   Structure.jfif
+|   |   
+|   \---photo
+|       |   security.jpg
+|       |   真實故事.jpg
+|       |   
+|       \---輸入資料
+|               滑板班.jpeg
+|               
+\---scripts
+        check-all.ps1
+        check-m0-gate.ps1
+        check-skills-sync.ps1
+        Install-OneClick.ps1
+        run sync skill.txt
+        Set-Server-Lock-Simple.ps1
+        Set-Wake-Simple.ps1
+        sync-skills.ps1
+        Wake-Test-Simple.ps1
+        

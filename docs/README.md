@@ -1,47 +1,37 @@
-# TimeMem — 屋企 Home Hub
+# TimeMem 文件索引（15 份正式文件；另列本索引）
 
-**一句講晒：舊電腦翻新用，好似 ROUTER 咁，屋企長開，當一個家庭個人整合集，好似 NAS 咁，多一個長期插火牛嘅電子設備。**
-
-**定位：** 個人化工具，唔係商業賺錢產品。返返去初心，做晒 JOE 想做嘅嘢，滿意值做滿，先至開心 SHARE。商業火花有冇，到時先知。
-
-## 睇邊份？唔好睇晒成個 Folder
-
-| 想做咩 | 睇邊份 |
+| 文件 | 用途／狀態 |
 |---|---|
-| 想知做咩、做到咩標準先叫完成 | `01-PRD-最終版 / TimeMem-PRD-V10-Final.md` — 唯一最終版 |
-| 想知點裝、點 SET Server | `03-SOP / TimeMem-Install-SOP-Lock-Version.md` — Lock 版，唔使 BIOS，唔使 WOL |
-| 想知點擺部機 | `03-SOP / TimeMem-Home-Hub-Physical-Setup.md` — 左電源，右 LAN，企係度，擺喺 ROUTER 隔離 |
-| 想知點包裝俾屋企人聽 | `03-SOP / TimeMem-Home-Hub-Packaging.md` |
-| 想直接裝 | `04-Scripts / Install-OneClick.ps1` + `Set-Server-Lock-Simple.ps1` |
-| 想睇舊版、AI 意見 | `05-Archive-舊版+AI意見` — 參考用，唔好照舊版做 |
+| [DECISIONS.md](./DECISIONS.md) | Repo 正式決策紀錄；Vault `02-決策-ADR` 只保存草稿。 |
+| [ERROR_LOG.md](./ERROR_LOG.md) | 錯誤、原因、修正及避免重犯方法；M0-M6 出錯時即時記錄。 |
+| [TODO.md](./TODO.md) | 尚未完成的工作及待決事項；每個 M-step 開始前先查看。 |
+| [REQUIREMENTS.md](./REQUIREMENTS.md) | Draft 範圍、排除項目、M0 成功準則及 assumptions；反映已批准的 CR-002 / D-023。 |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | D-024 的 React / Node Gateway / Python AI-RAG / PostgreSQL + pgvector 本機目標架構；M0 範圍不變，未決細節及未實作項目標為 TBD。 |
+| [TEST-PLAN.md](./TEST-PLAN.md) | 對應需求的 unit、integration 及 manual UAT 計劃；未聲稱已測。 |
+| [RISKS.md](./RISKS.md) | M0 風險、影響、緩解方法、負責人及狀態。 |
+| [M0-READY.md](./M0-READY.md) | 六份 gate 文件狀態、review findings、驗收證據及 Joe 批核記錄；目前 Draft。 |
+| [TimeMem-PRD-V10-1.md](./TimeMem-PRD-V10-1.md) | 產品需求來源；M0 scope 依 PRD 及已批准的 CR-002 / D-023。 |
+| [PROGRESS.md](./PROGRESS.md) | 工作現況、已決定事項、待決定事項及下一步。 |
+| [TimeMem-Home-Hub-Packaging.md](./TimeMem-Home-Hub-Packaging.md) | 面向家人的 Home Hub 說明與包裝用語。 |
+| [TimeMem-Home-Hub-Physical-Setup.md](./TimeMem-Home-Hub-Physical-Setup.md) | JOE-SERVER 的實體擺位及接線參考。 |
+| [TimeMem-Install-SOP-Lock-Version.md](./TimeMem-Install-SOP-Lock-Version.md) | V10.1 Lock 版安裝 SOP；取代舊 WOL 流程。 |
+| [TimeMem-Sprint-1-Wake-Test.md](./TimeMem-Sprint-1-Wake-Test.md) | 舊 Standby/WOL 喚醒測試草稿；僅供歷史參考，與 Lock 版不一致時以現行 PRD/SOP 為準。 |
+| [原構思 IDEA.txt](./原構思%20IDEA.txt) | 最初構想及早期技術方向；歷史參考，不覆蓋現行 PRD。 |
+| [README.md](./README.md) | 本索引。 |
 
-## 10 點滿意清單，就係驗收標準
+## Archive
 
-1. 拉 PDF，20 堂一次入
-2. 問問題，3-5 秒有答案
-3. 相片自動指返 RECORD
-4. NAS / 舊電腦一鍵安裝 → 而家改做 Home Hub，舊電腦翻新用，好似 ROUTER 咁長開
-5. 備份還原一鍵
-6. 好生動嘅相片牆背景，有特效 + 卡片回顧
-7. User Friendly
-8. 人性化，廣東話、中英混合輸入層，都明白得到（信心值）
-9. 如果理解不能（信心低），就係詢問位
-10. 越用越適合我
+- [archive/IMPLEMENTATION_PLAN.md](./archive/IMPLEMENTATION_PLAN.md) — obsolete Phase 1 proposal; retained for history only, not an implementation authority.
 
-## Home Hub 正常狀況
+## 報告 Reports
 
-- 舊電腦翻新，買個架企係度，左邊插電源，右邊插 LAN 線，擺喺 ROUTER 隔離。
-- WIN+L 鎖機，或者合上蓋 = 唔做任何嘢，部機一直開住，鎖住畫面，唔使 WOL，唔使 BIOS。
-- 電話開 TimeMem，見到隨機相片 + 故事卡片，問「下一堂滑板班幾時？」3-5 秒有答案。
+- 2026-11-10 M0 準備報告 — `docs\reports\2026-11-10-m0-ready.html` — historical report only; its PASS wording is not current review evidence or M0 approval.
+- [LUNA-REVIEW-2026-11-14.md](./LUNA-REVIEW-2026-11-14.md) — Luna review handoff/repair record; explicitly pending actual Luna review and not a completed review.
+- [INDEPENDENT-REVIEW-2026-11-14.md](./INDEPENDENT-REVIEW-2026-11-14.md) — historical independent document review; not Luna Review evidence or device UAT.
 
-## Folder 結構
+## Root 檔案
 
-```
-TimeMem-整理-2026-11-09/
-├── 00-總覽 / 00-總覽-預覽卡.md (呢份)
-├── 01-PRD-最終版 / TimeMem-PRD-V10-Final.md (唯一最終版)
-├── 02-README / README.md (呢份)
-├── 03-SOP / 4 份 SOP (Lock 版 + 簡單版 + 包裝 + 物理擺位 + 舊 WOL 參考)
-├── 04-Scripts / 4 個 .ps1 (一鍵安裝 + 一鍵 SET 鎖機 + 舊 WOL 參考)
-└── 05-Archive-舊版+AI意見 / 舊 PRD / 舊 README / AI Feedback / IDEA (參考用)
-```
+- `C:\Project\TimeMem\README.md`（約 1 KB）— 成個項目的入口，介紹點入門及去邊度睇文件；開始工作時由此進入，再按連結閱讀相關文件。
+- `C:\Project\TimeMem\docs\TODO.md` — 記錄未做及做緊的工作，並標明優先級。每個 M-step 開始前先查看；完成後將事項搬到 `docs\PROGRESS.md` 作已完成記錄，同時從 TODO 剔走。TODO 只列未做，PROGRESS 只列已做，兩者不可重疊。
+- `C:\Project\TimeMem\docs\ERROR_LOG.md` — 記錄錯誤、原因、修正及避免重犯的方法。M0-M6 每次出 bug 都要即時記錄，格式為：日期 / 邊個 M-step / 錯咩 / 原因 / 點 fix / 點避免再犯。DECISIONS 記決定；ERROR_LOG 記錯誤，兩者不可混用。
+- `C:\Project\TimeMem\skills-lock.json`（約 8 KB）— Skills metadata 檔，記錄 Skill、版本及 hash；不再用於同步。只使用 `.agents/skills/`（及 `.agents/skills-cold/`）；Luna 為主要工具。`.github` 嗰套 Skills 已刪走，Sync 已於 2026-11-15 停用。

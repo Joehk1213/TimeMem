@@ -1,28 +1,31 @@
 name: check-skills-sync
 
-# TimeMem 鐵律
-# .agents/skills = Source of Truth (唯一正本)
-# .github/skills = 鏡像 (唔好手改)
-#
-# 呢個 workflow 做兩重檢查：
-# 1. 有人改咗 .agents 但唔記得 sync -> fail
-# 2. 有人直接改咗 .github 鏡像 -> fail
-#
-# 正確流程：改 .agents/skills -> npm run sync:skills -> 兩邊一齊 commit
-
 on:
   pull_request:
     paths:
-      - ".agents/skills/**"
-      - ".github/skills/**"
-      - "scripts/sync-skills.ps1"
-      - ".github/workflows/check-skills-sync.yml"
+      - ".agents/skills/obsidian-markdown/**"
+      - ".agents/skills/obsidian-bases/**"
+      - ".agents/skills/obsidian-cli/**"
+      - ".agents/skills/defuddle/**"
+      - ".github/skills/obsidian-markdown/**"
+      - ".github/skills/obsidian-bases/**"
+      - ".github/skills/obsidian-cli/**"
+      - ".github/skills/defuddle/**"
+      - "scripts/check-skills-sync.ps1"
+      - ".github/workflows/Check-Skills-Sync.yml"
   push:
     branches: [main]
     paths:
-      - ".agents/skills/**"
-      - ".github/skills/**"
-      - "scripts/sync-skills.ps1"
+      - ".agents/skills/obsidian-markdown/**"
+      - ".agents/skills/obsidian-bases/**"
+      - ".agents/skills/obsidian-cli/**"
+      - ".agents/skills/defuddle/**"
+      - ".github/skills/obsidian-markdown/**"
+      - ".github/skills/obsidian-bases/**"
+      - ".github/skills/obsidian-cli/**"
+      - ".github/skills/defuddle/**"
+      - "scripts/check-skills-sync.ps1"
+      - ".github/workflows/Check-Skills-Sync.yml"
 
 permissions:
   contents: read
@@ -33,24 +36,14 @@ concurrency:
 
 jobs:
   check:
-    name: 檢查 .github/skills 係咪最新鏡像
+    # 已停用，用家主要用 GPT-6 Luna，唔再同步去 .github，停用日期 2026-11-15
+    if: false
+    name: Check four selected repo skill mirrors
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 檢查同步狀態
+      - name: Compare selected repository skills
         shell: pwsh
-        run: ./scripts/sync-skills.ps1 -Check
-
-      - name: 再用 git diff 驗證一次
-        shell: bash
-        run: |
-          pwsh ./scripts/sync-skills.ps1
-          if ! git diff --exit-code -- .github/skills; then
-            echo "::error::❌ .github/skills 同 .agents/skills 唔同步"
-            echo "::error::請喺本地跑 npm run sync:skills，再將兩邊一齊 commit。"
-            echo "::error::唔好直接改 .github/skills，返去 .agents/skills 改。"
-            exit 1
-          fi
-          echo "✅ 已同步"
+        run: ./scripts/check-skills-sync.ps1 -RepoOnly

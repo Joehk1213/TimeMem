@@ -25,6 +25,9 @@ param(
     [switch]$Check
 )
 
+Write-Error '[DISABLED] 已停用，用家主要用 GPT-6 Luna，唔再同步去 .github，停用日期 2026-11-15' -ErrorAction Stop
+exit 1
+
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 

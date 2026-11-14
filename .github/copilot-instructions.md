@@ -1,49 +1,40 @@
-# Project Context
+# TimeMem Copilot Instructions
 
-- TimeMem is a family-first, self-hosted life and memory system. Its core purpose is reminders plus remembering family moments, grounded in the README story of a child forgetting dictation preparation.
-- The source of truth is `README.md`, `reference/PROGRESS.md`, and `reference/IMPLEMENTATION_PLAN.md`. When they conflict or leave a decision open, stop and ask; do not guess or silently resolve it.
-- Phase 1 is limited to family members and family spaces, tasks, calendar reminders, photo import and organization, Memory Time Machine, and backup export plus a proposed basic restore test pending confirmation of PROGRESS item 8. Vault documents, family finance, and RAG belong outside Phase 1.
-- Home Edition is the self-hosted, local-first direction. POC cloud services are experiments only, not Home Edition prerequisites. Do not claim a feature is offline until it has been verified.
-- Current work status is tracked in PROGRESS.md: JOE-DESKTOP is active; JOE-SERVER is OFFLINE. Do not perform or claim SERVER validation while it is offline.
-- GitHub sequence is fixed: finish and review the four foundation documents together before the first push. Do not start by syncing or pushing.
+## Project source of truth
 
-# Tech Stack - Home Edition 閉環版
+- `docs/` is the canonical source for TimeMem product and implementation decisions. Use [docs/README.md](../docs/README.md) to find the current documents.
+- `docs/TimeMem-PRD-V10-1.md` is the current product requirements document: PRD V10.1. Do not treat older drafts or archived notes as overriding it.
+- The Obsidian Vault is at `C:\Project\Obsidian-Hub\TimeMem`. It is for personal notes and daily records; repo docs remain authoritative for project decisions if the two overlap.
+- If canonical docs conflict or leave a decision open, stop and ask instead of guessing or silently resolving it.
 
-- Frontend: React, TypeScript, Vite; Tailwind CSS may be used as described in README.
-- Gateway: Node.js, Express, TypeScript; API, session handling, and family/member authorization belong at the backend.
-- Database: PostgreSQL with ordinary relational data for Phase 1. Do not add pgvector in Phase 1.
-- Photo/document files: local filesystem storage with persistent storage for self-hosted deployment. Phase 1 does not use MinIO; evaluate it later only as README describes and after review.
-- Home Edition deployment target: Docker Compose for setup and upgrades; keep family data on the household's own storage by default.
-- Python, FastAPI, LangGraph, and the AI Brain are deferred until the later RAG/assistant phase; do not start them for Phase 1.
-- Supabase, Railway, OpenRouter, or other cloud services are POC experiments or explicitly user-enabled options, never required Home Edition dependencies.
-- Do not select or promise a particular model, vector dimension, or hardware requirement before the documented target-device testing and user review.
+## Vault safety and frontmatter
 
-# Monorepo Structure
+- Never rename the Vault's numbered folders `00` through `07`.
+- Never delete existing note body content. Preserve existing material; ask before removing or replacing it.
+- Preserve existing frontmatter properties. Do not silently rename or remove properties.
+- For new notes, use valid YAML frontmatter and only the agreed properties below. Ask before adding any other property.
 
-The current repository is documentation-only; do not present future application directories as existing or scaffold them without approval.
-
-```text
-TimeMem/
-├── .github/
-│   └── copilot-instructions.md
-├── reference/
-│   ├── IMPLEMENTATION_PLAN.md
-│   └── PROGRESS.md
-└── README.md
+```yaml
+---
+title:
+date: 2026-11-10
+type: note
+status: draft
+tags: []
+related: []
+---
 ```
 
-- Obsidian notes live outside this repository under `C:\Project\Obsidian-Hub\TimeMem`.
-- When implementation structure is approved, keep the frontend, backend gateway, and deployment configuration as distinct responsibilities, following the README stack; do not change the stack or invent additional services.
-- `D:\docker-data\timemem` is available only on JOE-SERVER. It is not a desktop path and must never be added to Git.
+- `title` may be blank or contain the note title.
+- `date` uses `YYYY-MM-DD`.
+- `type` is one of `PRD`, `ADR`, `SOP`, `clipping`, or `note`.
+- `status` is one of `draft`, `in-progress`, or `done`.
+- For `clipping` notes, include `source:` in addition to the properties above.
 
-# Key Conventions
+## Skills
 
-- Scope database row-level security (RLS) by family/member and also validate authorization in the backend. UI hiding is not authorization. Do not invent child/adult or private-record policies; those remain undecided.
-- Before starting work, read `reference/PROGRESS.md` and the relevant source sections in README and IMPLEMENTATION_PLAN.
-- Do not skip to another STEP without review. At the end of every task, update PROGRESS.md and make the matching daily-note and `00-總覽.md` entries in Obsidian.
-- Do not change the stack privately. Ask before changing technologies, adding services, or expanding Phase 1.
-- Do not promise specific models or vector dimensions. Do not carry forward the legacy terms `students`, `instructors`, or `course_code`; use family/member terminology.
-- Never put passwords, tokens, secret values, or `.env` contents/files into Obsidian. Do not commit credentials or secrets.
-- Treat `D:\docker-data\timemem` as server-only persistent data, outside Git; never assume that drive exists on JOE-DESKTOP.
-- Keep cloud data flows explicit and optional. A self-hosted deployment is not automatically secure or fully offline.
-- Do not change PROGRESS.md's pending decisions unless the user explicitly asks.
+- Use `.agents/skills/` only; GPT-6 Luna is the primary tool. The `.github/skills/` and `.github/skills-cold/` copies were removed. Sync has been disabled since 2026-11-15 and must not be re-enabled without Joe's approval.
+- Do not run `scripts\sync-skills.ps1`; it is disabled and fails explicitly. The `-RepoOnly` mode of `scripts\check-skills-sync.ps1` is disabled; running it without that switch still compares repository skills with the local Vault.
+- Follow [timemem-workflow](../.agents/skills/timemem-workflow/SKILL.md) for Repo-first validation, safe Vault synchronization, Bases conventions, and secret handling.
+- The former GitHub Actions skill-mirror check is disabled; it no longer validates or synchronizes repository Skills.
+- Do not treat GitHub as a source of Skills; keep active and cold Skills in `.agents/skills/` and `.agents/skills-cold/`.

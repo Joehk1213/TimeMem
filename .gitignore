@@ -1,0 +1,34 @@
+__pycache__/
+*.pyc
+node_modules/
+.env
+.env.*
+!.env.example
+!.env.docker.example
+npm-debug.log*
+
+docs/obsidian/dt.log
+
+dt.log
+public/*.acl-backup
+run-backup.bat
+
+# Local credentials and private keys
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+
+# Original evidence
+/docs/evidence/**
+
+# Skills are maintained only in .agents for the primary Luna workflow.
+.github/skills/**
+.github/skills-cold/**
+
+# Personal data
+**/personal-data/**
+**/private-data/**
+**/*-personal-data.*

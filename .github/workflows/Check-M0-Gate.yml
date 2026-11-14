@@ -1,0 +1,24 @@
+name: M0 Gate
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  m0-gate:
+    name: M0 Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require prior M0 approval for product code
+        shell: pwsh
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.sha }}
+          HEAD_REF: ${{ github.event.pull_request.head.sha }}
+        run: ./scripts/check-m0-gate.ps1 -BaseRef $env:BASE_REF -HeadRef $env:HEAD_REF

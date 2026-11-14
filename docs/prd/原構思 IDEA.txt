@@ -1,0 +1,122 @@
+我想做一個 Project
+
+家居總管全能系統
+佢可以幫我做到
+VECTOR DB 
+RAG SEARCH 
+彈出提醒事項
+日曆行事紀錄
+TO DO LIST
+
+相片收納
+證書收納
+證件收納
+財務收納
+財務統計
+財務分析
+
+記憶回顧 random  (時,人,地,事,相片) 背景相片 隨機移動 隨機放大縮少 
+mouse 放上去相片時停低 並彈出 記憶回顧(卡片頁)就睇可以到 mouse 離開時 還原 隨機移動 隨機放大縮少
+
+(智能家居總管 + 個人知識庫 + 財務管理 + 記憶時光機) + （兼有超有感覺嘅相片互動效果）
+
+因為我確信我會develop完後 必定會拎黎做我必用既工具前提下
+考慮到將來可以複製 落每個家庭上~~ 我會想planning埋 提前往商業考量上如何上架收費呢~~ 如何包裝吸引位呢
+
+中文名：時光管家
+英文名：TimeMem
+主 Slogan：守護每一刻時光
+英文 Slogan：Remember what matters.
+
+## Overview
+故事起因係 小朋友 放完長假期後 第二日返學 忘記左 要默書
+所以想自家制一個 家居總管全能系統 再引申各種想做到既功能 ALL IT ONE
+重點係要 self host 
+初步係做黎for自己家庭用
+再引申開去 有冇可能可以 複製到俾人使用呢 繼而付費呢
+
+難處
+如果要推上貨架收費 要解決幾個問題
+我只負責 前台後台 application db 如果要self host 自己own 需要user 自己 負責 db 
+(因為初心係security concern 唔想上cloud 所有資料 閉環 *selling point) 咁就一定安全啦 資料唔會外洩
+
+
+## Tech Stack
+- **Frontend**: React 19 + Vite + Tailwind CSS v4 + TypeScript (port 3000)
+- **Gateway**: Node.js 20 + Express + TypeScript + Supabase Auth (port 3001)
+- **AI Brain**: Python 3.11 + FastAPI + LangGraph (port 8000)
+- **Database**: Supabase (PostgreSQL + pgvector + JSONB) — Free tier for POC
+- **AI Model**: OpenRouter (POC) → TBC (production)
+- **Embedding**: qwen/qwen3-embedding-8b (4096 dimensions)
+- **Deployment**: Railway (3 services) + GitHub Actions CI/CD
+
+## Monorepo Structure
+```
+frontend/    — React app (components/, pages/, contexts/, hooks/, lib/, types/)
+gateway/     — Express API gateway (routes/, middleware/, services/, types/)
+ai-brain/    — Python FastAPI + LangGraph (api/, agents/, ingestion/, rag/, models/, core/)
+supabase/    — Database migrations and seed data
+shared/      — API contracts shared across services
+reference/   — Design docs, implementation plan, progress tracker
+```
+
+## Key Conventions
+- Gateway is TypeScript (not JavaScript)
+- AI Brain uses Pydantic models for all data schemas
+- LangGraph StateGraphs for all agent orchestration
+- Supabase RLS enforces access control (students see own data, instructors see course_code-scoped data)
+- Agent traces (JSONB) must accompany every AI response
+- "Intent over Syntax" — grading prioritizes logic correctness over prompt wording
+
+## Build & Run
+- Local dev: `docker compose up` (starts all 3 services + network)
+- Frontend: `cd frontend && npm run dev`
+- Gateway: `cd gateway && npm run dev`
+- AI Brain: `cd ai-brain && uvicorn app.main:app --reload`
+
+## Reference Documents
+- `reference/IMPLEMENTATION_PLAN.md` — Full phased plan with steps, files, and dependencies
+- `reference/PROGRESS.md` — Step-level progress tracker, error log, cost tracking
+- `reference/*.md` — Original design/requirements documents
+
+## Important
+- Always check `reference/PROGRESS.md` before starting work to know current state
+- Update `reference/PROGRESS.md` after completing any implementation step
+- Log errors and solutions in the Error Log section of PROGRESS.md
+
+實施環境
+
+兩部 FUJITSU LIFEBOOK U9311X
+分別係
+JOE-DESKTOP (WINDOW10)= 跟身開發機，淨係得C:
+C:\Project\TimeMem (同一個GITHUB REPO SYNC)
+C:\Project\Obsidian-Hub (DESIGN FOR 俾人睇既)
+
+JOE-SERVER (WINDOW11) = 放係屋企 暫時未7*24運作 用先開機，有C: & D:，係用嚟 self-host真DB
+C:\Project\TimeMem (同一個GITHUB REPO SYNC)
+D: Self Host DB
+family memory私人家事RAG（會用local embedding砌vector DB）
+
+D:\
+├── docker-data\
+│   ├──timemem (唔同PROJECT)
+│   │   ├── docker-compose
+│   │   ├── pgdata
+│   │   └── model
+│   │
+│   └──XXXXXX (唔同PROJECT)
+│       ├── docker-compose
+│       ├── pgdata
+│       └── XXXXXXX
+│
+└── 有需要再加 (你可建議)
+
+兩部機硬件一樣
+•  處理器：11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz 2.80 GHz 
+•  已安裝記憶體 (RAM)：16.0 GB (15.6 GB 可用) 
+•  顯示卡：Intel(R) Iris(R) Xe Graphics (128 MB) 
+•  儲存體：477 GB NVMe Micron_MTFDHBA51 (已使用 170 GB / 477 GB)
+
+用GITHUB 互相FILE SYNC
+POE DB 係 Supabase cloud 
+
