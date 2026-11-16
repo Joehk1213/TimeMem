@@ -6,7 +6,7 @@
 
 ## 口號
 
-**TimeMem — 拒絕月費、拒絕雲鎖定、打破屋企資料壟斷、免費 AI 屋企助手。**
+**Remember what matters。**
 
 ## 係咩
 

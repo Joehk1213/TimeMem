@@ -1,42 +1,103 @@
 ---
 name: obsidian-story-record
-description: "Use after major TimeMem decisions, Skill or file moves, archives, renames, document changes, or M0 status changes to write a readable, evidence-based daily Obsidian story with clear approval scope and named files."
+description: "After major TimeMem decisions or project changes, write one concise, evidence-based daily Obsidian story with clear approval scope and readable details."
 ---
 
 # Obsidian Story Record
 
-After a major TimeMem decision or project change, maintain one concise daily story note using evidence that persists across sessions. Each update replaces today's summary with a deduplicated rewrite; it must not append another running log or make the file grow over the day. This is a narrative record, not a product database or a place to make decisions.
+維護一日一篇 Story。每次更新都要由證據重新整理成完整一篇，先去重再重寫，唔好追加流水帳，亦唔好越寫越長。呢篇係俾人快速睇明白今日做過乜，唔係產品資料庫。
 
-## Procedure
+## 做之前
 
-1. Determine today's local date and the relevant project repository and Vault roots. For TimeMem, use repository `C:\Project\TimeMem` and Vault `C:\Project\Obsidian-Hub\TimeMem`.
-2. Locate `C:\Project\Obsidian-Hub\TimeMem\TimeMem-Story`. Create this folder if it does not exist. Before editing, read today's existing Markdown note, identified by its `YYYY-MM-DD-` filename prefix.
-3. Check cross-session file evidence in the project repository:
-   - Run `git status --short` from the repository root and identify staged, unstaged, and untracked paths.
-   - Run `git log --since="<local-day-start>" --until="<next-day-start>" --name-status --format=` with local-time boundaries, so files changed in today's commits are included as well as uncommitted work.
-   - For non-secret paths, establish which changes are from today using the status, commit records, and available timestamps. Inspect relevant diffs or changed files only when needed to understand the change. If a path's date or purpose is unclear, do not claim it as today's work.
-   - For `.env`, `.env.docker`, `Secrets-Backup`, and any file known or suspected to contain secrets, inspect filenames/status only. Never open, read, or diff those files; do not include secret values.
-4. Check the relevant project Vault for files created today. For TimeMem, inspect file metadata under `C:\Project\Obsidian-Hub\TimeMem`; identify today's new files and inspect only relevant project materials needed to understand their changes. For `.env`, `.env.docker`, `Secrets-Backup`, and any file known or suspected to contain secrets, inspect filenames/metadata only; never open, read, or diff them. Do not alter other Vault files or record secrets.
-5. Reconcile today's story with the repository status, today's commit file list, today's new Vault files, and non-secret project files changed during this run (excluding the story note itself). These are the only evidence sources for story claims. Use the existing story only to identify and merge duplicates; it is not evidence and must not verify or perpetuate a claim by itself. Do not infer events, decisions, or completed work from chat alone. Record only major events: decisions, Skills opened, created, edited, moved, archived, or renamed, substantive document changes, and M0 status. Skill moves, archiving, and renames are major events; record them with the Skill/file names and destinations. Do not record minutiae such as file searches, routine command runs, or inspection steps.
-6. Before drafting, check the allowed evidence sources for today's confirmed decisions, Skill changes, and changes to `docs/DECISIONS.md`, `docs/ARCHITECTURE.md`, or `docs/M0-READY.md`. If there is no confirmed decision, no Skill change, and none of those three documents changed today, write `今日無大事`; do not force the 200-300-character length or invent events to fill space.
-7. If today's note exists, consolidate overlapping or repeated information and rewrite the day's summary in place; do not append. If none exists, create one named `YYYY-MM-DD-短標題.md`. Keep the filename short and make the frontmatter `title` match the filename stem exactly, excluding `.md`. If the existing title and filename differ, rename the same daily note and update its title; never create a duplicate.
-8. Use exactly these three sections, in this order:
+1. 用本機日期確認今日日期，格式係 `YYYY-MM-DD`。TimeMem Repo 根目錄係 `C:\Project\TimeMem`，Story Vault 係 `C:\Project\Obsidian-Hub\TimeMem\TimeMem-Story`。
+2. 只喺 Story 資料夾入面搵同處理 Story。唔好開、讀、改其他 Vault 檔；為確認今日有冇新檔，只可睇其他 Vault 檔嘅名稱同建立日期，唔好讀內容。
+3. 檢查今日 Story，同時核對檔名日期、frontmatter `date` 同本機今日日期，三樣必須完全一致。檔名格式係 `YYYY-MM-DD-短標題.md`。`title` 必須逐字等於檔名（唔計 `.md`），唔可以多字、少字或有空格差別。
+4. frontmatter `title` 係機器檢查用，必須逐字等於檔名（唔計 `.md`），所以會包含日期；正文第一行另用 H1 寫俾人睇嘅短標題，唔好有日期。兩者用途唔同，唔好混為一談。
+5. 如果檔名日期唔係今日，但證據顯示內容係今日嘅 Story，唔好另開一篇；將原本嗰篇改名做今日檔名，並更新 frontmatter `title` 同 `date`，之後確認今日只得一篇。任何其他日期、frontmatter `title` 或檔名對唔上，都唔好自行另開、靜靜改名或當作通過；停低話俾 Joe 知。
+6. 如果發現同一日期有兩篇或以上 Story，保留檔名日期同今日一致嗰篇；唔好刪、搬走或清理其他嗰篇，話俾 Joe 知有重複。只有 Joe 指示後先可以處理其他副本。
+7. 建立或更新前先確認 Story 資料夾存在；唔存在先建立該資料夾。只可建立或改今日嗰篇 Story，唔好改其他 Vault 檔。
 
-   ```markdown
-   ## 今日總結
-   - 決定：...（說清決定內容，補一點必要背景）
-   - 結果：...（說清具體結果，補一點必要背景）
+## 證據同保護範圍
 
-   ## 今日做咗咩
-   - [File/Skill name]: [What specifically changed.]
+- Repo 證據只包括：Repo 入面嘅 `git status --short`、本地日界線內嘅 `git log --name-status`，以及 Vault 今日新檔嘅名稱同建立日期。用本機時間界定今日；只檢查理解事件所需嘅非敏感 Repo 內容。
+- Joe 親自驗證嘅 Server、PWA、T-005 等 Repo 以外嘅事，要明確標成「Joe 親自喺 Server 驗證」或相應位置。要有 Joe 親自驗證嘅明確確認先可以寫，唔好由對話、測試結果或 Repo 證據推斷成 Joe 驗證；亦唔好將呢類事寫成 Repo 證據。
+- 唔好靠一般對話估事件、決定、結果或驗證。Joe 明確講自己親自驗證咗乜，只能支持該項個人驗證，唔可以取代 Repo 證據。
+- 對 `.env`、`.env.*`、Secrets-Backup 同任何已知或懷疑有秘密嘅檔，只可睇名稱或 Git 狀態；絕對唔好開、讀、比較或抄內容，亦唔好記錄秘密。
+- 唔好用舊 Story 證明任何事；只可用佢去重。唔好將 Story 本身計入今日 Repo 改動。唔好寫程式、跑遷移、改其他 Vault 檔、commit 或 push。
+- M0 一律保持 Draft、未批；只有 Joe 親自明確批准 M0，先可以寫成已批。清晒 TBD、通過檢查、完成 Review 或批咗其他項目，都唔代表 M0 已批。寫批核時要講清楚 Joe 批咗邊樣，唔可以淨係寫「已批准」。
 
-   ## 下一步
-   - [The next meaningful action, or state that no next step is confirmed.]
-   ```
+## 幾時寫「今日無大事」
 
-   Keep exactly three sections in both cases, with a blank line before and after each heading. When `今日無大事` applies, use that phrase in the first section, leave the event list empty, and state there is no confirmed next step unless evidence shows one. Otherwise, write the first section as point form, not a prose paragraph. Use one bullet per major decision or result; each point must clearly state the decision or result and include a little necessary context, not just a bare label. When describing approval, name exactly what was approved; for example, write `批咗 CR-002，M0 仲未批`, not a bare `已批准` that could imply M0 approval. Do not repeat equivalent statuses or statements in another section; for example, do not separately say both `M0 gate 保持 Draft` and `M0 未獲批准`. The summary normally contains 200-300 Chinese characters; if there are more than three major items, it may extend to 350 characters. Do not delete a major item just to stay within 300 characters; shorten explanations first. Do not impose a sentence count. The summary covers only high-level decisions and outcomes; do not put next steps there.
+寫之前要一併查今日決定、Skill 變動、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md`、`docs/M0-READY.md`、Server、PWA 同 T-005 嘅有效證據。只有全部都無重大事件，先可以寫「今日無大事」。其中 Server、PWA、T-005 無 Repo 證據時，只可按 Joe 親自驗證嘅明確確認判斷；無確認唔好當作驗證過或當成無大事。唔好只因為三份文件或 Repo 無變，就寫「今日無大事」。
 
-   The second section is the detailed event list. For each major event, name the specific changed file or Skill using only its short basename or Skill slug, such as `DECISIONS.md` or `joe-keywords`; never put an absolute or full repository path in the story. State what changed, not only a count. For a bulk Skill move, archive, or rename, include the names and destination/status, grouping related names into short bullets as needed. Give each distinct file/Skill change its own concise bullet. Keep each rendered bullet to at most two lines; split a long point into shorter points without repeating its meaning. Use Chinese commas and colons consistently, end sentences with Chinese full stops, and keep English terms and capitalization consistent (for example `M0`, `PWA`, `Tailnet`, `Skill`, `Draft`, `Approved`, `Critical`, and `Major`). These details must complement, not copy, the summary. Put the next step only in the third section. Keep all sections simple and clear; merge repeated events instead of repeating them, and rewrite the full daily summary so updates do not make the file progressively longer. Do not add extra sections.
-9. Change only today's story note; leave all other Vault notes untouched. Do not include passwords, API keys, `.env` contents, or other secrets. Do not write product code, run migrations, or commit changes as part of this record task.
-10. Never describe M0 as approved unless Joe's explicit final approval is confirmed. Clearing TBDs, passing checks, or completing reviews alone is not approval.
-11. Verify the note has exactly the three required sections and its frontmatter title matches the filename stem. If the no-major-event condition applies, confirm the first section says `今日無大事`, no filler was added, and the length rule was waived. Otherwise, confirm the first section is point form with one adequately descriptive major decision or result per bullet, normally 200-300 characters and up to 350 when there are more than three major items; do not omit a major item merely to meet 300. Confirm approval wording names the approved object and does not imply M0 approval. Check that meanings and statuses are not repeated. In the second section, verify major Skill moves, archives, and renames are recorded; each major changed file or Skill is named and its change is described, rather than represented only by a count; paths are short; punctuation is consistent; and no bullet exceeds two rendered lines. The third section contains the next step only. Confirm every claim is supported by today's `git status`, today's `git log`, today's new Vault files, or relevant non-secret project files changed during this run. The existing story may be used only for deduplication, never as evidence. Confirm secret files were not opened or diffed and no other Vault note was changed.
+## 故事格式
+
+Properties 只留 `title` 同 `date`；Story 唔好有 `type`、`status`、`tags` 或 `related`。將 Properties 收埋或摺埋，令 End User 一打開就見到正文 H1。frontmatter `title` 只用嚟檢查，唔係俾人睇嘅標題；正文第一行 H1 先係俾人睇嘅短標題，唔好有日期。
+
+```markdown
+---
+title: 2026-11-14-Repo整理同邀請Sir
+date: YYYY-MM-DD
+---
+
+# Repo整理同邀請Sir
+
+<H1 後第一句口語總結，最多 60 字；講今日做咗乜、結果同 M0 批未批。唔好有檔名、提交編號或術語。>
+
+## 今日總結
+- 決定：...
+- 結果：...
+- 狀態：...
+- 證據：...
+- 批核：...
+
+## 今日做咗咩
+
+### Repo 執咗咩
+- ...
+- ...
+
+### 邀請同批核相關
+- ...
+- ...
+
+### 仲有咩未搞掂
+- ...
+- ...
+
+## 下一步
+- Sir：...
+- Joe：...
+
+## 想睇先開
+<details>
+<summary>改咗邊啲檔，想睇先開</summary>
+
+- ...
+
+</details>
+```
+
+### 寫作規則
+
+- 正文第一行係俾 End User 睇嘅 H1 短標題，唔好有日期；Properties 要收埋或摺埋，等打開就先見到 H1。frontmatter `title` 則要包含日期並逐字等於檔名（唔計 `.md`），只用嚟做檢查。
+- H1 後面第一句係口語一句，最多 60 個字，End User 5 秒內睇得明。要講今日做咗乜、結果點，同 M0 批咗未；唔好放檔名、提交編號或術語。
+- 「今日總結」固定五點，標籤同順序必須係「決定、結果、狀態、證據、批核」；批核係最後一點，單獨一點，唔好同其他內容痴埋。總結全文 200–350 字；唔好寫下一步、檔名、提交編號，亦唔好用未解釋嘅 A類、B類、C類。用人話，例如「而家用緊嘅文件」、「以前嘅紀錄」。同一個狀態只講一次，例如唔好重複寫 M0 係 Draft 同 M0 未批。無大事時仍按五點格式寫清楚證據同狀態，唔好用空白或虛構事件湊字數。
+- 「今日做咗咩」只用指定三個小標題。每個標題下面寫 2–3 點；每點最多 140 字，要講做咗乜，唔好淨係寫數。冇事件嗰類用一點講明「今日無相關變動」，唔好加料。一次過搬、封存或改名超過 5 個項目，合併成一點，寫數量同 2–3 個例子，唔好逐個列。唔好重複同一句狀態或做法。
+- 檔名同路徑唔好塞入故事正文清單；只將需要讀者打開嘅檔案名稱放喺最底「想睇先開」摺疊區。唔需要列嘅檔唔好硬加。Repo 證據、Joe 親自驗證要清楚分開；檔案清單唔可以取代證據描述。
+- 「下一步」逐項講明邊個做咩，只用「Sir：...」或「Joe：...」呢類格式；唔好寫「等 Sir」。無證據支持下一步就明確寫「未有確認下一步」，唔好自行安排。
+- 用講嘢口語，例如「做咗、改咗、留返」；避免「記錄、修正、註記」等文件字眼。唔好寫唔應該寫嘅內容，亦唔好寫任何秘密。
+
+## 更新同核對
+
+1. 對照 Repo 證據、今日 Vault 新檔 metadata，同 Joe 親自驗證嘅項目，分清楚來源。只保留有證據嘅重大事件；將今日內容合併去重，成篇重寫，唔好追加舊稿。保留未批 M0 嘅狀態，除非 Joe 親自明確批准。
+2. 寫完逐項核對以下標準，唔好用「兩行」等估唔到嘅條件：
+   - 只建立或更新今日一篇；檔名日期、`date`、本機今日日期一致，frontmatter `title` 同檔名（唔計 `.md`）逐字一致並包含日期；正文第一行 H1 係唔含日期嘅短標題。
+   - Properties 只有 `title`、`date`，而且已收埋或摺埋；正文 H1 後第一句最多 60 字，包含今日所做、結果、M0 批核狀態，冇檔名、提交編號或術語。
+   - 今日總結剛好 5 點，標籤及順序正確、批核獨立並排最後，總長 200–350 字，無下一步、檔名、提交編號、未解釋分類或重複狀態。
+   - 今日做咗咩有齊 3 個指定小標題，每個 2–3 點，每點不超過 140 字；大量搬、封存、改名有合併規則；無重複事件。
+   - Repo 證據同 Joe 親自驗證分開；Joe 驗證有明確來源。檢查「今日無大事」之前已包括決定、Skill、三份指定文件、Server、PWA、T-005。
+   - 下一步每項寫明 Sir 或 Joe 同佢要做嘅事；檔名清單只喺文末摺疊區。
+   - M0 未有 Joe 親自明確批准就係 Draft、未批；批准句子點名批咗邊樣。
+   - 無開敏感檔，無改其他 Vault 檔，無把無證據嘅對話當成事實。
+3. 若發現同一日期有重複 Story 或任何日期、frontmatter `title` 同檔名對唔上，按「做之前」嘅改名及重複檔規則處理；唔好另開新檔、靜靜改名（只有「內容係今日但檔名日期錯」嘅指定改名情況除外）、刪檔或假裝通過。
