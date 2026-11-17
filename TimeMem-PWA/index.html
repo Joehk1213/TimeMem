@@ -26,7 +26,7 @@
       --遮罩色: rgba(24, 32, 40, 0.28);
       --介面字體: system-ui, sans-serif;
       --字元字體: ui-monospace, SFMono-Regular, Consolas, monospace;
-      --背景鯊魚透明度: 1;
+      --背景鯊魚透明度: 0.68;
       --記憶卡透明面: rgba(255, 255, 255, 0.22);
       --輸入聚焦底色: #F8FAFC;
       --標題大小: 1.5rem;
@@ -710,7 +710,7 @@
 
     @media (max-width: 760px) {
       :root {
-        --背景鯊魚透明度: 1;
+        --背景鯊魚透明度: 0.68;
       }
 
       .site-header {
@@ -991,30 +991,71 @@ markFish(t){let{fishStamp:n,fishBuckets:e,sharkFlag:s}=this,h=++this.frameId;for
 
     function createTimeMemSharks(canvas) {
       const organismKinds = ["orca", "dolphin", "manta", "turtle", "whale", "swordfish", "classic"];
-      const usedSizes = new Set();
-      const organismOptions = organismKinds.map(function (kind) {
-        let size;
-        do {
-          size = randomBetween(1, 3);
-        } while (usedSizes.has(size));
-        usedSizes.add(size);
-        return { kind: kind, size: size };
-      });
-      for (let index = organismOptions.length - 1; index > 0; index--) {
-        const swapIndex = Math.floor(Math.random() * (index + 1));
-        const option = organismOptions[index];
-        organismOptions[index] = organismOptions[swapIndex];
-        organismOptions[swapIndex] = option;
+      const minimumSharks = 3;
+      const maximumSharks = 8;
+      const organismCount = Math.floor(Math.random() * (maximumSharks - minimumSharks + 1)) + minimumSharks;
+      const organisms = [];
+      for (let index = 0; index < organismCount; index++) {
+        organisms.push({
+          kind: organismKinds[Math.floor(Math.random() * organismKinds.length)],
+          size: randomBetween(1, 3)
+        });
       }
-      const organismCount = Math.floor(Math.random() * 4) + 3;
-      const organisms = organismOptions.slice(0, organismCount);
       const world = new TimeMemSharks.World(organisms, 0);
       const renderer = new TimeMemSharks.AsciiRenderer(canvas);
+      const opacityByDepth = new Map();
+      const shadeFactorByDepth = new Map();
+      const modifiedShadeCells = [];
+      const originalShadeValues = [];
+      const drawSharks = renderer.drawSharks.bind(renderer);
+      renderer.drawSharks = function () {
+        const context = renderer.ctx;
+        const originalFillRect = context.fillRect;
+        const originalAlpha = context.globalAlpha;
+        const flags = renderer.sharkFlag;
+        const shades = renderer.sharkShade;
+        for (let index = 0; index < flags.length; index++) {
+          if (!flags[index]) {
+            continue;
+          }
+          const factor = shadeFactorByDepth.get(renderer.sharkDepth[index]) || 1;
+          if (factor === 1) {
+            continue;
+          }
+          const shade = shades[index];
+          modifiedShadeCells.push(index);
+          originalShadeValues.push(shade);
+          shades[index] = Math.max(0, Math.min(1, shade * factor));
+        }
+        context.fillRect = function (x, y, width, height) {
+          const column = Math.floor(x / renderer.cellWidth);
+          const row = Math.floor(y / renderer.cellHeight);
+          const cellIndex = row * renderer.cols + column;
+          const depth = renderer.sharkDepth[cellIndex];
+          context.globalAlpha = originalAlpha * (opacityByDepth.get(depth) || 1);
+          originalFillRect.call(context, x, y, width, height);
+        };
+        try {
+          drawSharks();
+        } finally {
+          context.fillRect = originalFillRect;
+          context.globalAlpha = originalAlpha;
+          for (let index = 0; index < modifiedShadeCells.length; index++) {
+            shades[modifiedShadeCells[index]] = originalShadeValues[index];
+          }
+          modifiedShadeCells.length = 0;
+          originalShadeValues.length = 0;
+        }
+      };
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const resizeObserver = new ResizeObserver(resizeWorld);
       const fixedStep = 1 / 60;
       const simulationSpeed = 2;
       const maxStepsPerFrame = Math.ceil(0.1 * simulationSpeed / fixedStep);
+      let nextSpawnAt = randomBetween(3, 8);
+      let nextEdgeTransitAt = randomBetween(4, 8);
+      let nextMutationCheckAt = 5 * simulationSpeed;
+      let mutateNextIncoming = false;
       let frameHandle = 0;
       let lastFrameTime = 0;
       let accumulator = 0;
@@ -1066,23 +1107,1035 @@ markFish(t){let{fishStamp:n,fishBuckets:e,sharkFlag:s}=this,h=++this.frameId;for
         });
       }
 
+      function shiftWorld(dx, dy) {
+        world.sharks.forEach(function (shark) {
+          const nodes = shark.nodes;
+          for (let index = 0; index < nodes.length; index += 2) {
+            nodes[index] += dx;
+            nodes[index + 1] += dy;
+          }
+          shark.roamX += dx;
+          shark.roamY += dy;
+        });
+        world.fish.forEach(function (fish) {
+          fish.x += dx;
+          fish.y += dy;
+        });
+        world.noSwimZones.forEach(function (zone) {
+          zone.left += dx;
+          zone.right += dx;
+          zone.top += dy;
+          zone.bottom += dy;
+        });
+        world.pointer.x += dx;
+        world.pointer.y += dy;
+        world.events.forEach(function (event) {
+          event.x += dx;
+          event.y += dy;
+        });
+      }
+
+      function stepWithExitSpace(delta) {
+        const width = world.width;
+        const height = world.height;
+        const paddingX = width;
+        const paddingY = height;
+        shiftWorld(paddingX, paddingY);
+        world.width = width + paddingX * 2;
+        world.height = height + paddingY * 2;
+        try {
+          world.step(delta);
+        } finally {
+          shiftWorld(-paddingX, -paddingY);
+          world.width = width;
+          world.height = height;
+        }
+      }
+
+      function createIncomingShark() {
+        const kind = organismKinds[Math.floor(Math.random() * organismKinds.length)];
+        const size = randomBetween(1, 3);
+        const incomingWorld = new TimeMemSharks.World([{ kind: kind, size: size }], 0);
+        incomingWorld.resize(world.width, world.height, renderer.cellWidth, renderer.cellHeight);
+        const shark = incomingWorld.sharks[0];
+        const side = Math.floor(Math.random() * 4);
+        const headX = side === 0 ? -shark.length
+          : side === 1 ? world.width + shark.length
+            : randomBetween(world.width * 0.1, world.width * 0.9);
+        const headY = side === 2 ? -shark.length
+          : side === 3 ? world.height + shark.length
+            : randomBetween(world.height * 0.1, world.height * 0.9);
+        const heading = side === 0 ? 0
+          : side === 1 ? Math.PI
+            : side === 2 ? Math.PI / 2
+              : -Math.PI / 2;
+        const nodes = shark.nodes;
+        const segmentLength = shark.length / (nodes.length / 2 - 1);
+        shark.id = world.sharks.reduce(function (nextId, current) {
+          return Math.max(nextId, current.id + 1);
+        }, 1);
+        shark.heading = heading;
+        shark.speed = randomBetween(18, 30);
+        shark.pace = randomBetween(0.9, 2.2) / simulationSpeed;
+        shark.phase = randomBetween(0, Math.PI * 2);
+        shark.turn = 0;
+        shark.wander = 0;
+        shark.hunger = randomBetween(0.25, 0.75);
+        shark.target = null;
+        shark.retargetAt = world.time + randomBetween(2, 5);
+        shark.roamX = randomBetween(world.width * 0.1, world.width * 0.9);
+        shark.roamY = randomBetween(world.height * 0.1, world.height * 0.9);
+        shark.roamAt = world.time + randomBetween(8, 16);
+        shark.exitAt = world.time + randomBetween(15, 35);
+        shark.isExiting = false;
+        shark.isEntering = true;
+        shark.isEdgeSpawned = true;
+        shark.edgeEntrySide = side;
+        for (let index = 0; index < nodes.length; index += 2) {
+          const segment = index / 2;
+          nodes[index] = headX - Math.cos(heading) * segmentLength * segment;
+          nodes[index + 1] = headY - Math.sin(heading) * segmentLength * segment;
+        }
+        shark.depth = randomBetween(0.35, 1);
+        shark.visualOpacity = randomBetween(0.45, 1);
+        shark.targetVisualOpacity = shark.visualOpacity;
+        shark.shadeFactor = randomBetween(0.8, 2.5);
+        shark.targetShadeFactor = shark.shadeFactor;
+        shark.baseLength = shark.length;
+        shark.visualScale = 1;
+        shark.targetVisualScale = 1;
+        shark.appliedVisualScale = 1;
+        const depth = Math.fround(shark.depth);
+        opacityByDepth.set(depth, shark.visualOpacity);
+        shadeFactorByDepth.set(depth, shark.shadeFactor);
+        if (mutateNextIncoming) {
+          mutateNextIncoming = false;
+          return convertIncomingSharkToEdgeTransit(shark);
+        }
+        return shark;
+      }
+
+      function getEdgeTransitPoint(side, margin) {
+        return {
+          x: side === 0 ? -margin
+            : side === 1 ? world.width + margin
+              : randomBetween(0, world.width),
+          y: side === 2 ? -margin
+            : side === 3 ? world.height + margin
+              : randomBetween(0, world.height)
+        };
+      }
+
+      function getEdgeTransitActionPoint() {
+        return {
+          x: randomBetween(world.width * 0.25, world.width * 0.75),
+          y: randomBetween(world.height * 0.25, world.height * 0.75)
+        };
+      }
+
+      function getNextEdgeTransitSide(excludedSide, previousSide) {
+        const availableSides = [0, 1, 2, 3].filter(function (side) {
+          return side !== excludedSide && side !== previousSide;
+        });
+        return availableSides[Math.floor(Math.random() * availableSides.length)];
+      }
+
+      function convertIncomingSharkToEdgeTransit(shark) {
+        const startX = shark.nodes[0];
+        const startY = shark.nodes[1];
+        const startHeading = shark.heading;
+        const startSide = shark.edgeEntrySide;
+        const endSide = -1;
+        const end = getEdgeTransitActionPoint();
+        const duration = randomBetween(1, 3) * simulationSpeed;
+        const pauseEnabled = Math.random() < 0.4;
+        const transit = {
+          startX: startX,
+          startY: startY,
+          endX: end.x,
+          endY: end.y,
+          endSide: endSide,
+          originSide: startSide,
+          legEndsAtEdge: false,
+          startHeading: startHeading,
+          startTime: world.time,
+          duration: duration,
+          progress: 0,
+          pathLength: 0,
+          speed: 0,
+          actionsTotal: Math.floor(randomBetween(3, 6)),
+          actionsCompleted: 0,
+          actionMode: null,
+          actionStartedAt: 0,
+          actionDuration: 0,
+          pendingEndX: 0,
+          pendingEndY: 0,
+          pendingEndSide: -1,
+          pauseEnabled: pauseEnabled,
+          pauseProgress: pauseEnabled ? randomBetween(0.25, 0.75) : 0,
+          pauseDuration: pauseEnabled ? randomBetween(0.4, 0.8) * simulationSpeed : 0,
+          pauseTriggered: false,
+          isPaused: false,
+          pauseX: 0,
+          pauseY: 0,
+          pauseHeading: startHeading,
+          pauseStartedAt: 0
+        };
+        Object.assign(transit, createSpeedVariationState(world.time));
+        createEdgeTransitPath(transit, startHeading, shark.length);
+        transit.speed = transit.pathLength / duration;
+        shark.edgeTransit = transit;
+        shark.isEntering = false;
+        shark.isExiting = false;
+        shark.isEdgeSpawned = false;
+        shark.speed = 0;
+        shark.pace = 0;
+        shark.hunger = 0;
+        shark.target = null;
+        shark.swimMotion = null;
+        setEdgeTransitPosition(shark, transit, 0);
+        return shark;
+      }
+
+      function createEdgeTransitShark() {
+        const kind = organismKinds[Math.floor(Math.random() * organismKinds.length)];
+        const size = randomBetween(1, 3);
+        const transitWorld = new TimeMemSharks.World([{ kind: kind, size: size }], 0);
+        transitWorld.resize(world.width, world.height, renderer.cellWidth, renderer.cellHeight);
+        const shark = transitWorld.sharks[0];
+        const actionsTotal = Math.floor(randomBetween(3, 6));
+        const startSide = Math.floor(Math.random() * 4);
+        const margin = shark.length;
+        const start = getEdgeTransitPoint(startSide, margin);
+        const endSide = -1;
+        const end = getEdgeTransitActionPoint();
+        const startX = start.x;
+        const startY = start.y;
+        const endX = end.x;
+        const endY = end.y;
+        const heading = Math.atan2(endY - startY, endX - startX);
+        const duration = randomBetween(1, 3) * simulationSpeed;
+        const pauseEnabled = Math.random() < 0.4;
+        shark.id = world.sharks.reduce(function (nextId, current) {
+          return Math.max(nextId, current.id + 1);
+        }, 1);
+        shark.heading = heading;
+        shark.speed = 0;
+        shark.pace = 0;
+        shark.hunger = 0;
+        shark.target = null;
+        shark.isEntering = false;
+        shark.isExiting = false;
+        const transit = {
+          startX: startX,
+          startY: startY,
+          endX: endX,
+          endY: endY,
+          endSide: endSide,
+          originSide: startSide,
+          legEndsAtEdge: false,
+          startHeading: heading,
+          startTime: world.time,
+          duration: duration,
+          progress: 0,
+          pathLength: 0,
+          speed: 0,
+          actionsTotal: actionsTotal,
+          actionsCompleted: 0,
+          actionMode: null,
+          actionStartedAt: 0,
+          actionDuration: 0,
+          pendingEndX: 0,
+          pendingEndY: 0,
+          pendingEndSide: -1,
+          pauseEnabled: pauseEnabled,
+          pauseProgress: pauseEnabled ? randomBetween(0.25, 0.75) : 0,
+          pauseDuration: pauseEnabled ? randomBetween(0.4, 0.8) * simulationSpeed : 0,
+          pauseTriggered: false,
+          isPaused: false,
+          pauseX: 0,
+          pauseY: 0,
+          pauseHeading: heading,
+          pauseStartedAt: 0
+        };
+        Object.assign(transit, createSpeedVariationState(world.time));
+        createEdgeTransitPath(transit, heading, shark.length);
+        transit.speed = transit.pathLength / duration;
+        shark.edgeTransit = transit;
+        setEdgeTransitPosition(shark, transit, 0);
+        shark.depth = randomBetween(0.35, 1);
+        shark.visualOpacity = randomBetween(0.45, 1);
+        shark.targetVisualOpacity = shark.visualOpacity;
+        shark.shadeFactor = randomBetween(0.8, 2.5);
+        shark.targetShadeFactor = shark.shadeFactor;
+        shark.baseLength = shark.length;
+        shark.visualScale = 1;
+        shark.targetVisualScale = 1;
+        shark.appliedVisualScale = 1;
+        const depth = Math.fround(shark.depth);
+        opacityByDepth.set(depth, shark.visualOpacity);
+        shadeFactorByDepth.set(depth, shark.shadeFactor);
+        return shark;
+      }
+
+      function replaceExitedSharks() {
+        for (let index = world.sharks.length - 1; index >= 0; index--) {
+          const shark = world.sharks[index];
+          const nodes = shark.nodes;
+          let minX = Infinity;
+          let maxX = -Infinity;
+          let minY = Infinity;
+          let maxY = -Infinity;
+          for (let node = 0; node < nodes.length; node += 2) {
+            minX = Math.min(minX, nodes[node]);
+            maxX = Math.max(maxX, nodes[node]);
+            minY = Math.min(minY, nodes[node + 1]);
+            maxY = Math.max(maxY, nodes[node + 1]);
+          }
+          const overlapsViewport = maxX >= 0 && minX <= world.width && maxY >= 0 && minY <= world.height;
+          if (shark.isEntering) {
+            if (overlapsViewport) {
+              shark.isEntering = false;
+              shark.exitAt = world.time + randomBetween(15, 35);
+              if (shark.isEdgeSpawned && shark.swimMotion) {
+                shark.swimMotion.nextDartAt = world.time + randomBetween(0.3, 1.2);
+              }
+            }
+            continue;
+          }
+          if (shark.isExiting && (maxX < 0 || minX > world.width || maxY < 0 || minY > world.height)) {
+            const residentCount = world.sharks.filter(function (candidate) {
+              return !candidate.edgeTransit;
+            }).length;
+            if (residentCount > minimumSharks) {
+              opacityByDepth.delete(Math.fround(shark.depth));
+              shadeFactorByDepth.delete(Math.fround(shark.depth));
+              world.sharks.splice(index, 1);
+            } else {
+              shark.isExiting = false;
+              shark.isEntering = true;
+              shark.exitAt = world.time + randomBetween(8, 16);
+              shark.hunger = 0;
+              shark.target = null;
+              shark.roamX = randomBetween(world.width * 0.1, world.width * 0.9);
+              shark.roamY = randomBetween(world.height * 0.1, world.height * 0.9);
+              shark.roamAt = world.time + randomBetween(4, 8);
+            }
+          }
+        }
+      }
+
+      function updateSharkPopulation() {
+        if (world.time < nextSpawnAt) {
+          return;
+        }
+        nextSpawnAt = world.time + randomBetween(3, 8);
+        if (world.sharks.length < maximumSharks) {
+          world.sharks.push(createIncomingShark());
+        }
+      }
+
+      function updateRandomFishMutationCheck() {
+        if (world.time < nextMutationCheckAt) {
+          return;
+        }
+        nextMutationCheckAt = world.time + 5 * simulationSpeed;
+        if (Math.random() < 1 / 3) {
+          mutateNextIncoming = true;
+        }
+      }
+
+      function updateEdgeTransitPopulation() {
+        if (world.time < nextEdgeTransitAt) {
+          return;
+        }
+        nextEdgeTransitAt = world.time + randomBetween(4, 8);
+        if (world.sharks.length < maximumSharks) {
+          world.sharks.push(createEdgeTransitShark());
+        }
+      }
+
+      function getEdgeTransitPointOnPath(transit, progress) {
+        const t = Math.max(0, Math.min(1, progress));
+        if (!transit.pathSamples || transit.pathSamples.length < 2) {
+          return getEdgeTransitRawPoint(transit, t);
+        }
+        const targetDistance = t * transit.pathLength;
+        let low = 0;
+        let high = transit.pathSamples.length - 1;
+        while (low + 1 < high) {
+          const middle = Math.floor((low + high) / 2);
+          if (transit.pathSamples[middle].distance < targetDistance) {
+            low = middle;
+          } else {
+            high = middle;
+          }
+        }
+        const start = transit.pathSamples[low];
+        const end = transit.pathSamples[high];
+        const span = end.distance - start.distance;
+        const blend = span > 0 ? (targetDistance - start.distance) / span : 0;
+        return {
+          x: start.x + (end.x - start.x) * blend,
+          y: start.y + (end.y - start.y) * blend
+        };
+      }
+
+      function getEdgeTransitRawPoint(transit, progress) {
+        const t = Math.max(0, Math.min(1, progress));
+        const inverse = 1 - t;
+        const baseX = inverse * inverse * inverse * transit.startX
+          + 3 * inverse * inverse * t * transit.controlX1
+          + 3 * inverse * t * t * transit.controlX2
+          + t * t * t * transit.endX;
+        const baseY = inverse * inverse * inverse * transit.startY
+          + 3 * inverse * inverse * t * transit.controlY1
+          + 3 * inverse * t * t * transit.controlY2
+          + t * t * t * transit.endY;
+        const sine = Math.sin(Math.PI * t);
+        const taper = sine * sine;
+        let shape = 0;
+        if (transit.routeType === "S") {
+          shape = Math.sin(Math.PI * 2 * t) * taper;
+        } else if (transit.routeType === "U") {
+          shape = taper;
+        } else if (transit.routeType === "W") {
+          shape = Math.sin(Math.PI * 4 * t) * taper;
+        } else if (transit.routeType === "Z") {
+          const transition = Math.max(0, Math.min(1, (t - 0.2) / 0.6));
+          const smoothTransition = transition * transition * (3 - 2 * transition);
+          shape = (1 - 2 * smoothTransition) * taper;
+        }
+        const offset = shape * transit.routeAmplitude * transit.routeSign;
+        return {
+          x: baseX + transit.routeNormalX * offset,
+          y: baseY + transit.routeNormalY * offset
+        };
+      }
+
+      function createEdgeTransitPath(transit, startHeading, sharkLength) {
+        const dx = transit.endX - transit.startX;
+        const dy = transit.endY - transit.startY;
+        const distance = Math.hypot(dx, dy);
+        const endHeading = Math.atan2(dy, dx);
+        const controlDistance = Math.min(distance * 0.42, Math.max(sharkLength * 1.5, distance * 0.2));
+        const normalHeading = endHeading + Math.PI / 2;
+        transit.controlX1 = transit.startX + Math.cos(startHeading) * controlDistance;
+        transit.controlY1 = transit.startY + Math.sin(startHeading) * controlDistance;
+        transit.controlX2 = transit.endX - Math.cos(endHeading) * controlDistance;
+        transit.controlY2 = transit.endY - Math.sin(endHeading) * controlDistance;
+        transit.routeType = ["S", "U", "W", "Z"][Math.floor(Math.random() * 4)];
+        transit.routeSign = Math.random() < 0.5 ? -1 : 1;
+        transit.routeAmplitude = Math.min(
+          distance * 0.2,
+          Math.min(world.width, world.height) * randomBetween(0.12, 0.28)
+        );
+        transit.routeNormalX = Math.cos(normalHeading);
+        transit.routeNormalY = Math.sin(normalHeading);
+        const samples = [];
+        let pathLength = 0;
+        let previousPoint = null;
+        for (let index = 0; index <= 96; index++) {
+          const point = getEdgeTransitRawPoint(transit, index / 96);
+          if (previousPoint) {
+            pathLength += Math.hypot(point.x - previousPoint.x, point.y - previousPoint.y);
+          }
+          samples.push({
+            x: point.x,
+            y: point.y,
+            distance: pathLength
+          });
+          previousPoint = point;
+        }
+        transit.pathSamples = samples;
+        transit.pathLength = pathLength;
+      }
+
+      function getEdgeTransitHeading(transit, progress) {
+        const t = Math.max(0, Math.min(1, progress));
+        const before = getEdgeTransitPointOnPath(transit, Math.max(0, t - 0.005));
+        const after = getEdgeTransitPointOnPath(transit, Math.min(1, t + 0.005));
+        const dx = after.x - before.x;
+        const dy = after.y - before.y;
+        return Math.atan2(dy, dx);
+      }
+
+      function setEdgeTransitPosition(shark, transit, progress) {
+        const head = getEdgeTransitPointOnPath(transit, progress);
+        const heading = getEdgeTransitHeading(transit, progress);
+        const nodes = shark.nodes;
+        const segmentLength = shark.length / (nodes.length / 2 - 1);
+        const transitionNodes = transit.transitionNodes;
+        const transitionBlend = transitionNodes ? smoothStep(progress / 0.16) : 1;
+        shark.heading = heading;
+        for (let node = 0; node < nodes.length; node += 2) {
+          const segment = node / 2;
+          const nodeProgress = progress - segment * segmentLength / transit.pathLength;
+          let nodeX;
+          let nodeY;
+          if (nodeProgress < 0) {
+            const distanceBehindStart = -nodeProgress * transit.pathLength;
+            nodeX = transit.startX - Math.cos(transit.startHeading) * distanceBehindStart;
+            nodeY = transit.startY - Math.sin(transit.startHeading) * distanceBehindStart;
+          } else {
+            const point = getEdgeTransitPointOnPath(transit, nodeProgress);
+            nodeX = point.x;
+            nodeY = point.y;
+          }
+          nodes[node] = transitionNodes
+            ? transitionNodes[node] + (nodeX - transitionNodes[node]) * transitionBlend
+            : nodeX;
+          nodes[node + 1] = transitionNodes
+            ? transitionNodes[node + 1] + (nodeY - transitionNodes[node + 1]) * transitionBlend
+            : nodeY;
+        }
+        nodes[0] = head.x;
+        nodes[1] = head.y;
+        if (progress >= 0.16) {
+          transit.transitionNodes = null;
+        }
+      }
+
+      function configureEdgeTransitPause(transit) {
+        transit.pauseEnabled = Math.random() < 0.4;
+        transit.pauseProgress = transit.pauseEnabled ? randomBetween(0.25, 0.75) : 0;
+        transit.pauseDuration = transit.pauseEnabled ? randomBetween(0.4, 0.8) * simulationSpeed : 0;
+        transit.pauseTriggered = false;
+        transit.isPaused = false;
+      }
+
+      function startNextEdgeTransitLeg(shark, transit) {
+        const transitionNodes = new Float32Array(shark.nodes);
+        transit.startX = transit.endX;
+        transit.startY = transit.endY;
+        transit.startHeading = transit.pendingStartHeading;
+        transit.endX = transit.pendingEndX;
+        transit.endY = transit.pendingEndY;
+        transit.endSide = transit.pendingEndSide;
+        transit.legEndsAtEdge = Number.isInteger(transit.pendingEndSide);
+        transit.startTime = world.time;
+        transit.progress = 0;
+        transit.duration = randomBetween(1, 3) * simulationSpeed;
+        createEdgeTransitPath(transit, transit.startHeading, shark.length);
+        transit.speed = transit.pathLength / transit.duration;
+        transit.transitionNodes = transitionNodes;
+        transit.actionMode = null;
+        shark.orbitAction = null;
+        shark.speed = 0;
+        shark.pace = 0;
+        configureEdgeTransitPause(transit);
+        setEdgeTransitPosition(shark, transit, 0);
+      }
+
+      function finishEdgeTransitLeg(index, shark, transit) {
+        transit.actionsCompleted++;
+        if (transit.actionsCompleted >= transit.actionsTotal) {
+          opacityByDepth.delete(Math.fround(shark.depth));
+          shadeFactorByDepth.delete(Math.fround(shark.depth));
+          world.sharks.splice(index, 1);
+          return;
+        }
+        setEdgeTransitPosition(shark, transit, 1);
+        const nextIsFinalLeg = transit.actionsCompleted + 1 >= transit.actionsTotal;
+        let nextEnd;
+        let nextSide = -1;
+        if (nextIsFinalLeg) {
+          nextSide = getNextEdgeTransitSide(
+            transit.originSide,
+            Number.isInteger(transit.endSide) ? transit.endSide : -1
+          );
+          nextEnd = getEdgeTransitPoint(nextSide, shark.length);
+        } else {
+          nextEnd = getEdgeTransitActionPoint();
+        }
+        transit.pendingEndX = nextEnd.x;
+        transit.pendingEndY = nextEnd.y;
+        transit.pendingEndSide = nextSide;
+        transit.pendingStartHeading = getEdgeTransitHeading(transit, 1);
+        const actionRoll = Math.random();
+        if (actionRoll < 0.3) {
+          transit.actionMode = "rest";
+          transit.actionStartedAt = world.time;
+          transit.actionDuration = randomBetween(3, 6) * simulationSpeed;
+          setEdgeTransitPosition(shark, transit, 1);
+        } else if (actionRoll < 0.55) {
+          transit.actionMode = "orbit";
+          transit.actionStartedAt = world.time;
+          shark.orbitAction = createOrbitAction(shark, world.time);
+          transit.actionDuration = shark.orbitAction.duration;
+          shark.speed = 0;
+          shark.pace = 0;
+        } else {
+          startNextEdgeTransitLeg(shark, transit);
+        }
+      }
+
+      function updateEdgeTransits(delta) {
+        for (let index = world.sharks.length - 1; index >= 0; index--) {
+          const shark = world.sharks[index];
+          const transit = shark.edgeTransit;
+          if (!transit) {
+            continue;
+          }
+          updateSpeedVariation(transit, world.time);
+          if (transit.actionMode === "rest") {
+            setEdgeTransitPosition(shark, transit, 1);
+            if (world.time - transit.actionStartedAt >= transit.actionDuration) {
+              startNextEdgeTransitLeg(shark, transit);
+            }
+            continue;
+          }
+          if (transit.actionMode === "orbit") {
+            if (world.time - transit.actionStartedAt >= transit.actionDuration) {
+              startNextEdgeTransitLeg(shark, transit);
+            }
+            continue;
+          }
+          if (transit.isPaused) {
+            if (world.time - transit.pauseStartedAt < transit.pauseDuration) {
+              setEdgeTransitPosition(shark, transit, transit.pauseProgress);
+              continue;
+            }
+            let endSide = -1;
+            let end;
+            if (transit.legEndsAtEdge) {
+              endSide = getNextEdgeTransitSide(transit.originSide, transit.endSide);
+              end = getEdgeTransitPoint(endSide, shark.length);
+            } else {
+              end = getEdgeTransitActionPoint();
+            }
+            const transitionNodes = new Float32Array(shark.nodes);
+            transit.startX = transit.pauseX;
+            transit.startY = transit.pauseY;
+            transit.endX = end.x;
+            transit.endY = end.y;
+            transit.endSide = endSide;
+            transit.startHeading = transit.pauseHeading;
+            transit.transitionNodes = transitionNodes;
+            createEdgeTransitPath(transit, transit.startHeading, shark.length);
+            transit.startTime = world.time;
+            transit.duration = transit.pathLength / transit.speed;
+            transit.progress = 0;
+            transit.pauseTriggered = true;
+            transit.isPaused = false;
+            continue;
+          }
+          transit.progress = Math.min(
+            1,
+            transit.progress + delta * transit.speedFactor / transit.duration
+          );
+          const progress = transit.progress;
+          if (transit.pauseEnabled && !transit.pauseTriggered && progress >= transit.pauseProgress && progress < 1) {
+            const pausePoint = getEdgeTransitPointOnPath(transit, transit.pauseProgress);
+            transit.pauseX = pausePoint.x;
+            transit.pauseY = pausePoint.y;
+            transit.pauseHeading = getEdgeTransitHeading(transit, transit.pauseProgress);
+            transit.pauseStartedAt = world.time;
+            transit.isPaused = true;
+            setEdgeTransitPosition(shark, transit, transit.pauseProgress);
+            continue;
+          }
+          if (progress >= 1) {
+            finishEdgeTransitLeg(index, shark, transit);
+            continue;
+          }
+          setEdgeTransitPosition(shark, transit, progress);
+        }
+      }
+
+      function restoreSwimBends() {
+        world.sharks.forEach(function (shark) {
+          const motion = shark.swimMotion;
+          if (!motion) {
+            return;
+          }
+          const nodes = shark.nodes;
+          for (let index = 2; index < nodes.length; index += 2) {
+            nodes[index] -= motion.offsets[index];
+            nodes[index + 1] -= motion.offsets[index + 1];
+          }
+          motion.offsets.fill(0);
+        });
+      }
+
+      function restoreVisualSizes() {
+        world.sharks.forEach(function (shark) {
+          const scale = shark.appliedVisualScale || 1;
+          if (scale === 1 || !shark.baseLength) {
+            return;
+          }
+          const nodes = shark.nodes;
+          const headX = nodes[0];
+          const headY = nodes[1];
+          for (let index = 2; index < nodes.length; index += 2) {
+            nodes[index] = headX + (nodes[index] - headX) / scale;
+            nodes[index + 1] = headY + (nodes[index + 1] - headY) / scale;
+          }
+          shark.length = shark.baseLength;
+          shark.appliedVisualScale = 1;
+        });
+      }
+
+      function applyVisualSizes() {
+        world.sharks.forEach(function (shark) {
+          const scale = shark.visualScale || 1;
+          if (!shark.baseLength || scale === 1) {
+            return;
+          }
+          const nodes = shark.nodes;
+          const headX = nodes[0];
+          const headY = nodes[1];
+          for (let index = 2; index < nodes.length; index += 2) {
+            nodes[index] = headX + (nodes[index] - headX) * scale;
+            nodes[index + 1] = headY + (nodes[index + 1] - headY) * scale;
+          }
+          shark.length = shark.baseLength * scale;
+          shark.appliedVisualScale = scale;
+        });
+      }
+
+      function getBurstPulse(motion, time) {
+        if (time < motion.burstStart || time >= motion.burstUntil) {
+          return 0;
+        }
+        const progress = (time - motion.burstStart) / (motion.burstUntil - motion.burstStart);
+        const envelope = Math.sin(progress * Math.PI);
+        return envelope * envelope;
+      }
+
+      function smoothStep(value) {
+        const progress = Math.max(0, Math.min(1, value));
+        return progress * progress * (3 - 2 * progress);
+      }
+
+      function createSpeedVariationState(time) {
+        return {
+          speedFactor: 1,
+          speedFrom: 1,
+          speedTarget: 1,
+          speedChangeStart: time,
+          speedChangeEnd: time,
+          nextSpeedChangeAt: time + randomBetween(2, 5) * simulationSpeed
+        };
+      }
+
+      function updateSpeedVariation(state, time) {
+        const transition = state.speedChangeEnd > state.speedChangeStart
+          ? (time - state.speedChangeStart) / (state.speedChangeEnd - state.speedChangeStart)
+          : 1;
+        state.speedFactor = state.speedFrom
+          + (state.speedTarget - state.speedFrom) * smoothStep(transition);
+        if (time >= state.nextSpeedChangeAt) {
+          state.speedFrom = state.speedFactor;
+          state.speedTarget = randomBetween(0.65, 1.45);
+          state.speedChangeStart = time;
+          state.speedChangeEnd = time + randomBetween(0.8, 1.6) * simulationSpeed;
+          state.nextSpeedChangeAt = time + randomBetween(2, 5) * simulationSpeed;
+        }
+        return state.speedFactor;
+      }
+
+      function createOrbitAction(shark, time) {
+        const direction = Math.random() < 0.5 ? -1 : 1;
+        return {
+          startTime: time,
+          duration: randomBetween(2, 4) * simulationSpeed,
+          turns: Math.floor(randomBetween(1, 3)),
+          direction: direction,
+          radius: Math.min(
+            Math.max(shark.length * 0.8, 16),
+            Math.min(world.width, world.height) * 0.12
+          ),
+          baseNodes: null,
+          baseHeading: shark.heading,
+          centerX: 0,
+          centerY: 0,
+          startAngle: 0
+        };
+      }
+
+      function restoreSwimOrbits() {
+        world.sharks.forEach(function (shark) {
+          const orbit = shark.orbitAction;
+          if (!orbit || !orbit.baseNodes) {
+            return;
+          }
+          shark.nodes.set(orbit.baseNodes);
+          shark.heading = orbit.baseHeading;
+        });
+      }
+
+      function applySwimOrbits() {
+        world.sharks.forEach(function (shark) {
+          const orbit = shark.orbitAction;
+          if (!orbit) {
+            return;
+          }
+          if (!orbit.baseNodes) {
+            orbit.baseNodes = new Float32Array(shark.nodes);
+            orbit.baseHeading = shark.heading;
+            orbit.startAngle = orbit.baseHeading - orbit.direction * Math.PI / 2;
+            orbit.centerX = shark.nodes[0] - Math.cos(orbit.startAngle) * orbit.radius;
+            orbit.centerY = shark.nodes[1] - Math.sin(orbit.startAngle) * orbit.radius;
+          }
+          const progress = Math.max(0, Math.min(1, (world.time - orbit.startTime) / orbit.duration));
+          const blend = Math.min(smoothStep(progress / 0.12), smoothStep((1 - progress) / 0.12));
+          const angle = orbit.startAngle + orbit.direction * Math.PI * 2 * orbit.turns * progress;
+          const nodes = shark.nodes;
+          const segmentLength = shark.length / (nodes.length / 2 - 1);
+          for (let index = 0; index < nodes.length; index += 2) {
+            const segment = index / 2;
+            const nodeAngle = angle - orbit.direction * segmentLength * segment / orbit.radius;
+            const circleX = orbit.centerX + Math.cos(nodeAngle) * orbit.radius;
+            const circleY = orbit.centerY + Math.sin(nodeAngle) * orbit.radius;
+            nodes[index] = orbit.baseNodes[index]
+              + (circleX - orbit.baseNodes[index]) * blend;
+            nodes[index + 1] = orbit.baseNodes[index + 1]
+              + (circleY - orbit.baseNodes[index + 1]) * blend;
+          }
+          if (blend > 0.01) {
+            shark.heading = angle + orbit.direction * Math.PI / 2;
+          }
+        });
+      }
+
+      function chooseMotionProfile() {
+        const roll = Math.random();
+        if (roll < 0.7) {
+          return {
+            mode: "cruise",
+            idlePace: randomBetween(0.72, 1.08),
+            phaseSpeed: randomBetween(0.35, 0.8),
+            burstGain: randomBetween(0.25, 0.65),
+            pauseChance: 0.03,
+            pauseMin: 0.25,
+            pauseMax: 0.6,
+            burstMin: 0.7,
+            burstMax: 1.2,
+          };
+        }
+        if (roll < 0.9) {
+          return {
+            mode: "drift",
+            idlePace: randomBetween(0.32, 0.58),
+            phaseSpeed: randomBetween(0.15, 0.4),
+            burstGain: randomBetween(1.2, 2),
+            pauseChance: 0.18,
+            pauseMin: 0.5,
+            pauseMax: 1.2,
+            burstMin: 0.8,
+            burstMax: 1.4,
+          };
+        }
+        return {
+          mode: "rest-burst",
+          idlePace: randomBetween(0, 0.12),
+          phaseSpeed: randomBetween(0, 0.16),
+          burstGain: randomBetween(2.4, 3.2),
+          pauseChance: 0.38,
+          pauseMin: 1,
+          pauseMax: 2.1,
+          burstMin: 0.9,
+          burstMax: 1.7,
+        };
+      }
+
+      function updateSwimMotion(delta) {
+        const time = world.time;
+        const residentCount = world.sharks.filter(function (shark) {
+          return !shark.edgeTransit;
+        }).length;
+        let exitingCount = world.sharks.filter(function (shark) {
+          return !shark.edgeTransit && shark.isExiting;
+        }).length;
+        world.sharks.forEach(function (shark) {
+          if (shark.edgeTransit) {
+            return;
+          }
+          if (!shark.isExiting && !shark.isEntering && time >= shark.exitAt) {
+            if (residentCount - exitingCount > minimumSharks) {
+              const exitSide = Math.floor(Math.random() * 4);
+              shark.isExiting = true;
+              exitingCount++;
+              shark.roamX = exitSide === 0 ? -world.width
+                : exitSide === 1 ? world.width * 2
+                  : randomBetween(world.width * 0.1, world.width * 0.9);
+              shark.roamY = exitSide === 2 ? -world.height
+                : exitSide === 3 ? world.height * 2
+                  : randomBetween(world.height * 0.1, world.height * 0.9);
+              shark.roamAt = Infinity;
+              shark.target = null;
+            } else {
+              shark.exitAt = time + randomBetween(5, 12);
+            }
+          }
+          if (shark.isExiting) {
+            shark.hunger = 0;
+          }
+          if (!shark.swimMotion) {
+            const profile = chooseMotionProfile();
+            shark.swimMotion = Object.assign({
+              phase: randomBetween(0, Math.PI * 2),
+              nextAction: time + randomBetween(2, 5),
+              nextDartAt: time + randomBetween(4, 12),
+              dartStart: 0,
+              dartUntil: 0,
+              dartGain: 1,
+              burstStart: 0,
+              burstUntil: 0,
+              pauseUntil: 0,
+              basePace: shark.pace,
+              offsets: new Float32Array(shark.nodes.length)
+            }, createSpeedVariationState(time), profile);
+          }
+          const motion = shark.swimMotion;
+          if (shark.orbitAction && time - shark.orbitAction.startTime >= shark.orbitAction.duration) {
+            shark.orbitAction = null;
+          }
+          if (time >= motion.nextAction && time >= motion.pauseUntil && !shark.orbitAction) {
+            Object.assign(motion, chooseMotionProfile());
+            shark.targetVisualScale = randomBetween(0.9, 1.1);
+            shark.targetVisualOpacity = randomBetween(0.45, 1);
+            shark.targetShadeFactor = randomBetween(0.8, 2.5);
+            motion.pauseUntil = Math.random() < motion.pauseChance
+              ? time + randomBetween(motion.pauseMin, motion.pauseMax)
+              : time;
+            motion.burstStart = motion.pauseUntil;
+            motion.burstUntil = motion.burstStart + randomBetween(motion.burstMin, motion.burstMax);
+            motion.nextAction = time + randomBetween(2, 5);
+            if (Math.random() < 0.08) {
+              motion.pauseUntil = time + randomBetween(3, 6) * simulationSpeed;
+              motion.burstStart = motion.pauseUntil;
+              motion.burstUntil = motion.burstStart + randomBetween(motion.burstMin, motion.burstMax);
+              motion.nextAction = motion.pauseUntil + randomBetween(2, 5) * simulationSpeed;
+            } else if (Math.random() < 0.08) {
+              shark.orbitAction = createOrbitAction(shark, time);
+              motion.nextAction = time + shark.orbitAction.duration + randomBetween(2, 5) * simulationSpeed;
+            }
+          }
+          const speedFactor = updateSpeedVariation(motion, time);
+          if (!shark.isExiting && !shark.isEntering && !shark.orbitAction && time >= motion.pauseUntil && time >= motion.nextDartAt) {
+            motion.nextDartAt = time + (shark.isEdgeSpawned ? randomBetween(2, 5) : randomBetween(4, 10));
+            const dartChance = shark.isEdgeSpawned ? 0.9 : 0.35;
+            if (Math.random() < dartChance) {
+              const isEdgeDash = shark.isEdgeSpawned;
+              motion.dartStart = time;
+              motion.dartUntil = time + randomBetween(isEdgeDash ? 0.9 : 0.7, isEdgeDash ? 1.6 : 1.4);
+              motion.dartGain = randomBetween(isEdgeDash ? 2.6 : 1.8, isEdgeDash ? 3.5 : 3);
+              motion.pauseUntil = Math.min(motion.pauseUntil, time);
+              const headX = shark.nodes[0];
+              const headY = shark.nodes[1];
+              const canExitDuringDart = shark.isEdgeSpawned
+                && headX >= 0 && headX <= world.width
+                && headY >= 0 && headY <= world.height
+                && residentCount - exitingCount > minimumSharks;
+              if (canExitDuringDart) {
+                let exitSide = shark.edgeEntrySide;
+                if (!Number.isInteger(exitSide)) {
+                  const exitDistances = [headX, world.width - headX, headY, world.height - headY];
+                  exitSide = 0;
+                  for (let side = 1; side < exitDistances.length; side++) {
+                    if (exitDistances[side] < exitDistances[exitSide]) {
+                      exitSide = side;
+                    }
+                  }
+                }
+                shark.roamX = exitSide === 0 ? -world.width
+                  : exitSide === 1 ? world.width * 2
+                    : headX;
+                shark.roamY = exitSide === 2 ? -world.height
+                  : exitSide === 3 ? world.height * 2
+                    : headY;
+                shark.roamAt = Infinity;
+                shark.target = null;
+                shark.isExiting = true;
+                shark.hunger = 0;
+                exitingCount++;
+                shark.isEdgeSpawned = false;
+              } else {
+                shark.roamX = randomBetween(world.width * 0.08, world.width * 0.92);
+                shark.roamY = randomBetween(world.height * 0.08, world.height * 0.92);
+                shark.roamAt = motion.dartUntil;
+              }
+            }
+          }
+          const paused = time < motion.pauseUntil || !!shark.orbitAction;
+          const burstPulse = getBurstPulse(motion, time);
+          const dartPulse = getBurstPulse({
+            burstStart: motion.dartStart,
+            burstUntil: motion.dartUntil
+          }, time);
+          shark.pace = paused ? 0 : motion.basePace * Math.min(
+            3.2,
+            motion.idlePace + burstPulse * motion.burstGain + dartPulse * motion.dartGain
+          ) * speedFactor;
+          if (paused) {
+            shark.speed = 0;
+          }
+          motion.phase += delta * (paused ? 0 : motion.phaseSpeed + burstPulse * 5.2 + dartPulse * 3.5);
+          const blend = Math.min(1, delta * 1.5);
+          shark.visualScale += (shark.targetVisualScale - shark.visualScale) * blend;
+          shark.visualOpacity += (shark.targetVisualOpacity - shark.visualOpacity) * blend;
+          shark.shadeFactor += (shark.targetShadeFactor - shark.shadeFactor) * blend;
+          const depth = Math.fround(shark.depth);
+          opacityByDepth.set(depth, shark.visualOpacity);
+          shadeFactorByDepth.set(depth, shark.shadeFactor);
+        });
+      }
+
+      function applySwimBends() {
+        world.sharks.forEach(function (shark) {
+          const motion = shark.swimMotion;
+          if (!motion) {
+            return;
+          }
+          const nodes = shark.nodes;
+          const headX = nodes[0];
+          const headY = nodes[1];
+          const sideX = -Math.sin(shark.heading);
+          const sideY = Math.cos(shark.heading);
+          const burstPulse = getBurstPulse(motion, world.time);
+          const amplitude = Math.min(20, shark.length * (0.01 + burstPulse * 0.075));
+          const lastNode = nodes.length - 2;
+          for (let index = 2; index <= lastNode; index += 2) {
+            const progress = index / lastNode;
+            const wave = progress * amplitude * Math.sin(motion.phase - progress * Math.PI * 2);
+            const offsetX = sideX * wave;
+            const offsetY = sideY * wave;
+            nodes[index] = headX + (nodes[index] - headX) + offsetX;
+            nodes[index + 1] = headY + (nodes[index + 1] - headY) + offsetY;
+            motion.offsets[index] = offsetX;
+            motion.offsets[index + 1] = offsetY;
+          }
+        });
+      }
+
       function resizeWorld() {
         const bounds = canvas.getBoundingClientRect();
         if (bounds.width < 1 || bounds.height < 1) {
           return;
         }
+        restoreSwimBends();
+        restoreVisualSizes();
         const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
         renderer.resize(bounds.width, bounds.height, pixelRatio);
         world.resize(bounds.width, bounds.height, renderer.cellWidth, renderer.cellHeight);
         if (!sharkSpeedsAssigned && world.sharks.length) {
-          const usedSpeedMultipliers = new Set();
           world.sharks.forEach(function (shark) {
-            let speedMultiplier;
-            do {
-              speedMultiplier = randomBetween(1, 2.2);
-            } while (usedSpeedMultipliers.has(speedMultiplier));
-            usedSpeedMultipliers.add(speedMultiplier);
-            shark.pace = speedMultiplier / simulationSpeed;
+            shark.pace = randomBetween(0.9, 2.2) / simulationSpeed;
+            shark.exitAt = world.time + randomBetween(15, 35);
+            shark.depth = randomBetween(0.35, 1);
+            shark.visualOpacity = randomBetween(0.45, 1);
+            shark.targetVisualOpacity = shark.visualOpacity;
+            shark.shadeFactor = randomBetween(0.8, 2.5);
+            shark.targetShadeFactor = shark.shadeFactor;
+            shark.baseLength = shark.length;
+            shark.visualScale = 1;
+            shark.targetVisualScale = 1;
+            shark.appliedVisualScale = 1;
+            const depth = Math.fround(shark.depth);
+            opacityByDepth.set(depth, shark.visualOpacity);
+            shadeFactorByDepth.set(depth, shark.shadeFactor);
           });
           sharkSpeedsAssigned = true;
         }
@@ -1110,8 +2163,19 @@ markFish(t){let{fishStamp:n,fishBuckets:e,sharkFlag:s}=this,h=++this.frameId;for
         accumulator += elapsed * simulationSpeed;
         let steps = 0;
         while (accumulator >= fixedStep && steps < maxStepsPerFrame) {
-          world.step(fixedStep);
-          keepSharksInView();
+          restoreSwimBends();
+          restoreSwimOrbits();
+          restoreVisualSizes();
+          updateSwimMotion(fixedStep);
+          stepWithExitSpace(fixedStep);
+          updateEdgeTransits(fixedStep);
+          applyVisualSizes();
+          applySwimOrbits();
+          applySwimBends();
+          replaceExitedSharks();
+          updateRandomFishMutationCheck();
+          updateSharkPopulation();
+          updateEdgeTransitPopulation();
           accumulator -= fixedStep;
           steps += 1;
         }
