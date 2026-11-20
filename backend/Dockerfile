@@ -15,7 +15,8 @@ RUN cd /app/gateway && npm ci --omit=dev
 COPY backend/gateway /app/gateway
 COPY backend/python /app/python
 COPY backend/start.sh /app/start.sh
-RUN chmod +x /app/start.sh
+RUN sed -i 's/\r$//' /app/start.sh \
+  && chmod +x /app/start.sh
 
 USER node
 EXPOSE 444
