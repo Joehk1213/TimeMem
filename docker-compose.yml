@@ -1,0 +1,68 @@
+name: timemem-hybrid5
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: timemem-frontend:hybrid5
+    restart: unless-stopped
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: timemem-backend:hybrid5
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "444"
+      AI_PORT: "5001"
+      RAG_PORT: "5002"
+      DATABASE_URL: postgres://timemem:${TIMEMEM_DB_PASSWORD:?Set TIMEMEM_DB_PASSWORD}@database:5432/timemem
+      TIMEMEM_SESSION_SECRET: ${TIMEMEM_SESSION_SECRET:?Set TIMEMEM_SESSION_SECRET}
+      TIMEMEM_BOOTSTRAP_PIN: ${TIMEMEM_BOOTSTRAP_PIN:-}
+      FRONTEND_URL: http://frontend:80
+    depends_on:
+      database:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:444:444"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:444/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 8s
+      retries: 6
+      start_period: 35s
+    stop_grace_period: 20s
+
+  database:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: timemem
+      POSTGRES_USER: timemem
+      POSTGRES_PASSWORD: ${TIMEMEM_DB_PASSWORD:?Set TIMEMEM_DB_PASSWORD}
+    volumes:
+      - timemem_hybrid5_postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U timemem -d timemem && psql -U timemem -d timemem -tAc \"SELECT 1 FROM pg_extension WHERE extname='vector'\" | grep -q 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  timemem_hybrid5_postgres_data:
+    name: timemem_hybrid5_postgres_data

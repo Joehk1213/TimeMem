@@ -12,3 +12,12 @@ TimeMem 係一個以家庭為本、自家託管嘅時間與記憶系統；現行
 4. 設定時可參考 [.env.example](.env.example)，填入本機值前先複製成 `.env`；唔好提交 `.env` 或真密碼/API key。
 
 正式決策以 Repo `docs/DECISIONS.md` 為準；Vault `02-決策-ADR` 只作草稿。
+
+## Hybrid 5 Docker stack
+
+1. 將 `.env.docker.example` 複製成 `.env`，設定隨機 `TIMEMEM_DB_PASSWORD` 及 `TIMEMEM_SESSION_SECRET`。
+2. 如需建立初始 Owner，臨時設定 6 位數 `TIMEMEM_BOOTSTRAP_PIN`；建立後應移除該值。
+3. 執行 `docker compose config` 做設定檢查，再執行 `docker compose up -d --build`。
+
+唯一主機入口是 `127.0.0.1:444`。Compose 只包含 `frontend`、`backend`、`database`；
+PostgreSQL 資料保存在獨立 named volume `timemem_hybrid5_postgres_data`，不會因重建容器而刪除。

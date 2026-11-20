@@ -1,0 +1,10 @@
+.git
+.agents
+docs
+reference
+scripts
+node_modules
+**/node_modules
+**/__pycache__
+*.pyc
+.env
