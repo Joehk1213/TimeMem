@@ -20,11 +20,11 @@ Tests are planned only; no product acceptance is claimed. Pass criteria come fro
 
 | Test | Requirement | Procedure | Pass evidence |
 |---|---|---|---|
-| T-001 | REQ-001 | Follow the clean-device procedure in [TimeMem-Install-SOP-Lock-Version.md](./TimeMem-Install-SOP-Lock-Version.md) on JOE-SERVER. | One completed checklist and date recorded in M0-READY. |
-| T-002 | REQ-002 | Run the approved one-click installer in [TimeMem-Install-SOP-Lock-Version.md](./TimeMem-Install-SOP-Lock-Version.md) once. | One successful installer result recorded in M0-READY. |
-| T-003 | REQ-003 | Verify every check in [TimeMem-Install-SOP-Lock-Version.md](./TimeMem-Install-SOP-Lock-Version.md). | All SOP checks pass; result recorded in M0-READY. |
-| T-004 | REQ-004 | Follow [TimeMem-Home-Hub-Physical-Setup.md](./TimeMem-Home-Hub-Physical-Setup.md) and verify router-side placement and connection. | One placement result recorded in M0-READY. |
-| T-005 | REQ-005 | Restart once after installation and observe the local application endpoint. | Endpoint opens without manual launch; result recorded in M0-READY. |
+| T-001 | REQ-001 | Follow the clean-device procedure in [TimeMem-Install-SOP-Lock-Version.md](./working/TimeMem-Install-SOP-Lock-Version.md) on JOE-SERVER. | One completed checklist and date recorded in GATE. |
+| T-002 | REQ-002 | Run the approved one-click installer in [TimeMem-Install-SOP-Lock-Version.md](./working/TimeMem-Install-SOP-Lock-Version.md) once. | One successful installer result recorded in GATE. |
+| T-003 | REQ-003 | Verify every check in [TimeMem-Install-SOP-Lock-Version.md](./working/TimeMem-Install-SOP-Lock-Version.md). | All SOP checks pass; result recorded in GATE. |
+| T-004 | REQ-004 | Follow [TimeMem-Home-Hub-Physical-Setup.md](./working/TimeMem-Home-Hub-Physical-Setup.md) and verify router-side placement and connection. | One placement result recorded in GATE. |
+| T-005 | REQ-005 | Restart once after installation and observe the local application endpoint. | Endpoint opens without manual launch; result recorded in GATE. |
 | T-006 | REQ-006 | From one authorized Tailnet device outside the home LAN, open the HTTPS endpoint; repeat from one external non-Tailnet device. | Tailnet request succeeds, non-Tailnet request is unreachable, and no router port is open; record both results. |
 | T-007 | REQ-007 | On the authorized remote device, open the PWA through the Tailnet endpoint once. | App shell renders; no login, Calendar, or data operation is required. |
 

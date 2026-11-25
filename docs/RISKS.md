@@ -9,7 +9,7 @@ status: Draft
 ### Risk R-001
 - Risk: PRD and M0 implementation scope could diverge.
 - Impact: High — implementation or approval may cover the wrong milestone.
-- Mitigation: Joe resolved the M0 boundary in CR-002 / D-023; keep Requirements, Test Plan, and M0-READY aligned with that decision.
+- Mitigation: Joe resolved the M0 boundary in CR-002 / D-023; keep Requirements, Test Plan, and GATE aligned with that decision.
 - Owner: Joe
 - Status: Closed
 
@@ -37,7 +37,7 @@ status: Draft
 ### Risk R-005
 - Risk: REQ-006 public-ingress and Tailnet-reachability evidence was re-reviewed on 2026-11-15 and passed. The dated 2026-11-14 record includes Tailnet HTTPS success at 11:23, non-Tailnet LTE denial at 22:52, and Tailscale ON/OFF state at 11:40. Joe reports the NAS 5443 forwarding rule was deleted, not disabled; the current `router-single` screenshot shows 0 entries. Port-range forwarding and triggering tables are empty, UPnP is disabled, IPv4/IPv6 SPI firewall protection is enabled with no IPv6 Port Services entries, DDNS is disabled, and DMZ is off. The Administration page in this firmware has no Remote Management section.
 - Impact: High — access could be unavailable or insufficiently restricted.
-- Mitigation: REQ-006 evidence re-review passed, and REQ-007 is recorded PASS with its dated PWA-shell result and screenshot in [M0-READY](./M0-READY.md). The reported ingress was Tailscale Serve (`tailscale serve --bg http://127.0.0.1:8080`), not Caddy. Independent Review covers gate documents only and is not device UAT. App authentication is outside M0.
+- Mitigation: REQ-006 evidence re-review passed, and REQ-007 is recorded PASS with its dated PWA-shell result and screenshot in [GATE](./GATE.md). The reported ingress was Tailscale Serve (`tailscale serve --bg http://127.0.0.1:8080`), not Caddy. Independent Review covers gate documents only and is not device UAT. App authentication is outside M0.
 - Owner: Joe
 - Status: Closed
 

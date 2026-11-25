@@ -16,7 +16,7 @@ if (-not $docker) {
 Write-Host "  OK，Docker 已裝" -ForegroundColor Green
 
 # 2. Docker Compose 起晒
-Write-Host "[2/5] 正在啟動 TimeMem，App + DB + Ollama..." -ForegroundColor Yellow
+Write-Host "[2/5] 正在啟動 TimeMem，App + DB + 主機 Ollama..." -ForegroundColor Yellow
 docker compose up -d
 if ($LASTEXITCODE -ne 0) {
     Write-Host "FAIL，Docker Compose 起唔到，請 Copy 段 Error 俾 JOE 睇" -ForegroundColor Red
@@ -24,10 +24,24 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "  OK，3 個容器已起" -ForegroundColor Green
 
-# 3. Pull Local Model
-Write-Host "[3/5] 正在下載 Local Model，bge-m3 + qwen3:8b，可能要等幾分鐘..." -ForegroundColor Yellow
-docker exec timemem-ollama ollama pull bge-m3
-docker exec timemem-ollama ollama pull qwen3:8b
+# 3. Pull Local Model from host Ollama
+Write-Host "[3/5] 正在使用主機 Ollama (127.0.0.1:11434) 下載 Local Model..." -ForegroundColor Yellow
+$ollama = Get-Command ollama -ErrorAction SilentlyContinue
+if (-not $ollama) {
+    Write-Host "FAIL，找不到主機 Ollama，請先確認已安裝 Ollama。" -ForegroundColor Red
+    exit 1
+}
+$env:OLLAMA_HOST = "http://127.0.0.1:11434"
+& $ollama.Source pull bge-m3
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "FAIL，bge-m3 下載失敗。" -ForegroundColor Red
+    exit 1
+}
+& $ollama.Source pull qwen3:8b
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "FAIL，qwen3:8b 下載失敗。" -ForegroundColor Red
+    exit 1
+}
 Write-Host "  OK，Model 已下載" -ForegroundColor Green
 
 # 4. TEMP BACKUP 還原，如果 DB 係空

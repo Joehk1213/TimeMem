@@ -102,8 +102,8 @@ related: []
 
 - `C:\Project\TimeMem\README.md`（約 1 KB）是整個項目的入口，說明如何入門及去哪裡看文件；由此進入項目並按連結閱讀文件。
 - `C:\Project\TimeMem\docs\TODO.md` 記錄未做及做緊的工作並標明優先級。完成後將事項搬到 `docs\PROGRESS.md` 作已完成記錄，並從 TODO 剔走。TODO 只列未做，PROGRESS 只列已做，兩者不可重疊。
-- `C:\Project\TimeMem\docs\ERROR_LOG.md` 記錄錯誤、原因、修正及避免重犯的方法。M0-M6 每次出 bug 都要即時記錄，格式為：日期 / 邊個 M-step / 錯咩 / 原因 / 點 fix / 點避免再犯。DECISIONS 記決定；ERROR_LOG 記錯誤，兩者不可混用。
+- `C:\Project\TimeMem\docs\ERRORLOG.md` 記錄錯誤、原因、修正及避免重犯的方法。M0-M6 每次出 bug 都要即時記錄，格式為：日期 / 邊個 M-step / 錯咩 / 原因 / 點 fix / 點避免再犯。DECISIONS 記決定；ERRORLOG 記錯誤，兩者不可混用。
 - `C:\Project\TimeMem\skills-lock.json`（約 8 KB）記錄 Skill、版本及 hash；不是同步機制。只使用 `.agents/skills/` 及 `.agents/skills-cold/`，Luna 為主要工具；同步至 `.github` 已停用，日期為 2026-11-15。
-- 每次開工做 M-step，一定要先看 `docs\TODO.md`；做完要更新 `docs\TODO.md`、`docs\PROGRESS.md`，如有出錯亦要更新 `docs\ERROR_LOG.md`，不可用舊 Root 路徑。
+- 每次開工做 M-step，一定要先看 `docs\TODO.md`；做完要更新 `docs\TODO.md`、`docs\PROGRESS.md`，如有出錯亦要更新 `docs\ERRORLOG.md`，不可用舊 Root 路徑。
 - `sync-skills.ps1` 已停用；`check-skills-sync.ps1 -RepoOnly` 亦已停用。不可產生或檢查 `.github` Skills；不帶 `-RepoOnly` 的指令仍可比較本機 Vault。
 - Root 要保持乾淨，只留 `README.md`、`.gitignore`、`.env.example`、`skills-lock.json`、`.agents`、`.github`、`docs`、`reference`、`scripts`、`.git`。

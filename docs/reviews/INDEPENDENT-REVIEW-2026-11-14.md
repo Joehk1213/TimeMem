@@ -14,7 +14,7 @@ DECISIONS.md
 ARCHITECTURE.md
 TEST-PLAN.md
 RISKS.md
-M0-READY.md
+GATE.md
 
 按你要求：
 
@@ -59,7 +59,7 @@ Minor Findings
 Minor-1：Formal Review 被寫成「Reported 0 Critical / 0 Major」，但原始 review 證據缺失
 證據
 
-M0-READY.md 明確記錄：
+GATE.md 明確記錄：
 
 Formal Review (current)
  Reported 0 Critical / 0 Major; evidence incomplete
@@ -97,7 +97,7 @@ Minor
 Minor-2：Skill Flow PASS 仍屬 Reported，非可驗證 PASS
 證據
 
-M0-READY.md：
+GATE.md：
 
 Skill flow: Previously reported PASS; test-run details and evidence link not recorded
 
@@ -139,7 +139,7 @@ Minor
 
 證據
 
-M0-READY.md：
+GATE.md：
 
 手機在屋外使用 LTE、連上 Tailnet，經 HTTPS MagicDNS 名稱 https://joe-server.tailbdf469.ts.net 成功開啟服務；REQ-006 PASS。
 
@@ -165,7 +165,7 @@ authorized device outside the home LAN + HTTPS endpoint + Tailnet
 
 證據
 
-M0-READY.md：
+GATE.md：
 
 同一部街外裝置經 HTTPS 成功開啟 PWA shell
 
@@ -212,7 +212,7 @@ R-005：
 
 Independent Review is a review of the six gate documents only, not device UAT or evidence of physical network testing.
 
-M0-READY.md：
+GATE.md：
 
 Independent Review 是六份 gate 文件的文件 Review，不是實機重測。
 
@@ -254,7 +254,7 @@ Critical: 0
 上次 4 Major 已清除
 剩餘問題屬證據完整性（Formal Review、Skill Flow run evidence）
 因此文件一致性層面係 0/0/2
-而 M0-READY.md 自己仍然寫住：
+而 GATE.md 自己仍然寫住：
 
 Independent Review: 0 Critical / 4 Major / 2 Minor — NOT PASS
 

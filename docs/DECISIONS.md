@@ -392,6 +392,337 @@
 - Affected Decisions: D-003, D-004, D-008, D-012, D-013, D-023 and D-024, only to the extent specified in D-025.
 - Resulting Decision: D-025
 
+### D-026 — Space 作權限及資料分界
+
+- Date: 2026-11-22
+- Status: Approved
+- Decision: 建立六個初始 Space：Joe、Joy、Josie、Jolie、Ailene 各一個私人 Space，再加一個 Family Shared。新 Item 預設入 Family Shared。Item 同一時間只屬一個 Space。登入者可將自己擁有嘅 Item 搬入自己私人 Space；搬去其他人私人 Space 需要來源及 destination owner 批准。private 搬去 Family Shared 必須顯示來源／目的、5 秒倒數及第二次確認。Ailene 預設只見 Family Shared；小朋友 Space 可先由父母代管，之後再 activate login。
+- Rationale: 令私人／共享成為可執行的 authorization boundary，同時保留簡單 default。
+- Implementation constraint: Space 概念已批准，但 database tables、columns、foreign keys、grant model 及 migration 未批准。
+- Conflict handling: D-008「Owner Joe 可看全部」已由 D-033 選 B 限定；之後私人 Space schema/API 必須保留明確理由、警告及 immutable audit log，唔可以默認讓 System Admin 直接讀私人內容。
+- Approver: Joe
+- Supersedes: D-025 only for `Space = TBD`.
+
+### D-027 — TimeMem outbound read-only MCP direction
+
+- Date: 2026-11-22
+- Status: Approved as direction
+- Decision: TimeMem 作 MCP client，主動呼叫 allowlisted local/public MCP servers；初期只使用 read-only tools。第一批只設計 local filesystem allowlist、calendar-file import、time/timezone 等不需要私人資料的 connector。Closed-loop private payload、真實姓名、關係、Vault、附件、embedding、logs、backups 不得送去 Cloud connector。Public POC 只用 synthetic/test data，UI 必須顯示 Cloud upload warning。
+- Rationale: TimeMem 控制何時、傳咩、傳去邊，避免另一個服務主動讀取完整家庭系統。
+- Pending detail: transport、connector registry、credential storage、per-tool payload class、approval、audit、revoke、rate limit、offline behavior 及 milestone。
+- M0 effect: None; D-027 不批准 MCP implementation 或 M1 scheduling。
+- Approver: Joe
+
+### D-028 — M2 compact local model benchmark
+
+- Date: 2026-11-22
+- Status: Approved as benchmark direction
+- Decision: M2 用以下本機候選做 benchmark：embedding primary `paraphrase-multilingual-MiniLM-L12-v2` 384D；backup `intfloat/multilingual-e5-small` 384D；classification LLM `qwen2.5:3b`。固定版本／digest 後，以 100 個 synthetic Cantonese/中文/英文/中英夾雜 cases 測 retrieval、latency、RAM、cold start 及 confidence calibration；固定 benchmark 重跑一次仍合格，才可選為 runtime。失敗時 fallback 為 local rule/structured/keyword search 或細型本機 model，永不呼叫外部 LLM。
+- Rationale: 配合 JOE-SERVER 16 GB RAM、降低 latency，並保留決策前的可重現 benchmark。
+- Preserved policy: D-010/D-021 的 0.7/0.9 thresholds、≤5% error target、confirmation 及 fail-closed policies 不變。
+- Supersedes: D-010 model-name/dimension clauses for bge-m3、qwen3:8b and the prohibition on 384D columns, only if benchmark passes and runtime selection is separately recorded.
+- Approver: Joe
+
+### D-029 — Vault security zone
+
+- Date: 2026-11-22
+- Status: Approved as policy; detailed cryptography pending
+- Decision: Vault 是獨立 security zone，只由 Joe/Joy unlock/access；Ailene 只可 request。Vault 接收身份／旅行文件、民事證明、健康、保險及敏感財務文件；密碼、private key、seed phrase、2FA secret 及完整卡 security code 不入 TimeMem。Vault content 不做普通 semantic embedding、AI summary 或 log/trace；搜尋只限 title/category/tags。敏感內容若被提議放入普通 Space，先 quarantine/mask 為 Vault candidate，再要求 confirm。提醒只顯示「有重要文件快到期」等不泄露內容字句。
+- Backup direction: 一個 outer backup archive，但 normal data 與 Vault 使用獨立 encryption key hierarchy；Vault key 不可只依賴 PIN hash，亦不與 D: 同位。每週隔離 restore 必須驗證 ordinary restore 與 Vault unlock/restore。
+- Pending detail: encryption format、KDF、key wrapping、paper recovery、rotation、OCR/thumbnail、expiry metadata、audit 及 restore conflicts。
+- Approver: Joe
+
+### D-030 — Reminder taxonomy and acknowledgement policy
+
+- Date: 2026-11-22
+- Status: Approved
+- Decision: 提醒分出門前 checklist、到時提醒、現場即時提醒、逾期跟進四類。預設為 T-60 第一次提醒、T-30 第二次及 checklist、event time 要求 acknowledgement；冇 response 時每 10 分鐘重提一次，連續兩次冇 response 後停止重複聲音／彈窗並記 `missed`，稍後作溫和跟進。每個 event/todo 可以 override。
+- Delivery boundary: PWA/server 長開、cached shell 或 Tailnet connected 不等於 offline phone guarantee。V1 只承諾 in-app/reachable-device reminder 及 reconnect missed reconciliation；OS-level offline alarm 需 mobile Calendar/Reminders bridge 或 native companion，另行批准及測試。
+- Approver: Joe
+
+### D-031 — Canonical repository document structure
+
+- Date: 2026-11-22
+- Status: Approved
+- Decision: 每個新 repo 採統一文件結構：root `README.md`；`docs/README.md`、`docs/PRD.md`、`docs/DECISIONS.md`、`docs/GATE.md`、`docs/TODO.md`、`docs/PROGRESS.md`、`docs/ERRORLOG.md`、`docs/ARCHITECTURE.md`、`docs/archive/`、`docs/evidence/`。當前 PRD 是唯一 active version，舊版歸 `archive/`。TODO 只放未完成，PROGRESS 只放已完成及 evidence，ERRORLOG 只放錯誤與 regression evidence。Routine task evidence updates 不需逐項批准；scope/security/privacy/schema/auth/model/deploy/gate 仍要 Joe 批准。
+- TimeMem migration note: 2026-11-22 按 Joe 指示以 `git mv` 將舊 M0/working 路徑 normalize 到 `docs/GATE.md`、`docs/TODO.md`、`docs/PROGRESS.md`、`docs/ERRORLOG.md`；舊 V10.2 同 M0 snapshot 保留在 `docs/archive/`。只改名及引用，唔改 approval。
+- Approver: Joe
+
+### D-032 — Google Login proposal for household track
+
+- Date: 2026-11-22
+- Status: Draft / not approved
+- Proposal: Joe 提議所有 users 使用 Google accounts login。
+- Current authority: D-008/D-025 仍規定 household closed-loop 使用 Passkey + PIN，Google/Supabase Auth 只屬 public POC。未完成 offline dependency、account recovery、child account、data boundary、consent、revoke 及 Tailnet integration review 前，不可實作或宣稱已改。
+- Required next step: Joe 決定採用 `Passkey/PIN only`、`Google only` 或 `Google optional bootstrap/recovery`；批核後寫新 superseding decision。
+
+### D-033 — System Admin versus private data access
+
+- Date: 2026-11-22
+- Status: Approved
+- Approval date: 2026-11-23
+- Approver: Joe
+- Selected option: B
+- Issue: D-008 令 Owner Joe 可看全部私人內容，而 D-026 將私人 Space 定義為真正權限邊界。
+- Decision: Joe 已批准選項 B：System Admin 可以因明確理由受控讀取其他人私人 Space/Vault，但每次讀取前必須顯示警告並留有不可改、不可靜默刪除嘅 immutable audit log；Joe 只以管理身份存取管理功能唔會自動取得私人內容。Backup 仍只係 encrypted operation，唔代表可喺 App 直接讀 plaintext。
+- Rationale: 保留支援、救急及 accountability，同時唔再把 System Admin 身份直接等同無限制私人內容讀取。
+- Supersedes: D-008 同角色／私人內容存取有衝突嘅條款。
+- Required next step: 後續私人 Space/Vault authorization、break-glass 流程同 audit tests 必須按本決定實作及驗證；本決定唔改 M0 整體 approval。
+
+### D-034 — REQ-001 8 月清機證據缺口
+
+- Date: 2026-11-22
+- Status: Approved
+- Approval date: 2026-11-22
+- Issue: REQ-001 現行做法要求一份已完成及有執行日期嘅 clean-device checklist；2026 年 8 月清機當時冇留低足夠 contemporaneous evidence。現有 `systeminfo`、磁碟及候選備份 evidence 能證明現狀，但唔足以重建當時完整流程。
+- Joe confirmation: Joe 於 2026-11-22 確認 JOE-SERVER 已於 2026 年 8 月清理完成；現時部機正在使用，唔需要再清機。
+- Proposal: REQ-001 改為接受以下組合：一份日期為 2026-11-22 的現狀 clean-device checklist、已核實嘅 JOE-SERVER Windows 11／硬件／磁碟現狀證據、Joe 對 2026 年 8 月已清機同毋須再清機嘅明確確認。唔會倒推、重建或補造 8 月當時嘅 backup manifest 或執行 log。
+- Rationale: 已清好的運行中 SERVER 唔應為補歷史 evidence 而再清機；但要保留證據缺口、現狀可觀察性及 Joe 的明確責任確認。
+- Affected Requirement: REQ-001 acceptance evidence definition only；M0 scope 不變。
+- GATE effect: 本決定只批准 REQ-001 acceptance evidence basis；REQ-001 checklist 已可標示 PASS。`GATE.md` 及整體 M0 approval 未獲額外批准前保持不變；其餘 REQ 不受影響。
+- Supersedes: None
+- Approver: Joe
+- Required next step: REQ-001 可按已批核嘅 acceptance basis 更新 checklist；`GATE.md` 及整體 M0 approval 未獲額外批准前不得改，REQ-002 亦不得由本次決定自動開始。
+
+### D-035 — REQ-002 installer 與現行 Docker / Ollama 配置
+
+- Date: 2026-11-22
+- Status: Approved
+- Approval date: 2026-11-22
+- Approver: Joe
+- Approval note: Joe 表示「裝囉 冇問題」。
+- Findings:
+  - `Install-OneClick.ps1` 預期 `timemem-ollama` 容器，但現有 `docker-compose.yml` 冇定義該容器。
+  - JOE-SERVER 現有主機 Ollama 程序 PID 18748，正聆聽 `127.0.0.1:11434`。
+  - frontend 現時只 expose port 80，冇將 host `127.0.0.1:3000` map 去容器 port 80；installer 使用嘅 `localhost:3000` 因此未對齊。
+  - installer 仍拉取 `bge-m3` 同 `qwen3:8b`，同 D-028 已記錄嘅 benchmark 候選 `paraphrase-multilingual-MiniLM-L12-v2`／`qwen2.5:3b` 唔同。
+- Decision:
+  - installer 及 runtime 改為使用主機 Ollama `127.0.0.1:11434`，唔新增 `timemem-ollama` 容器。
+  - frontend 增加 `127.0.0.1:3000:80` port map，令 installer 使用嘅 `localhost:3000` 可達。
+  - 今次安裝模型跟 installer 現有 `bge-m3`／`qwen3:8b`。
+  - 上述模型同 D-028 嘅 MiniLM／`qwen2.5:3b` 方向有差異，記作後續跟進；呢項差異唔阻 REQ-002。
+- Approval boundary: 本決定只批准 installer／compose 應作嘅修改；`GATE.md`、整體 M0 approval 及其他 REQ 唔受本決定自動改變。
+- Required next step: 按本決定修改 installer／compose，之後重新驗證 REQ-002。
+
+### D-036 — REQ-003 Server Lock 現實運行政策
+
+- Date: 2026-11-22
+- Status: Approved
+- Approval date: 2026-11-22
+- Approver: Joe
+- Decision:
+  - Ethernet 唔再係 REQ-003 強制條件；接受 WiFi 取代 LAN。Joe 已實測 JOE-SERVER 放喺 Router 隔離使用 WiFi 一星期冇斷過，重點係連線穩定，唔係一定要有 LAN 線。
+  - Lock 8 小時電話 Search 測試可以 BYPASS。Power 設定驗證，加上服務已連續 Up 46 小時，而且 3000 / 444 / 11434 仍回 HTTP 200，已證明長時間鎖機期間 SERVER 唔會睡眠。
+  - Docker restart policy 保持 `unless-stopped`；容器會喺 crash 或 Docker／主機重開後自動恢復，而人手 stop 會維持停止狀態以便維修。SOP 原先要求 `always` 唔符合現實運行需要，改以 `unless-stopped` 為準。
+- Rationale: 以實測穩定性、長時間運行證據同可維修性判定 REQ-003，唔為咗字面 SOP 要求增加冇必要嘅硬件或測試成本。
+- Affected Requirement: REQ-003 acceptance policy only；M0 scope 不變。
+- Approval boundary: 本決定只批准 REQ-003 嘅上述判定原則；唔改整體 M0 approval、其他 REQ、installer 或 compose。
+
+### D-037 — REQ-004 實體擺位政策
+
+- 日期: 2026-11-22
+- 狀態: 已批准
+- 批准日期: 2026-11-22
+- 批核人: Joe
+- 決定:
+  - REQ-004 接受 WiFi 代替 LAN 線，唔再把 LAN 線列為必須條件。
+  - 接受 JOE-SERVER 直接放喺枱面，唔需要鋁架。
+  - Joe 已實測 JOE-SERVER 使用 WiFi 一星期保持穩定；擺位相顯示部機同 ROUTER 並排放喺枱面，位置通風、唔入櫃、唔入袋，按此政策足以通過 REQ-004。
+  - 擺位相證據放喺 `docs/evidence/M0-REQ-004/`。
+- 理由: 以 Joe 一星期實測嘅 WiFi 穩定性，以及實際擺位相顯示嘅通風與 ROUTER 隔離條件，接受現實運行狀態，唔為咗原 SOP 嘅字面要求額外加鋁架或 LAN 線。
+- 受影響要求: 只改 REQ-004 驗收政策；M0 範圍不變。
+- 批准邊界: 本決定只批准 REQ-004 擺位同連線判定；唔改 M0 整體批准、其他 REQ、installer 或 compose。
+- 2026-11-23 補充批准: Joe 已明確批准維持以上 REQ-004 判定，並 REJECT 另加「必須再影一張同時見到完整 SERVER、ROUTER、擺位及通風位嘅全景相」作額外審計要求。現有 `docs/evidence/M0-REQ-004/` 已足夠支持 D-037；唔再追交新相。
+
+### D-038 — REQ-005 自動啟動證據政策
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - REQ-005 接受 Joe 親自確認做證據；Joe 確認兩日前已實測重啟後 TimeMem 自動開返成功。
+  - Joe 確認 2026-11-23 00:24:50 嘅 JOE-SERVER 本機 Logon 驗證 JSON 為 PASS；3000 / 444 / 11434 全部 HTTP 200，Docker 三個容器全部 healthy，Ollama API 有 `bge-m3` 同 `qwen3:8b`。
+  - 呢次本機 PASS JSON 嘅 SHA-256 為 `0B2F6319B1E3F70412B92E10AC87679F30AB429FFEEAE3E9C29EF871119B482C`。
+  - 驗證程式寫入雜湊同同步共享失敗屬工具問題，唔係 TimeMem 自動啟動或服務問題，唔再阻擋 REQ-005；工具寫入及同步修正列做後續處理。
+- 理由: Joe 親自重啟實測成功，加上當晚本機 Logon 驗證已逐項確認服務端點、容器健康同模型可用；共享證據傳送問題唔影響產品重啟驗收結果。
+- 受影響要求: 只改 REQ-005 驗收判定；M0 範圍不變。
+- 批准邊界: 本決定只批准 REQ-005 以 Joe 親自確認及本機 PASS JSON 驗收；唔改 M0 整體批准、其他 REQ、installer、compose 或產品 code。
+
+### D-039 — Hybrid 5 已部署狀態嘅 M0 例外
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - 確認 Hybrid 5 已經喺 JOE-SERVER 部署，包括 frontend、Node gateway、local PostgreSQL、database init、Docker Compose 及相關 installer/script。
+  - 為避免倒填歷史，呢個已發生狀態只記錄成「已執行嘅 M0 例外」，唔追認為 M0 原批准流程已覆蓋，亦唔等同正式產品 baseline。
+  - M0 期間只接受現有 stack 作 REQ-002 至 REQ-005 嘅驗收目標；Space、Vault、private authorization、production data、migration 及新功能仍保持 blocked。
+  - M0 整體尚未批准前，唔再新增會改 product code、schema、migration 或 deployment 嘅工作。
+- 理由: 現有文件話 M0 未批准前不建立 product code／DB，但 Hybrid 5 已實際部署。用明確例外記錄實況，比靜默當冇發生或倒填批准更安全。
+- 批准邊界: Joe 只批准 D-039 所記嘅已部署 M0 例外；唔改 `Owner Joe final approval=NOT APPROVED`，唔批准新 product code、schema、migration、production data 或 M0 整體。
+- Supersedes: None
+- Architecture Impact: 只界定現有 Hybrid 5 嘅歷史及 M0 驗收地位；正式 architecture baseline 仍要另外確認。
+
+### D-042 — Off-host HDD 備份、restore evidence 及 REQ-006 LINK 驗證
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - M0 備份及 restore 接納一隻 Off-host HDD 1TB 作離站保存；Joe 今晚返屋企插 HDD 後，先由 SERVER LUNA 執行加密備份同隔離 restore 驗證。
+  - HDD 未插之前，備份及 restore evidence 維持 TBD；唔准冒認已完成，唔要求 Joe 而家插 HDD。
+  - REQ-006 接納 `docs/evidence/M0-REQ-006/REQ-006-link-boundary-verification-20261123-120507.json` 作最新 LINK 模擬驗證：Tailnet URL 先後維持 HTTP 200，非 Tailnet `192.168.1.136:8444` 三次 TCP 連線均失敗，listener 只綁定 Tailnet address；REQ-006 記為 PASS。
+  - 上述 JSON 嘅 SHA-256 為 `C233134D4AC51780D6FD4500416C17804A6A24ED7E455A803D729C839D465B1E`。
+- 理由: 用實際 LINK 邊界驗證收窄 REQ-006 證據缺口，同時保留尚未完成嘅 Off-host HDD 備份及 restore 係唯一 M0 TBD。
+- 受影響要求: REQ-006 驗證判定轉 PASS；Off-host HDD 備份及 restore 仍待實作證據。
+- 批准邊界: 本決定只批准指定方案及 REQ-006 判定；唔改 M0 整體 approval。M0 整體仍係 NOT APPROVED，Joe 要喺 HDD 備份及 restore 證據完成後先作最後一句 PASS 或 NOT PASS 決定。
+
+### D-043 — 刪除 public track，owner-private 成為唯一正本
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - 刪除 `owner-public` track；`owner-private` 係 TimeMem 唯一正本。
+  - 唔再維護任何獨立 public POC、公開 Cloud 或 Supabase 路線。
+  - 所有後續產品、測試及文件工作只圍繞 `owner-private` 本地閉環方向。
+- 理由: 避免同一產品維護兩套隔離度高但目標互相牽制嘅 repo／架構路線，集中資源落單一正本。
+- 批准邊界: 本決定只改現行產品 track 同維護方向；M0 整體仍維持原 approval 狀態，唔透過呢項決定自行改 `GATE`。
+- Supersedes: D-025；以及 D-003、D-008、D-013、D-024 中只適用於獨立 public POC 嘅條款。
+
+### D-044 — M1 只做 Text → Embedding → Vector DB → UI 小圈
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - M1 優先次序固定為先完成 `Text → Embedding → Vector DB → UI` 呢個最小驗證圈。
+  - PDF ingestion 遲一個明確後續階段先加入。
+  - M1 唔一次過實作完整 pipeline；每一步先驗證可用，再進入下一步。
+- 理由: 先完成一條細而可證明嘅本地 RAG 路徑，可及早發現模型、向量儲存同 UI 整合問題，避免大範圍返工。
+- 批准邊界: 本決定設定 M1 實作次序；唔批准 schema、migration 或 PDF 功能提早施工。
+
+### D-045 — M1 採用阿SIR Reading App Logic 同全本地技術
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - 照抄阿SIR Reading App Logic：將文字切成約 1000 字一段。
+  - 每段經 Embedding 後存入 Vector DB。
+  - 使用者問問題時，先搵最似嘅 Top 5 chunks。
+  - 將 Top 5 context 俾 LLM 生成答案，再由 UI 顯示。
+  - Embedding 使用本地 Ollama `bge-m3`；LLM 使用本地 Ollama `qwen3:8b`。
+  - Vector DB 使用本地 PostgreSQL；M1 唔使用 Supabase 雲端。
+- 理由: 沿用已清楚理解嘅小型 RAG 流程，配合現有本地模型同資料主權要求。
+- 批准邊界: 本決定固定 M1 邏輯同技術選擇；詳細 schema、API contract 及 UI 行為仍按一步一驗證方式落地。
+
+### D-046 — qwen3:8b 性能基準及後備模型
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - M1 繼續使用 `qwen3:8b`。
+  - 喺 16GB RAM、冇 GPU 嘅環境，5–10 tok/s 視為正常表現。
+  - 200 字答覆須喺 30 秒內完整輸出先算合格。
+  - 只有 `qwen3:8b` 未達合格線，先允許改用 `qwen3:4b` 作後備；未證明不合格前不得預先降級。
+- 理由: 用明確速度同完成時間管理本地 CPU inference 預期，亦保留可追溯嘅降級門檻。
+- 批准邊界: 本決定只批准模型維持及性能驗收／後備規則；唔改其他模型、資料或安全決策。
+
+### D-047 — M1 test data 固定使用公開文件
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - M1 測試資料使用 `docs/README.md`。
+  - 所用測試內容必須公開、唔敏感；唔使用假資料，亦唔使用私人資料。
+- 理由: 以真實 repo 公開文件驗證 ingestion／retrieval，避免測試資料脱離實際用途，亦避免私人資料流入測試環境。
+- 批准邊界: 本決定只界定 M1 test dataset；唔批准 production data、外部資料集或其他私人來源。
+
+### D-048 — 今晚 Off-host HDD 及 qwen3:8b 測速工作
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - 今晚使用 Joe 直接插 USB 嘅 Off-host HDD。
+  - HDD 容量少過 500GB 唔接納；1TB 為優先。
+  - 接駁後除加密備份及 restore evidence 外，順便執行 `qwen3:8b` 速度測試。
+  - HDD 未插或未確認容量前，唔可宣稱備份／restore 或速度測試完成。
+- 理由: 一次完成硬碟接駁、容量確認、M0 唯一 HDD TBD 同 M1 模型性能基準。
+- 批准邊界: 本決定補充 D-042 嘅今晚執行條件；唔改 M0 整體 approval，亦唔將速度測試納入 M0 pass 條件。
+
+### D-049 — AI 互動節奏
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - AI 必須一步一步執行，一次只做一樣。
+  - 回覆保持短，唔可以又快又長。
+  - Joe 一講停，AI 即時停止，不續做下一步。
+- 理由: 保持 Joe 對工作範圍、進度同風險嘅即時掌控，避免一次執行過多而失去審閱機會。
+- 批准邊界: 呢項係持續工作節奏規則，唔改已批准架構、M0 approval 或其他決策內容。
+
+### D-050 — 2026-11-23 Off-host HDD 備份、restore 同 qwen3:8b 測速證據
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - 接納 `E:` BUFFALO 2TB 外置 USB HDD 作今晚 Off-host backup；裝置採 BitLocker XTS-AES 256、FullyEncrypted，Protection On。
+  - 已將 TimeMem 備份至 `E:\JOE-SERVER\C-Project-20261123-221322`；備份包含 1055 個 file，共 50,429,049 bytes，所有 SHA-256 全部核對正確。
+  - 已由備份還原 `TimeMem\docs` 40 個 file，所有 SHA-256 全部核對正確；還原測試用 temp 已清除。
+  - `qwen3:8b` 實測為 9.02 tok/s，200 字約 22.17 秒，達到 D-046 合格線。
+  - D-042 及 D-048 所需今晚 HDD 備份、restore evidence 同速度測試已完成；相應 TODO 移入 PROGRESS。
+- 理由: 將 Joe 已批准同步嘅實測結果正式固化，完整保留儲存位置、加密狀態、數量、大小、hash、restore 同性能結果，供後續審計。
+- 批准邊界: 本決定只記錄並接納指定證據；唔改 M0 整體 approval、`GATE.md` 或其他 approval 狀態，亦唔等同自動將 M0 改為 PASS。M0 最終係 PASS 定 NOT PASS 仍須由 Joe 另外作決定。
+
+### D-051 — M0 正式批准 PASS
+
+- 日期: 2026-11-23
+- 狀態: 已批准
+- 批准日期: 2026-11-23
+- 批核人: Joe
+- 決定:
+  - M0 於 2026-11-23 正式批准為 PASS。
+  - 三項整體判定全部 PASS：安全、穩定、頂到 M1。
+  - D-034 至 D-042 嘅需求證據、D-050 嘅 Off-host HDD 加密備份、restore 同性能結果，連同已完成 review，一併構成今次 M0 批准基礎。
+  - D-023 所定 M0 範圍已完成，可由 M0 轉入 M1 下一階段。
+- 理由: Joe 已覆核現有證據，並明確批准 M0 以安全、穩定及可承接 M1 三項標準正式通過。
+- 批准邊界: 本決定只將 M0 正式批准為 PASS；M1 仍須按既定次序逐步執行、驗證及停候下一次批准，唔代表所有後續 milestone 已自動批准。
+
+### D-052 — M1 private test plan 固定規格
+
+- 日期: 2026-11-25
+- 狀態: 已批准
+- 批准日期: 2026-11-25
+- 批核人: Joe
+- 決定:
+  - M1 private test 固定使用 5 條合成版行程、2 條 test 問題同 2 個 PASS 標準；完整資料放喺 `docs/owner-private/04-PRIVATE-TEST.md`，只留本機，唔 commit、唔 push。
+  - 技術固定為 Embedding `bge-m3`、本地 PostgreSQL 加 `pgvector`、LLM `qwen3:8b`；現有 UI 基準係 PWA `index`。
+  - 切段規則為 1 條行程 = 1 個 chunk，唔再切；DB 使用 `test_schedules`，欄位為 `id`、`content`、`embedding`、`time`、`person`、`place`、`action`。
+  - 流程為打問題、轉 Embedding、由 DB 搵最似 2 條、將嗰 2 條交 `qwen3:8b` 答、用 RESULT 彈出框顯示結果。
+  - UI 唔加嘢落 PWA；PWA 原有魚保持原樣。RESULT 彈出 2 張行程卡，頂係時間、中係人 + 地、底係做咩；搵唔到就顯示「搵唔到相關行程」，閂框後返回 PWA 主頁。
+  - 2 條 test 問題只喺分別答到星期一 + 星期四，或星期二 + 星期六嗰指定 2 條時先算 PASS。PASS 後先加 PDF、加行程同加人。
+  - 呢項只定下 M1 test plan；下個月先寫 code，呢個月唔寫 code。
+- 理由: 將合成行程、問題、PASS、模型、儲存、retrieval 數量及 UI 邊界一次寫清，令實作前有一致、可驗證嘅小圈規格。
+- 批准邊界: 本決定覆蓋 D-045 同 D-047 對今次 M1 private test 嘅 1000 字切段、Top 5、`docs/README.md` 唯一 test data 規格；唔改其他已批准安全、部署或模型規則，亦唔批准提前寫 code、migration、PDF 或新產品資料。
+- Supersedes: D-045 及 D-047 限今次 M1 private test 嘅切段、retrieval 同 test data 條款。
+
 ## IDEA 備註（未批准；不是正式 D-ID 決策）
 
 - 首頁構想：中央放一行輸入，周圍以隨機相片作背景；滑鼠停留時彈出記憶回顧卡片，作為 S6 相片故事卡片體驗的補充想法。

@@ -121,7 +121,7 @@ $GateDocNames = @(
     'ARCHITECTURE.md',
     'TEST-PLAN.md',
     'RISKS.md',
-    'M0-READY.md'
+    'GATE.md'
 )
 $MissingGateDocs = @($GateDocNames | Where-Object {
     -not (Test-Path -LiteralPath (Join-Path $FormalDocsPath $_) -PathType Leaf)
@@ -143,17 +143,17 @@ else {
         -Passed $false -Detail 'docs/ARCHITECTURE.md is missing.'
 }
 
-$M0ReadyPath = Join-Path $RepoRoot 'docs\M0-READY.md'
+$M0ReadyPath = Join-Path $RepoRoot 'docs\GATE.md'
 if (Test-Path -LiteralPath $M0ReadyPath -PathType Leaf) {
     $M0ReadyText = Get-Content -LiteralPath $M0ReadyPath -Raw -Encoding UTF8
     $M0ReadyHasTbdOrCriteria = [regex]::IsMatch($M0ReadyText, '(?i)\bTBD\b|通過準則')
-    Add-CheckResult -Name 'docs/M0-READY.md exists and marks TBD or pass criteria' `
+    Add-CheckResult -Name 'docs/GATE.md exists and marks TBD or pass criteria' `
         -Passed $M0ReadyHasTbdOrCriteria `
-        -Detail 'Expected TBD or 通過準則 in docs/M0-READY.md.'
+        -Detail 'Expected TBD or 通過準則 in docs/GATE.md.'
 }
 else {
-    Add-CheckResult -Name 'docs/M0-READY.md exists and marks TBD or pass criteria' `
-        -Passed $false -Detail 'docs/M0-READY.md is missing.'
+    Add-CheckResult -Name 'docs/GATE.md exists and marks TBD or pass criteria' `
+        -Passed $false -Detail 'docs/GATE.md is missing.'
 }
 
 $ExpectedRootEntries = @(
@@ -182,14 +182,14 @@ Add-CheckResult -Name 'docs/TODO.md exists and root TODO.md is absent' `
         (-not (Test-Path -LiteralPath $RootTodoPath))) `
     -Detail 'TODO.md must exist under docs/ and not in the repository root.'
 
-$DocsErrorLogPath = Join-Path $RepoRoot 'docs\ERROR_LOG.md'
-$RootErrorLogPath = Join-Path $RepoRoot 'ERROR_LOG.md'
-Add-CheckResult -Name 'docs/ERROR_LOG.md exists and root ERROR_LOG.md is absent' `
+$DocsErrorLogPath = Join-Path $RepoRoot 'docs\ERRORLOG.md'
+$RootErrorLogPath = Join-Path $RepoRoot 'ERRORLOG.md'
+Add-CheckResult -Name 'docs/ERRORLOG.md exists and root ERRORLOG.md is absent' `
     -Passed ((Test-Path -LiteralPath $DocsErrorLogPath -PathType Leaf) -and
         (-not (Test-Path -LiteralPath $RootErrorLogPath))) `
-    -Detail 'ERROR_LOG.md must exist under docs/ and not in the repository root.'
+    -Detail 'ERRORLOG.md must exist under docs/ and not in the repository root.'
 
-$ReportPath = Join-Path $RepoRoot 'docs\reports\2026-11-10-m0-ready.html'
+$ReportPath = Join-Path $RepoRoot 'docs\archive\2026-11-10-m0-ready.html'
 if (Test-Path -LiteralPath $ReportPath -PathType Leaf) {
     $ReportText = Get-Content -LiteralPath $ReportPath -Raw -Encoding UTF8
     $RequiredReportPhrases = @(
@@ -212,7 +212,7 @@ if (Test-Path -LiteralPath $ReportPath -PathType Leaf) {
 }
 else {
     Add-CheckResult -Name 'M0 report exists and contains all six required phrases' `
-        -Passed $false -Detail 'docs/reports/2026-11-10-m0-ready.html is missing.'
+        -Passed $false -Detail 'docs/archive/2026-11-10-m0-ready.html is missing.'
 }
 
 $GitCommand = Get-Command git -ErrorAction SilentlyContinue

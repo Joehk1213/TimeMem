@@ -135,7 +135,7 @@ Joe 已拍板：001 同 002 唔打架，係 Dev 同 Target。001 係點開發，
 
 ## 5. TimeMem-PRD-Detail-Review.html 一頁 Record 講咩
 
-呢份 HTML 係將原 IDEA、PRD V10 Final、PRD V10.1、Joe Review (REVIEW.txt)、最新 M0-READY.md、001.png、002.png 對比後嘅拍板加仲爭咩。
+呢份 HTML 係將原 IDEA、PRD V10 Final、PRD V10.1、Joe Review (REVIEW.txt)、最新 GATE.md、001.png、002.png 對比後嘅拍板加仲爭咩。
 
 **已拍板，CR-004 / D-025 建議：**
 - Two-track：POC 公開版 (Supabase / Cloud) 加閉環版 (Local Postgres 加 pgvector 加 Ollama)
@@ -145,7 +145,7 @@ Joe 已拍板：001 同 002 唔打架，係 Dev 同 Target。001 係點開發，
 - Space TBC
 - MCP 等上堂
 
-**要 Update 嘅文件：** DECISIONS、ARCHITECTURE、RISKS、M0-READY、REQUIREMENTS、TEST-PLAN
+**要 Update 嘅文件：** DECISIONS、ARCHITECTURE、RISKS、GATE、REQUIREMENTS、TEST-PLAN
 **要答嘅問題：** 6 張 tables 夠唔夠，加 Backup 點測試
 **M0 範圍不變：** 5 項加 Tailnet 加 PWA shell
 **唔做：** 唔寫 code，唔做 migration / schema，唔 commit
@@ -157,7 +157,7 @@ Joe 已拍板：001 同 002 唔打架，係 Dev 同 Target。001 係點開發，
 
 ## 6. M0 而家最新狀態：2026-11-15
 
-呢部分係用最新 M0-READY 加 Review 檔案補上，俾阿 Sir 知 M0 已經行到邊。
+呢部分係用最新 GATE 加 Review 檔案補上，俾阿 Sir 知 M0 已經行到邊。
 
 ### 6.1 M0 證據，12 張齊晒
 - Router 單一轉寄：0 條，NAS 嗰條已 DELETE，唔係 Disabled
@@ -207,12 +207,12 @@ Joe 已拍板：001 同 002 唔打架，係 Dev 同 Target。001 係點開發，
 ### 7.3 reference 同 docs/prd 唔係真重複（Audit 做咗 SHA-256 比對）
 - 對 `reference` 同 `docs/prd` 嘅檔案做 SHA-256 比對，冇一個檔案係完全相同
 - 而家睇到嘅係主題重疊或者唔同版本，唔係可確認嘅完全重複檔
-- `reference/README-HOME-HUB-OVERVIEW.md` 嘅 Home Hub 介紹、滿意清單同安裝概念，同 `docs/prd/TimeMem-PRD-V10-2.md` 有內容重疊，但佢標明係舊 Root README 搬嚟，屬歷史版本，唔應該當成可直接刪除嘅副本
+- `reference/README-HOME-HUB-OVERVIEW.md` 嘅 Home Hub 介紹、滿意清單同安裝概念，同 `docs/PRD.md` 有內容重疊，但佢標明係舊 Root README 搬嚟，屬歷史版本，唔應該當成可直接刪除嘅副本
 - `reference/README.md`、`Architecture.jfif`、`Structure.jfif` 同 `docs/prd/原構思 IDEA.txt` 有舊構想 / 架構上嘅關聯，要保留歷史定位，圖片唔好同說明索引分開搬，除非同步修好相對連結
 - 如果 Joe 之後批准搬移：先盤點所有 inbound links，再同一個變更更新連結同索引，可以喺舊路徑保留指引頁。呢次 Audit 冇搬移
 
 ### 7.4 Gate 6 份同 evidence：大小一樣，但 Git 未追蹤，要講清楚限制
-- 6 份 Gate 而家喺 `docs` 根目錄，大小同上次盤點一模一樣：REQUIREMENTS 4801、DECISIONS 36824、ARCHITECTURE 27339、TEST-PLAN 8391、RISKS 6180、M0-READY 22553
+- 6 份 Gate 而家喺 `docs` 根目錄，大小同上次盤點一模一樣：REQUIREMENTS 4801、DECISIONS 36824、ARCHITECTURE 27339、TEST-PLAN 8391、RISKS 6180、GATE 22553
 - `docs/evidence` 而家 12 個檔案，合計 896197 bytes。實際 evidence 目錄係 `docs/evidence`，唔係 repo 根目錄嗰個 `evidence`
 - 限制，要老實講：6 份 Gate 同 `docs/evidence` 而家都係 Git 未追蹤檔案，冇 HEAD 版本可以比較。所以可以確認目前位置同大小，但唔可以證明大小相比之前冇變。只可以講「自從上次盤點之後冇變過」，唔可以講「由始至終冇變過」
 - 呢次 Audit 冇改動佢哋

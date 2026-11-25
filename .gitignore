@@ -1,6 +1,8 @@
 __pycache__/
 *.pyc
 node_modules/
+frontend/dist/
+.validation-venv/
 .env
 .env.*
 !.env.example
@@ -8,6 +10,8 @@ node_modules/
 npm-debug.log*
 
 docs/obsidian/dt.log
+docs/JOE-ANSWERS.md
+docs/owner-private/
 
 dt.log
 public/*.acl-backup

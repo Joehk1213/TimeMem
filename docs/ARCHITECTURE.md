@@ -60,11 +60,11 @@ The household mapping follows the instructor's [Gen-AI Reading App](https://gith
 | React PWA | 提供家庭使用者介面，所有資料操作均經 `/api/v1`。 | M0 只驗證 app shell 可經 Tailnet 開啟；自然語言輸入 M2、Passkey/login M4、Face ID M5。Reference: D-009, D-023. |
 | Tailnet ingress | Caddy reverse proxy or Tailscale Serve, providing Tailnet-only HTTPS access to the application. | Either approved alternative must remain Tailnet-only and must not require a router port. M0 ingress reported: `tailscale serve --bg http://127.0.0.1:8080`. Reference: D-004, D-011, D-024. |
 | Node / Express Gateway/Auth | 提供 `/api/v1`、身份驗證／授權及內部服務路由；包含唯一可連 PostgreSQL 的資料存取模組。 | 只有資料存取模組持有 DB credentials；API/UI 不直接連 DB。App login 仍按 D-008／PRD 的後續 milestone 執行，不屬 M0。Reference: D-003, D-008, D-009, D-024. |
-| Python / FastAPI backend | 內部 AI/ML + RAG 模組：本機 embedding、候選檢索協作、理解輸入及組織回覆。 | 只接收經授權的 context，回傳結構化候選／理由／建議；不持有 DB credentials、不直接讀寫 PostgreSQL。Reference: D-010, D-024. |
-| DB | 本機 PostgreSQL 保存 `families`、`members`、`events`、`todos`、`event_changes`、`inputs`、`photos`、`memories`、`memory_members`、`memory_photos`；D-024 將 pgvector 列為向量儲存目標。 | JOE-SERVER 是唯一可寫 Primary；資料根目錄為 `D:\docker-data\timemem`。pgvector 僅屬架構決定，未批准 schema/table/dimension 或 migration。Reference: D-004–D-007, D-024. |
+| Python / FastAPI backend | 內部 AI/ML + RAG 模組：本機 embedding、候選檢索協作、理解輸入及組織回覆。 | 只接收經授權的 context，回傳結構化候選／理由／建議；不持有 DB credentials、不直接讀寫 PostgreSQL。M2 benchmark target 依 D-028。Reference: D-010, D-024, D-028. |
+| DB | 本機 PostgreSQL 保存結構化資料、關聯、變更、相片／記憶 metadata 及 vector data。 | JOE-SERVER 是唯一可寫 Primary；D-026 Space 是已批准 domain boundary，但 table/column/constraint/migration 仍未批准。pgvector dimension 要由 D-028 benchmark 決定。Reference: D-004–D-007, D-024, D-026, D-028. |
 | Ollama | 在本機執行核准的 embedding／LLM 模型，供 Python backend 使用。 | 不使用外部 LLM；自然語言輸入、confidence、Undo 及故障 fallback 均不屬 M0。Reference: D-010, D-023, D-024. |
 | 備份 | 對 PostgreSQL dump、相片原檔及縮圖執行加密備份、還原及驗證。 | 備份置於 D: 的 backups，每晚一次、保留 30 日；每週還原至臨時 DB 驗證；不得直接覆蓋 Primary。離線媒體副本的方案仍為 TBD (D-019 Draft). Reference: D-007. |
-| MCP | FR-10 原為 optional read-only 構想。 | 用途、設計及 milestone 待上堂後決定，不屬 M0；D-025 取代舊 MCP timing/design 條款。 |
+| MCP | TimeMem 作 outbound client，呼叫 allowlisted read-only tools/connectors。 | 方向已由 D-027 批准；transport、credential、audit、revoke、milestone 仍未批准，不屬 M0。Closed-loop private payload 不可送去 Cloud connector。 |
 
 ## 模組分工
 
@@ -76,7 +76,8 @@ The household mapping follows the instructor's [Gen-AI Reading App](https://gith
 - **閉環寫入：** 只有 Node 資料存取模組可執行寫入。所有 AI 分類及提議統一採用 >0.9、0.7–0.9（含邊界）、<0.7 三級；低於 0.7 不寫入並澄清，0.7–0.9 須確認，>0.9 只可按已批准的功能政策自動執行。明確要求確認的功能（例如相片 Link）仍須確認。events/todos 更新的 Undo 依 D-015。Reference: D-004, D-010, D-015, D-024.
 - **備份：** 協調本機 DB 與家庭檔案的匯出、還原及驗證；備份及 migration 是 D-005 / D-007 規管的維護操作，不受應用 runtime 唯一 DAO 限制。還原只到隔離的臨時 DB，不得覆蓋 Primary。Reference: D-007, D-024.
 - **認證：** 由 Gateway/Auth 邊界承載 Passkey／PIN、server-side session 及撤銷能力；Tailscale 裝置授權是外層，不取代 App 認證。Reference: D-004, D-008, D-024.
-- **MCP：** 用途、設計及 milestone 待上堂後再決定，不屬 M0。Reference: D-025.
+- **MCP：** TimeMem outbound read-only client；connector allowlist、credential、payload class、audit 及 revoke 由 Gateway policy 層控制。Reference: D-027.
+- **Space／Vault：** Space 決定一般 Item 嘅 shared/private owner boundary；Vault 係額外 security zone，content 唔參與普通 semantic embedding 或 AI prompt。D-033 選 B 已批准；System Admin 唔會自動讀私人內容，受控讀取必須有明確理由、警告及 immutable audit log。
 
 Node Gateway、Python backend、PostgreSQL、pgvector、Ollama 及 PWA 是不同服務／執行邊界；服務間只走內部網絡與明確 API。pgvector 是資料存取邊界內的儲存能力，不是 Python backend 的 DB 直連許可。此目標拓撲須在 M0 批准後才進入實作。
 
@@ -89,7 +90,7 @@ This flow is not part of M0. Decision basis: D-003, D-004, D-010, D-012, D-023, 
 3. Python backend 回傳結構化候選、理由、信心值及建議動作；所有應用層的結構化與向量查詢／持久化仍由 Node 資料存取模組執行。Backup/migration 是 D-005／D-007 規管的維護操作。
 4. 信心值 > 0.9 時，只有在該功能已批准政策允許自動更新時，資料存取模組才執行更新並提供 Undo；0.7–0.9（含邊界）先顯示確認卡，確認後才更新；低於 0.7 時不寫 DB，先詢問及澄清。明確要求確認的功能仍須確認。Reference: D-004, D-010, D-024.
 5. 所有變更須向用戶回報實際內容；AI 模組本身不直接寫入或刪除 DB。
-6. MCP 並非此流程的已批准依賴；用途、設計及 milestone 待上堂後決定。
+6. MCP 不是 AI/RAG 必要依賴；只可由明確 allowlist 呼叫 read-only connector，且 closed-loop private payload 不可外送。
 
 ## Tailnet Remote Reachability and Later App Authentication
 
@@ -147,7 +148,8 @@ Decision basis: D-005, D-006, D-007.
 
 - D-005 的家庭 DB 規劃範圍為 `families`、`members`、`events`、`todos`、`event_changes`、`inputs`、`photos`、`memories`、`memory_members`、`memory_photos`；成員及記憶／相片關聯使用關聯表，不使用 UUID array。這不是在未批准的 M0 準備閘口安裝 DB 的要求。
 - PostgreSQL + pgvector 是 D-024 的結構化資料／向量儲存目標；extension 設定、table/column、embedding dimension、index 及 migration 均未在本輪批准。
-- `User / Space / Item / Asset / Reminder / Embedding` 六項只是概念清單，不足以證明六張表能滿足授權、session、成員關係、事件／TODO、提醒、附件關聯、變更／Undo 及未來 Finance。Space 未定；概念可合併或分拆。D-005 的既有十表方向沒有被六表替換，亦未批准新 schema 或 migration。
+- `User / Space / Item / Asset / Reminder / Embedding` 六項只是概念清單，不足以證明六張表能滿足授權、session、成員關係、事件／TODO、提醒、附件關聯、變更／Undo 及未來 Finance。D-026 已批准 Space 作 permission boundary，但仍未批准 table/column/migration。
+- Vault 內容屬 D-029 security zone，不能因為同樣叫 private 就與普通 private Space 共用相同 unlock、search、embedding 或 backup behavior。
 - Migration 使用純 SQL；每個版本一個檔案並明列 up/down，以 `schema_migrations` 記錄版本，不使用 ORM 自動 migrate。M0 只定原則，不執行 migration；舊 `DB_SCHEMA_DRAFT.sql` 及 Supabase migrations 不可作起點。
 - D: 目錄為 `D:\docker-data\timemem`，包含 `postgres`、`backups`、`photos\originals`、`photos\thumbs`、`exports`。
 - 相片原檔不可變及不可覆寫，以 SHA-256 加副檔名命名並按年／月存放；metadata 寫入 `photos` 表。SHA-256 判定完全相同，pHash Hamming distance ≤5 只提示 Joe 判斷相似，不自動刪除。
@@ -159,8 +161,8 @@ Not part of M0 PWA-shell acceptance. Passkey/login is M4 and Face ID is M5 per P
 
 - Passkey 公鑰經資料存取模組寫入 DB，私鑰永不離開裝置。PIN 為 6 位數，只存 Argon2 hash，不存明文。錯誤計數只於成功登入時重設；連續錯 5 次鎖 5 分鐘，期滿不重設，之後再連錯 5 次（自上次成功登入累計 10 次）鎖 10 分鐘，顯示「聯絡屋企 Admin (JOE)」並記錄事件，不自動通知。累計達 10 次後，每次鎖定期滿仍未成功登入而再次輸錯，繼續鎖 10 分鐘。鎖定期間的輸入只記錄、不計數。
 - Session 使用 DB server-side session 表；隨機 token 只存 hash，30 日過期並可即時 revoke，不使用 JWT。遺失手機時用另一部已登入裝置或 JOE-DESKTOP revoke，不使用 email reset。
-- 三級角色：Owner Joe 可看全部；成人可看共享及自己的資料；兒童可看共享及自己的資料、不可看成人私人資料。私人紀錄只有建立者及 Joe 可看。
-- 家庭閉環不採用 Email／Google Auth 加 RLS；Passkey／PIN 登入取代 Google 登入卡。所有家庭查詢授權由資料存取模組執行。公開 POC 的 Supabase Auth 及授權設計另行處理 (D-025)。
+- 三級角色仍受 D-008 管理，但私人內容條款已由 D-033 選 B 收窄；System Admin 唔會自動取得私人內容，受控讀取必須先警告並記 immutable audit log。後續實作仍要通過對應 authorization 同 audit tests。
+- 家庭閉環現階段仍採 Passkey／PIN；Joe 提議 Google login 已記為 D-032 Draft。公開 POC 可另行使用 Supabase Auth (D-025)。
 
 ## PWA Shell, API and Later Offline Boundaries
 
@@ -173,9 +175,9 @@ M0 verifies only that the shell opens over Tailnet; login, Calendar, data operat
 
 Not part of M0. Decision basis: D-010, D-023. Manual form fallback when Ollama is unavailable remains Draft (D-022).
 
-- Ollama 在 JOE-SERVER Docker 執行；`bge-m3`、`qwen3:8b` 的固定 tag 加 digest 在 DEVELOP 開始時鎖定，之後不得自動更新；更新須 Joe 批准。拉取／匯入只在本機進行，執行時不需上網。
+- M2 runtime 先按 D-028 benchmark `paraphrase-multilingual-MiniLM-L12-v2` 384D、`multilingual-e5-small` 384D backup 及 `qwen2.5:3b`。實際 runtime 仍要固定 tag/digest、100-case benchmark、RAM/latency/repeat evidence 後另行記錄。
 - 以 100 個假測例覆蓋 >0.9、0.7–0.9、<0.7 三級；錯誤率須 ≤5%，不合格就重新校準，不可靜默調整門檻。cosine 相似度不可當作信心值。
-- Ollama 停止或模型缺失時，PWA 顯示錯誤並停止提供 AI 候選，改以 Calendar／todo 標準表單手動新增或修改；自然語言 AI 寫入停用，永不轉用外部 LLM。舊 BGE／Transformers.js loader、384／512 維 column 及 placeholder 向量不採用。
+- Ollama／local embedding 停止或模型缺失時，PWA 顯示錯誤並停止提供 AI 候選，改以 Calendar／todo 標準表單手動新增或修改；自然語言 AI 寫入停用，永不轉用外部 LLM。Placeholder vector 不可進 production。
 
 ## Later-Milestone Backup, Restore and Reminders
 
@@ -184,11 +186,11 @@ Not part of M0 acceptance. Decision basis: D-007, D-011, D-023. Offline media an
 - 備份包括 `pg_dump`、`photos\originals`、`photos\thumbs`，加密存於 `D:\docker-data\timemem\backups`；每晚備份、保留 30 日，每週還原至臨時 DB 做全量驗證，通過後才記 PASS。
 - 備份金鑰不放同一 D:，由 Joe 另外保管並有紙本復原程序；不依賴 Vault 自動復原。還原先至臨時 DB 驗證，不得直接覆蓋 JOE-SERVER Primary；之後由 Joe 人手決定合併。「Keep」只補回不見資料，不刪除現有資料；衝突時保留現有資料、跳過備份並記錄 (D-007). 衝突重套用 UI／稽核步驟為 TBD (D-018 Draft)；離線媒體副本為 TBD (D-019 Draft).
 - age + Argon2 僅為待設計的備份方案，未批准實作；須先釐清 age 支援的加密／passphrase 機制、Argon2 用途及金鑰管理。PIN 的 Argon2 hash 不等於備份加密；不假設 age 原生使用 Argon2。隔離還原測試見 [TEST-PLAN.md](./TEST-PLAN.md)。
-- 提醒在 PWA 內於 event 開始前 30 分鐘及 todo 到期時觸發；重複提醒跟隨裝置時區。只保證 App 開啟時可彈，App 關閉時不保證；不使用外部／Cloud push。舊只記 log 的 reminders scheduler 不採用。
+- D-030 提醒分出門前 checklist、到時提醒、現場即時、逾期跟進；預設 T-60、T-30、acknowledgement 及 no-response retry policy。只保證 reachable in-app delivery；PWA 已關閉或手機完全 offline 的 OS alarm 必須使用後續 Calendar/Reminders bridge 或 native companion。
 
 ## MCP and Later Photo-Wall UI
 
-MCP 的用途、設計及 milestone 待上堂後決定；photo-wall UI 是後續工作。Decision basis: D-012, D-023, D-025.
+MCP direction 已由 D-027 定為 TimeMem outbound allowlisted read-only client；transport、credential、payload classification、audit、revoke 及 milestone detail 仍待設計。photo-wall UI 是後續工作。Decision basis: D-012, D-023, D-025, D-027.
 
 - PRD FR-10 的 read-only MCP 是歷史構想，不是目前已批准的實作規格。
 - `living-wall-topbar` 高 48px，左側 `FAMILY CALENDAR`，右側 bell 及 Master 身份。共用的 `living-photo-wall` 背景以 12 張本機家庭感佔位圖呈現；尺寸隨機 80–220px、radius 16px、一般 opacity 0.35、hover 0.65、`pointer-events: none`。輸入期間背景 opacity 降至 0.15。
@@ -214,6 +216,6 @@ Decision basis: D-003, D-013.
 
 Architecture choices above trace to D-003 through D-015, D-023 / CR-002, D-024 / CR-003 and D-025 / CR-004. D-024 supersedes D-003's deployment topology; D-025 scopes public Cloud to synthetic-data POC, allows guarded encrypted Tailnet access for household data, and defers MCP. Household sole-DAO and privacy invariants remain. D-016 through D-022 are Draft proposals only and are not architecture authority.
 
-The following remain TBD for later milestones until the related proposal is approved: JOE-DESKTOP promotion and recovery (D-016), the 10-second / 3-tap test procedure (D-017), restore conflict review and reapply (D-018), offline backup media (D-019), recovery session handling (D-020), confidence score source/scoring (D-021), and manual input when Ollama is unavailable (D-022). Space, smart home, MCP and POC security design also remain TBD; Finance statistics/analysis is Later, phase TBD. Multi-Agent is a reserved concept only. M6 SHARE is uncommitted with scope and timing TBD. M0 scope is REQ-001 through REQ-007 per D-023; authentication, AI behavior, device remembrance, Calendar entry, Tailnet Always-on and offline-LAN behavior are outside M0.
+後續 milestone 仍有以下 proposal 等批准：JOE-DESKTOP promotion 同 recovery（D-016）、10 秒／3 下測試程序（D-017）、restore conflict review 及 reapply（D-018）、recovery session handling（D-020）、信心分數來源／scoring（D-021）、Ollama 唔可用時嘅手動輸入（D-022），以及 Google login（D-032）。Off-host HDD 1TB 已由 D-042 批准，但實際加密備份及 restore evidence 仲未完成。私密 Space/Vault admin boundary 已由 D-033 選 B 批准。Space 方向記喺 D-026，MCP client 方向記喺 D-027；實際 schema／connector/security design 仍要 detail review。Finance statistics/analysis、smart home、Multi-Agent 同 M6 SHARE 都係後續或未承諾範圍。M0 依 D-023 包括 REQ-001 至 REQ-007；認證、AI 行為、記住裝置、Calendar 入口、Tailnet Always-on 同離線 LAN 行為唔屬 M0。
 
 The historical implementation plan, unapproved DB drafts, Supabase migrations, old static version and old architecture diagrams are not starting points. M0 remains Draft; no product code, migration or product database setup is authorized.

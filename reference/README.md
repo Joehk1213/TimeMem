@@ -1,6 +1,6 @@
 # Reference 圖片說明
 
-以下圖片保留自早期構想，均對應 [原構思 IDEA.txt](../docs/prd/原構思%20IDEA.txt) 中的舊技術方向；它們不是現行架構規格。現行要求請以 [PRD V10.2](../docs/prd/TimeMem-PRD-V10-2.md) 及 [文件索引](../docs/README.md) 為準。V10.1 已移至 `docs/archive/TimeMem-PRD-V10-1.md`。
+以下圖片保留自早期構想，均對應 [原構思 IDEA.txt](../docs/prd/原構思%20IDEA.txt) 中的舊技術方向；它們不是現行架構規格。現行要求請以 [PRD V10.2](../docs/PRD.md) 及 [文件索引](../docs/README.md) 為準。V10.1 已移至 `docs/archive/TimeMem-PRD-V10-1.md`。
 
 | 圖片 | 圖片內容 | 關聯文件／用途 |
 |---|---|---|

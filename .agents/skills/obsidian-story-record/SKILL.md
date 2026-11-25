@@ -28,7 +28,7 @@ description: "After major TimeMem decisions or project changes, write one concis
 
 ## 幾時寫「今日無大事」
 
-寫之前要一併查今日決定、Skill 變動、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md`、`docs/M0-READY.md`、Server、PWA 同 T-005 嘅有效證據。只有全部都無重大事件，先可以寫「今日無大事」。其中 Server、PWA、T-005 無 Repo 證據時，只可按 Joe 親自驗證嘅明確確認判斷；無確認唔好當作驗證過或當成無大事。唔好只因為三份文件或 Repo 無變，就寫「今日無大事」。
+寫之前要一併查今日決定、Skill 變動、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md`、`docs/GATE.md`、Server、PWA 同 T-005 嘅有效證據。只有全部都無重大事件，先可以寫「今日無大事」。其中 Server、PWA、T-005 無 Repo 證據時，只可按 Joe 親自驗證嘅明確確認判斷；無確認唔好當作驗證過或當成無大事。唔好只因為三份文件或 Repo 無變，就寫「今日無大事」。
 
 ## 故事格式
 

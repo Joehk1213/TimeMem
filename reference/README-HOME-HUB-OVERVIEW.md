@@ -1,6 +1,6 @@
 # Home Hub 概覽（由舊 Root README 搬移）
 
-> 以下內容由原 Root README 搬到此處，保留原有概覽及歷史資料。現行要求請以 [PRD V10.2](../docs/prd/TimeMem-PRD-V10-2.md) 為準；V10.1 已移至 `docs/archive/TimeMem-PRD-V10-1.md`。Vault 路徑結構僅為舊參考。
+> 以下內容由原 Root README 搬到此處，保留原有概覽及歷史資料。現行要求請以 [PRD V10.2](../docs/PRD.md) 為準；V10.1 已移至 `docs/archive/TimeMem-PRD-V10-1.md`。Vault 路徑結構僅為舊參考。
 
 # TimeMem — 屋企 Home Hub
 

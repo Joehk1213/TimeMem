@@ -5,7 +5,7 @@
 > 日期：2026-11-11
 > 狀態：審核提案，未批准實作
 > 舊 Repo：`C:\Project\old\Family\FamilySystem`（只讀）
-> 現行依據：[DECISIONS.md](../DECISIONS.md)、[ARCHITECTURE.md](../ARCHITECTURE.md)、[M0-READY.md](../M0-READY.md)
+> 現行依據：[DECISIONS.md](../DECISIONS.md)、[ARCHITECTURE.md](../ARCHITECTURE.md)、[GATE.md](../GATE.md)
 
 ## 1. 範圍、決策及結論
 
@@ -40,7 +40,7 @@
 | `README.md` | 舊 Family Calendar 的閱讀次序、假資料規則、Supabase 初始化／RLS／記憶功能操作說明。明確指出初始 schema 未驗證。 | 可作舊系統總覽；其中 Supabase 操作步驟、測試憑證流程和外部服務設定不移植。 |
 | `PROGRESS-FAMILY.md` | 舊專案階段進度、未完成測試、模型 placeholder、部署與文件治理狀態。 | 歷史狀態；不可當 TimeMem 功能已完成或現況驗收證據。 |
 | `TODO.md` | 舊 Family Calendar／RAG 的工作清單；包含仍未驗證的模型、資料庫及部署事項。 | 只供審核舊未竟項目；不併入 TimeMem TODO。 |
-| `ERROR_LOG.md` | 記錄舊模型上游不穩、解析容錯與修正測試。 | 可參考「錯誤要可見、用假資料驗證」原則；外部模型故障處理不可作新架構。 |
+| `ERRORLOG.md` | 記錄舊模型上游不穩、解析容錯與修正測試。 | 可參考「錯誤要可見、用假資料驗證」原則；外部模型故障處理不可作新架構。 |
 | `package.json`、`package-lock.json` | 舊 Node/Express/Supabase/Transformers.js/PDF.js 依賴及舊測試命令。 | 不沿用依賴鎖檔；只供辨認舊 runtime 和測試範圍。 |
 | `requirements.txt` | Python embedding worker 的套件需求。 | 不直接帶入；TimeMem 的 AI 邊界已決定使用本機 Ollama。 |
 | `docker-compose.prod.yml` | 舊 Supabase Postgres、Auth、PostgREST、Storage、Caddy gateway 等容器及 bind mount。 | 不重用 stack；服務拆分、資料路徑及 port 綁定都屬舊系統。 |
@@ -146,7 +146,7 @@
 | 手機提醒（本機通知、PWA、外部推播） | **要改先用得** | 舊 reminders 表/API 可供列出欄位和完成狀態的參考；scheduler 每 15 分鐘只記 log，沒有手機推播。重寫時經 DAO，PWA 通知需先評估平台權限及 App 關閉時可靠度。 | 本地優先、不用 Cloud/外部 LLM 已定；通知類型、何時觸發、重複/時區、App 關閉時承諾及外部推播是否完全排除仍要 Joe 決定。 |
 | Vault 金鑰復原／加密備份、Backup restore「Keep」語義及保留規則 | **要改先用得** | 舊 CMS/OneDrive、雙機都可備份、非原子 DB/Storage 搬存、`RestoreIfEmpty` 是不同拓撲，不符合唯一 Primary。可沿用「備份需校驗、先隔離還原、不覆蓋非空資料」的安全檢查思路；需設計 TimeMem 的一致性、加密、金鑰獨立保管、還原演練及 Keep 含義。 | 唯一 Primary 已定；備份介質／位置、頻率、保留、加密金鑰復原及 Keep 的精確操作後果都要 Joe 新決定。不可默認 OneDrive/雲端或舊 CMS 格式。 |
 | 付費功能、授權、支援和更新政策 | **唔用得** | 舊 package 標示為私人專案，未找到可當 TimeMem 商業／授權承諾的文件。舊 Git 同步、Docker image 更新是特定機器的操作紀錄，不是終端使用者更新、回退或支援政策。 | 商業模式、授權、收費、支援範圍、更新來源/批准/維護窗口/回退及安全修補期限全部要 Joe 新決定。 |
-| Repo-first Skill／Copilot 操作及實測；M0 approval record | **要改先用得** | 舊 README／build plan 的閱讀順序和假資料測試可作文件流程參考；舊 repo 的 instruction/approval 不會替代 TimeMem gate。 | TimeMem 的 M0 Gate 已拍板，仍要按 [M0-READY.md](../M0-READY.md) 完成實際 GPT-LUNA review、第三方方案覆核、Joe 最終批准及 CI/branch protection 證據；舊 repo 無法清除此 TBD。 |
+| Repo-first Skill／Copilot 操作及實測；M0 approval record | **要改先用得** | 舊 README／build plan 的閱讀順序和假資料測試可作文件流程參考；舊 repo 的 instruction/approval 不會替代 TimeMem gate。 | TimeMem 的 M0 Gate 已拍板，仍要按 [GATE.md](../GATE.md) 完成實際 GPT-LUNA review、第三方方案覆核、Joe 最終批准及 CI/branch protection 證據；舊 repo 無法清除此 TBD。 |
 
 ## 5. 舊組件 → TimeMem modular monolith 模組
 
@@ -164,7 +164,7 @@
 | `scripts/backup-encrypted.ps1`、舊備份／DR 文件 | **備份** | 可參考校驗、空資料保護、演練與 recovery checklist；重新設計 DB/檔案一致性、金鑰復原、Keep 和保留規則。 |
 | `docker/Caddyfile`、`docker-compose.prod.yml`、舊部署文件 | **部署邊界（非 App 模組）** | 重新為本機 Postgres/Ollama/App 和 tailnet-only proxy 寫部署文件；不沿用舊服務、端口或資料掛載。 |
 | `server/services/openrouterService.js`、舊 Telegram webhook | **沒有新模組對應** | 不採用；外部 LLM 與舊訊息入口不屬已批准 M0。 |
-| Root README、`PROGRESS-FAMILY.md`、`TODO.md`、`ERROR_LOG.md`、舊 `docs/` | **文件治理／審核證據** | 只用作歷史參考，TimeMem 現況以本 Repo 正式文件及實際驗證為準。 |
+| Root README、`PROGRESS-FAMILY.md`、`TODO.md`、`ERRORLOG.md`、舊 `docs/` | **文件治理／審核證據** | 只用作歷史參考，TimeMem 現況以本 Repo 正式文件及實際驗證為準。 |
 
 ## 6. Joe 建議拍板次序
 

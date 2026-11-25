@@ -38,11 +38,11 @@ Create and maintain these project files:
 3. `docs/ARCHITECTURE.md` — modules, boundaries, and design tied to decision IDs.
 4. `docs/TEST-PLAN.md` — unit, integration, and manual UAT approach tied to requirements.
 5. `docs/RISKS.md` — risks, impact, mitigation, owner, and status.
-6. `docs/M0-READY.md` — M0 gate status, evidence, reviews, and Joe's approval.
+6. `docs/GATE.md` — M0 gate status, evidence, reviews, and Joe's approval.
 7. `docs/archive/` — obsolete proposals retained as history, clearly marked obsolete.
 8. The configured Obsidian story folder — one story Markdown file per calendar day.
 
-Resolve conflicts in this order: `REQUIREMENTS.md`, `DECISIONS.md`, `ARCHITECTURE.md`, `TEST-PLAN.md`, `RISKS.md`, `M0-READY.md`, then Obsidian stories. A decision cannot silently change requirements. A scope change requires a Change Request, an updated Requirements record, and a linked new Decision.
+Resolve conflicts in this order: `REQUIREMENTS.md`, `DECISIONS.md`, `ARCHITECTURE.md`, `TEST-PLAN.md`, `RISKS.md`, `GATE.md`, then Obsidian stories. A decision cannot silently change requirements. A scope change requires a Change Request, an updated Requirements record, and a linked new Decision.
 
 The independent reviewer receives only the six gate documents (items 1-6). Do not provide `PROGRESS`, `TODO`, `IDEA`, `README`, old repositories, `.env`, or unrelated Vault notes.
 
@@ -149,7 +149,7 @@ After a confirmed decision or meaningful project progress, use the `obsidian-sto
 
 **Review 1 — Luna consistency review**
 
-- Compare `REQUIREMENTS.md`, `DECISIONS.md`, `ARCHITECTURE.md`, `TEST-PLAN.md`, `RISKS.md`, and `M0-READY.md`.
+- Compare `REQUIREMENTS.md`, `DECISIONS.md`, `ARCHITECTURE.md`, `TEST-PLAN.md`, `RISKS.md`, and `GATE.md`.
 - Report contradictions, missing references, untestable criteria, uncovered risks, and incomplete gate evidence.
 - Do not silently edit the reviewed documents or approve M0. Propose findings separately for Joe to decide.
 
@@ -201,7 +201,7 @@ After requirements or an approved decision need to change:
 
 ### Phase 7 — Joe's final M0 approval
 
-Create and maintain `docs/M0-READY.md` with:
+Create and maintain `docs/GATE.md` with:
 
 ```markdown
 # M0 Ready
@@ -229,7 +229,7 @@ Do not enable Branch Protection during M0 planning. It is the first step of DEVE
 
 ### Phase 8 — Develop only after approval
 
-1. Confirm `M0-READY.md` is `Approved`, approval is explicitly Joe's, and the approval has not expired.
+1. Confirm `GATE.md` is `Approved`, approval is explicitly Joe's, and the approval has not expired.
 2. As the first DEVELOP action, enable GitHub Branch Protection. Record its state. Only then begin product implementation.
 3. Keep implementation out of scope changes. A feature idea returns to Phase 1 for an explicit In Scope / Out of Scope decision.
 4. If an assumption fails or a decision changes, use Phase 6 and repeat both reviews and approval as required.

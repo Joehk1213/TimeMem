@@ -9,7 +9,7 @@ DECISIONS.md
 ARCHITECTURE.md
 TEST-PLAN.md
 RISKS.md
-M0-READY.md
+GATE.md
 
 Review basis:
 
@@ -22,7 +22,7 @@ REQ-006
 
 REQ-006 requires an authorized device outside the home LAN to reach the HTTPS endpoint over Tailnet, a non-Tailnet external device to be denied, and no router port opened.
 
-Current evidence recorded in M0-READY.md and cross-referenced by RISKS.md records:
+Current evidence recorded in GATE.md and cross-referenced by RISKS.md records:
 
 Tailnet HTTPS success
 non-Tailnet denial
@@ -37,7 +37,7 @@ REQ-007
 
 REQ-007 requires opening the PWA shell from the authorized remote device through the Tailnet endpoint. T-007 requires evidence that the app shell renders.
 
-Current M0-READY.md records:
+Current GATE.md records:
 
 Date: 2026-11-14
 Time: 11:23
@@ -55,7 +55,7 @@ Luna Review
 
 D-014 requires a documented Skill-flow test, a Luna consistency review, and an independent review of the same six gate documents.
 
-Current M0-READY.md records:
+Current GATE.md records:
 
 Luna Review: Complete
 Verdict: PASS WITH MINOR FINDINGS (0/0/2)
@@ -72,7 +72,7 @@ Status = Closed
 Mitigation updated to reference REQ-006 re-review PASS and REQ-007 PASS evidence
 Independent Review scope clarified as document review, not device UAT
 
-Current wording is consistent with M0-READY.md.
+Current wording is consistent with GATE.md.
 
 No remaining inconsistency found.
 
@@ -116,7 +116,7 @@ REQUIREMENTS.md states the requirements remain Draft pending reviews and approva
 
 D-014 explicitly states that only Joe can approve M0.
 
-M0-READY.md remains Draft and records that M0 is not yet approved.
+GATE.md remains Draft and records that M0 is not yet approved.
 
 Final Conclusion
 

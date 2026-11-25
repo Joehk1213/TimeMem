@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$ApprovalPath = Join-Path $RepoRoot 'docs\M0-READY.md'
+$ApprovalPath = Join-Path $RepoRoot 'docs\GATE.md'
 
 function Get-ChangedFiles {
     if ($ChangedFiles -and $ChangedFiles.Count -gt 0) {
@@ -49,7 +49,7 @@ function Test-ProductCodePath {
 
 function Get-ApprovalText {
     if ($BaseRef) {
-        $ApprovalRef = "${BaseRef}:docs/M0-READY.md"
+        $ApprovalRef = "${BaseRef}:docs/GATE.md"
         $Text = @(& git -C $RepoRoot show $ApprovalRef 2>$null)
         if ($LASTEXITCODE -ne 0) {
             throw "Approval record is missing from the base branch: $ApprovalRef"

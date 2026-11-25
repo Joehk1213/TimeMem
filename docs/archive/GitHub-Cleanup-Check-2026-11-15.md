@@ -26,7 +26,7 @@
 |---|---|---|
 | `docs/ARCHITECTURE.md` | IPv4 位址樣式（回環／保留用途） | 39、56、90、93 |
 | `docs/DECISIONS.md` | IPv4 位址樣式（回環／保留用途） | 60 |
-| `docs/M0-READY.md` | IPv4 位址樣式（回環／保留用途）；IMEI 相關文字標記，未檢出 15 位識別碼 | 50、102 |
+| `docs/GATE.md` | IPv4 位址樣式（回環／保留用途）；IMEI 相關文字標記，未檢出 15 位識別碼 | 50、102 |
 | `docs/RISKS.md` | IPv4 位址樣式（回環／保留用途） | 40 |
 | `docs/working/TimeMem-Sprint-1-Wake-Test.md` | 私人區域網絡位址樣式 | 131 |
 | `docs/reports/TimeMem-Summary-For-Sir.md` | IMEI 相關文字標記，未檢出 15 位識別碼 | 124 |
@@ -55,7 +55,7 @@
 
 ## 3. evidence 清單
 
-以下只依據檔名及 `docs/M0-READY.md` 文字判斷，沒有開啟任何 evidence 圖片。`M0-READY.md` 列出下列 evidence；其中成功連線截圖在文件中標示為 PASS。這不代表 M0 已批准。
+以下只依據檔名及 `docs/GATE.md` 文字判斷，沒有開啟任何 evidence 圖片。`GATE.md` 列出下列 evidence；其中成功連線截圖在文件中標示為 PASS。這不代表 M0 已批准。
 
 | 檔案 | 類型 | 可能包含網絡／個人敏感資訊 |
 |---|---|---|
@@ -132,7 +132,7 @@ id_ed25519*
 |---|---|
 | `docs/ARCHITECTURE.md` | `14C9D07DBDC677E1F40D973E3577F5AFE5BE2B90ACE9FFFBDA10CAB7BFEB6224` |
 | `docs/DECISIONS.md` | `3F9DD3A8EAAA206FB4E1B20AE8E06F0E3990B6A5E37831230836333115642055` |
-| `docs/M0-READY.md` | `0A458EF0306F96B9BA4DD00770C9E3A0BCD42E575701134CC2C951698C7EBEED` |
+| `docs/GATE.md` | `0A458EF0306F96B9BA4DD00770C9E3A0BCD42E575701134CC2C951698C7EBEED` |
 | `docs/REQUIREMENTS.md` | `FF4011CD22B83E8E84E414DEEE3E8F2FA0DCE3D52190130E3DBC0D6BB54195B8` |
 | `docs/RISKS.md` | `12E47E093CFBEF033E436274CB18ABEE965DAFFD17A4933F5AA9D8A4B30676A9` |
 | `docs/TEST-PLAN.md` | `BD00363CE7E71C37B5B54E047F93CA700221EF1CC19921C83B5A88DF80EBDBCB` |
@@ -142,7 +142,7 @@ id_ed25519*
 | 檔案 | 寫入前 SHA-256 |
 |---|---|
 | `docs/archive/TimeMem-PRD-V10-1.md` | `09FDDE9E2B06CEAB12ABE7C5CB4B69F5B4163FBD179D050139126A6747DA92C5` |
-| `docs/prd/TimeMem-PRD-V10-2.md` | `E27A7D4540C61FE01C8B4EDAB6B986E8C31C9A25D13B240A0FCBB5E02D3AA190` |
+| `docs/PRD.md` | `E27A7D4540C61FE01C8B4EDAB6B986E8C31C9A25D13B240A0FCBB5E02D3AA190` |
 | `docs/reports/TimeMem-Summary-For-Sir.md` | `F9B92FF33C18577C3F91772A2C97006A5BAEDCCE6F914AEA4E8AB16A61C1CF75` |
 | `docs/reports/TimeMem-Summary-for-Sir-v2.md` | `4AB6042FC3C88214CB7357FEFD9A9A61F082A4958126B13700A4799E713438C5` |
 
