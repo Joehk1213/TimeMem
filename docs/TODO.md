@@ -7,9 +7,21 @@
 > D-051 已正式批准 M0 PASS；`owner-private` 係唯一正本，M1 按以下最小圈逐步執行。
 
 - [x] D-052 已定 M1 test plan：5 條合成版行程、2 條問題、2 個 PASS 標準；資料及完整規格保留喺 `docs/owner-private/04-PRIVATE-TEST.md`。
-- [ ] 下個月先按 D-052 寫 code；呢個月唔寫 code。
-- [ ] 實作 `bge-m3 + Postgres + pgvector + qwen3:8b` 最小圈：1 條行程 = 1 chunk，`test_schedules` 取最似 2 條，再以 RESULT 彈出框顯示。
+- [ ] **Priority 1：完成 FastAPI 圖片上傳至本地 Ollama 端對端最小圈。**
+  - [ ] 實作 FastAPI `Multipart Upload` 圖片上傳 API，同時限定合成資料及本機儲存。
+  - [ ] 接入本地 Ollama `qwen3:8b` 做 Vision / OCR 萃取人物、時間、地點及活動。
+  - [ ] 將 OCR 文字經本地 `bge-m3` 轉成 embedding；固定 1 條行程 = 1 chunk。
+  - [ ] 寫入本機 PostgreSQL `pgvector`，只限隔離表 `test_schedules`。
+  - [ ] 問題經同一條 embedding 路徑檢索最相似 2 條，再交由 `qwen3:8b` 判定。
+  - [ ] PWA 彈出 RESULT 框顯示行程卡；無結果顯示「搵唔到相關行程」。
+- [ ] 按 D-052 固定 PASS 標準驗證：只喺指定星期一／星期四或星期二／星期六問題組合答中指定 2 條行程。
 - [ ] PASS 後先加 PDF、加多啲行程、加多啲人。
+
+## n8n 後勤定位
+
+- [ ] 保持本地 Docker `n8n`（Port `5678`）為後勤自動化外掛／外部觸發器，不放入核心業務判斷。
+- [ ] n8n 可接收 FastAPI Backend Webhook，負責日曆同步、通知提醒或開發期 API 測試。
+- [ ] 所有上傳、OCR、embedding、向量檢索、結果判定及資料寫入仍嚴格留喺 FastAPI；n8n 唔直接處理核心模型邏輯或權威資料存取。
 
 ### 後續 milestone 待決定
 

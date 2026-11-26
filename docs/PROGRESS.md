@@ -1,5 +1,13 @@
 # PROGRESS — 已完成事項
 
+## 2026-11-26 — M1 基底結構與核心主線正式對齊
+
+- 已精簡 `.github/copilot-instructions.md`，保留強制收尾同步、架構決策同步、繁體廣東話 Record 語言、Rule-SEC-01 資安紅線及 Obsidian Vault Hold 狀態。
+- 已確認 M0 已 PASS，現行階段正式鎖定為 M1。
+- 已補齊 `docs/GATE.md` 同 `docs/ERRORLOG.md` 為根目錄 Canonical Files；舊 M0／歷史文件繼續隔離喺 `docs/archive/`。
+- 已將 M1 Priority 1 定為 FastAPI Multipart Upload → 本地 Ollama `qwen3:8b` Vision / OCR → `bge-m3` embedding → PostgreSQL `pgvector` 寫入 → PWA RESULT 框閉環。
+- 已記錄本地 Docker n8n（Port `5678`）只做後勤自動化外掛／外部觸發器；核心業務邏輯繼續留喺 FastAPI。
+
 ## 2026-11-26 — 文件瘦身及腳本導覽完成
 
 - 已完成 `docs/` 根目錄瘦身；保留 `PRD.md`、`TODO.md`、`PROGRESS.md`、`DECISIONS.md`、`ARCHITECTURE.md` 作核心現行文件。

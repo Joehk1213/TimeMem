@@ -730,3 +730,38 @@
 - 構想上每頁由一個 Agent 配一個 Skill 負責，頁面之間以 Link 串連；例如證書連到相片，相片再連到財務（如 HKT 續約 $88／月），並保留可延展的循環連結方向。具體頁面、連結圖及責任邊界未定。
 - Multi-Agent 只預留為概念，不代表現階段實作；新增頁面應以毋須大改整體設計為方向。
 - 本備註只記錄 IDEA，不批准功能、架構、里程碑或 Finance 分析範圍；D-025 對 Finance statistics/analysis 為 Later、phase TBD 的描述維持不變。S1–S10 及所有已批准決策不變；不授權程式碼、schema 或 migration 工作。
+
+### D-027 — M1 階段多模態圖文閉環測試流向（以興趣班 Schedule 為例）
+
+- 日期: 2026-11-26
+- 狀態: Meta 共識；待正式批准後才展開實作
+- 批准人: 待 Joe 確認
+- 決定方向:
+  - 使用興趣班 Schedule 圖片作 M1 合成多模態閉環測試，不以真實家庭相片或個資做驗證資料。
+  - 透過 Vision / OCR 由圖片萃取人物、活動、時間及地點等欄位；固定使用 `qwen3:8b` 作文字／識別任務判定。
+  - OCR 結果經 `bge-m3` 轉為 embedding；每條行程固定為 1 個 chunk。
+  - embedding 寫入本地 PostgreSQL `pgvector`；M1 測試只使用隔離表 `test_schedules`。
+  - 使用者輸入問題後，先轉 embedding，再由 `test_schedules` 即時檢索最相似的 2 條行程。
+  - PWA 即時彈出 RESULT 框，卡片頂部顯示時間、中部顯示人物及地點、底部顯示活動；無結果時顯示「搵唔到相關行程」。
+- 資安合規（Rule-SEC-01）:
+  - 真實相片、OCR 私人內容、個人資料、credentials、`.env`、embeddings、logs及私人 backup 嚴禁寫入 Git。
+  - 公開設定只依賴脫敏 `.env.example`；測試及 evidence 只使用合成資料及本機受控儲存。
+- 理由: 將 M1 圖片上傳、Vision / OCR、embedding、向量入庫、檢索及 PWA 渲染串成單一可量測閉環，方便以興趣班 Schedule 驗證實際流向。
+- 批准邊界: 本決定只記錄 D-052 框架下嘅多模態測試流向；未取得 Joe 正式批准前，不代表批准圖片上傳實作、schema migration、模型選型、外部 API、Cloud 部署或真實資料處理。
+
+### D-053 — M1 圖片主線與 n8n 後勤分工
+
+- 日期: 2026-11-26
+- 狀態: 正式架構方向；實作仍受 D-052 私密測試邊界約束
+- 決策:
+  - M1 第一 Priority 固定為 FastAPI 圖片上傳主線：`Multipart Upload` → 本地 Ollama `qwen3:8b` Vision / OCR → `bge-m3` embedding → PostgreSQL `pgvector` 寫入／檢索 → PWA 彈出 RESULT 框。
+  - 圖片及 OCR 萃取只限合成 Schedule 資料、本機受控儲存及 M1 隔離表 `test_schedules`；未經批准不得加入真實家庭相片或私人 OCR 內容。
+  - 本地 Docker n8n（Port `5678`）定位為後勤自動化外掛及外部觸發器，可接收 Backend Webhook，負責日曆同步、通知提醒或開發期 API 測試。
+  - 核心業務邏輯包括圖片接收、Vision / OCR、embedding、向量寫入、檢索及結果判定，一律留喺 FastAPI，不放入 n8n。
+- 資安合規（Rule-SEC-01）:
+  - 真實 credentials、`.env`、個人資料、相片、OCR 結果、embedding、log及backup 不得進入 Git、公開分享位置或外部服務。
+  - n8n workflow、測試 payload、Webhook 設定及日誌不得保存敏感內容；外部觸發只使用脫敏合成資料。
+- 理由:
+  - 將可量測的多模態最小閉環集中喺 FastAPI，確保核心資料及模型路徑可審計、可停止及可本機驗證；n8n 只承擔非核心後勤工作。
+- 批准邊界:
+  - 本決定固定 M1 主線及後勤分工；唔代表自動批准 production schema、真實個資、PDF、雲端部署或任何外部服務整合。

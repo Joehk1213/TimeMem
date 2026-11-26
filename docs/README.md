@@ -1,6 +1,6 @@
 # TimeMem 文件索引
 
-現行核心文件只包含以下五份；歷史、階段性及待處理資料歸入各自目錄。
+現行 Canonical Files 包含以下七份；歷史、階段性及待處理資料歸入各自目錄。
 
 | 文件 | 用途 |
 |---|---|
@@ -9,6 +9,8 @@
 | [PROGRESS.md](./PROGRESS.md) | 已完成事項、驗證及交接現況。 |
 | [DECISIONS.md](./DECISIONS.md) | 正式決策紀錄。 |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | 系統藍圖及架構參考。 |
+| [GATE.md](./GATE.md) | M0／M1 Gate 狀態及批准邊界。 |
+| [ERRORLOG.md](./ERRORLOG.md) | 錯誤、回歸及處理紀錄。 |
 | [working/](./working/) | 正在使用嘅 SOP、交接狀態及工作草稿。 |
 | [archive/](./archive/) | 歷史及階段性文件；不作現行核心依據。 |
 
