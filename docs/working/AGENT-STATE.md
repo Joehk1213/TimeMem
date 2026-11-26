@@ -8,11 +8,18 @@
 # AGENT-STATE — Multi-Agent 交接狀態板
 
 - **Last Active Agent：** Copilot SDK in VS Code
-- **Timestamp：** 2026-11-26T19:15:47+08:00
-- **Current Milestone：** TimeMem 專案結構精簡、腳本導覽及 M1 開發準備
+- **Timestamp：** 2026-11-26T19:58:26+08:00
+- **Current Milestone：** M1 戰前準備 10/10 滿分就緒
 - **Last Completed Task：** 完成 `docs/` 文件瘦身、歷史文件歸檔、更新 `docs/README.md`，並建立 `scripts/README.md` 自動化腳本導覽地圖
 - **Next Immediate Action：** 可隨時開啟 M1 功能模組開發；按批准範圍逐步執行最小實作圈，完成一項即停止等候下一次批核
 - **Important Warnings：** 專案準備度已達滿分狀態，M0 已正式 PASS；後續仍須按 `docs/TODO.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 同 `docs/PRD.md` 批准範圍執行。呢輪冇刪除任何程式碼。
+
+## M1 硬件與 Tailscale 網絡架構分工
+
+- **Desktop `joe-desktop`**：負責本地開發、編碼、測試、文件修改及 Agent 執行。
+- **Server `joe-server`（`100.122.60.98`）**：負責運行 Docker 容器，包括 `pgvector`、`backend` 同 `frontend`。
+- **手機 `iphone-11-pro`**：負責透過 PWA 驗證介面、回應流程及實機操作。
+- **狀態**：M1 戰前準備 10/10 滿分就緒；私密配置、私密協議及交接架構已對齊，可進入 M1 開發。
 
 ## PWA 合併候選清單（待確認）
 
