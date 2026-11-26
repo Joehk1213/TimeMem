@@ -1,0 +1,9 @@
+{
+  "name": "TimeMem",
+  "short_name": "TimeMem",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#f5f5f5"
+}

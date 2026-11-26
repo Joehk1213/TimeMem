@@ -1,5 +1,9 @@
 # TimeMem Copilot Instructions
 
+## 強制 Multi-Agent 交接規則
+
+- 任何 AI Agent 開始工作前必須先讀取 `docs/PROGRESS.md` 與 `docs/working/AGENT-STATE.md`；每次完成任務後，必須同步更新這兩個檔案。
+
 <!--
 性質：Repository Copilot 操作指引
 用途：規範批准、PROMPT、檔案閱讀同工作模式

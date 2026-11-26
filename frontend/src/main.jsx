@@ -11,9 +11,6 @@ function App() {
     fetch("/ready")
       .then((response) => setStatus(response.ok ? "ready" : "starting"))
       .catch(() => setStatus("offline"));
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
-    }
   }, []);
 
   async function ask(event) {
@@ -75,3 +72,9 @@ function App() {
 }
 
 createRoot(document.getElementById("root")).render(<App />);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch((err) => console.error("SW registration failed:", err));
+  });
+}

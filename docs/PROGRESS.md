@@ -1,5 +1,13 @@
 # PROGRESS — 已完成事項
 
+## 2026-11-25 — Multi-Agent 交接機制同專案文件重整
+
+- 已新增 `docs/working/AGENT-STATE.md`，作為 Multi-Agent 唯一交接狀態板。
+- `.github/copilot-instructions.md` 已加入開工前讀取交接文件、完工後同步更新嘅強制規則。
+- 已確認 `docs/PRD.md` 係現行 V10.2，並只修正開頭格式；舊 V10.2 snapshot 仍保留喺 `docs/archive/`。
+- 舊架構圖及歷史說明已由 `reference/` 移入 `docs/archive/`；無刪除程式碼。
+- PWA 合併候選已列入 `docs/working/AGENT-STATE.md`：`TimeMem-PWA/manifest.json`、`TimeMem-PWA/sw.js`，預定目的地為 `frontend/public/`；暫未搬動或刪除任何程式碼。
+
 ## 2026-11-25 — M1 test plan 完成
 
 - Joe 已批准 M1 private test plan，正式編號為 D-052。

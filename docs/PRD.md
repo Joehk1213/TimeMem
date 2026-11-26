@@ -1,4 +1,4 @@
-****************************# TimeMem — PRD V10.2
+# TimeMem — PRD V10.2
 
 Version: 10.2
 
