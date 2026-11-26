@@ -5,6 +5,18 @@
 幾時可刪：Joe 批准清除完整歷史紀錄，或紀錄正式由新系統取代
 -->
 
+# 2026-11-26 — 新對話 Cold Start 置頂錨點及打包除錯
+
+- **問題 1：** 新舊文件打架（Lost in the Middle）令舊版 `ARCHITECTURE.md` 描述可干擾新對話判斷；舊版 Express Gateway、Obsidian 雙向橋接及 M0 草稿與現行 M1 主線並列時，AI 有機會採信過時資料。
+- **影響：** 新對話可能把舊架構、舊階段或非當前優先工作重新當作最高準則，破壞 M1 Priority 1、Obsidian Hold 同 n8n 後勤分工的一致性。
+- **處理：** `.github/copilot-instructions.md` 最前 25 行加入 `## 🚨 CURRENT ACTIVE DIRECTIVE (M1 OVERRIDE)`；`docs/ARCHITECTURE.md` 頂部加入相同 M1 Active Data Flow；舊版 Express Gateway 標示 Legacy，舊版 Obsidian 雙向橋接標示 Hold；規定新對話只優先採用置頂區塊及 `docs/TODO.md` 頂部。
+- **防護：** `docs/TODO.md` 頂部、置頂指令及架構頂部三者保持相同核心事實；`docs/archive/`、舊 M0 草稿及舊架構圖一律視為歷史，不得凌駕現行文件。
+
+- **問題 2：** 原 `cold-start-pack.ps1` 使用 `git archive HEAD` 製作 ZIP；HEAD 只包含已 commit 版本，會漏載未 commit 的置頂錨點、進度及腳本升級修改。
+- **影響：** ZIP 掃描可回報 PASS，但解壓後仍可能缺少最新現行文件，令第二輪 Cold Start 考牌出現假性 PASS 或錯誤判斷。
+- **處理：** 腳本先匯出 HEAD，再疊加 `git diff --name-only HEAD`及 `git ls-files --others --exclude-standard` 找到嘅工作樹修改／新檔；疊加後仍依原有 `.git`、`.env*`、私人目錄、相片及私鑰規則清洗，最後重做路徑及文字內容掃描。
+- **防護：** ZIP 重建後必須逐項核對置頂指令、架構 Active Data Flow、PROGRESS 錨點紀錄及資安掃描；只有三項錨點命中、0 路徑違規及 0 Secret 命中才可記錄 PACK PASS。
+
 # 2026-11-23 — M0 evidence 同 AUDIT 工具錯誤
 
 - **問題：** REQ-005 嘅 SYSTEM trigger 用 `Get-Process` 搵唔到 `ollama.exe`，曾被誤判做 FAIL。

@@ -2,6 +2,13 @@
 
 > 以下只列未完成工作。原有 Family Calendar System MVP + AI Co-Pilot 清單中的已完成項目已移至 [PROGRESS.md](PROGRESS.md)；該清單的雲端／舊架構工作須先對照現行 PRD V10.2（V10.1 已移至 `docs/archive/TimeMem-PRD-V10-1.md`），不能直接視為已批准的 TimeMem 方向。
 
+## 已完成嘅 Cold Start 包裝工作
+
+- [x] 已建立 `.agents/skills/cold-start-pack/`，提供 `cold-start-pack` 觸發、Git archive、安全過濾及壓縮包掃描流程；完成證據及操作記錄見 [PROGRESS.md](PROGRESS.md)。
+- [x] 已鎖定 `.github/copilot-instructions.md` 同 `docs/ARCHITECTURE.md` 嘅 M1 置頂錨點，舊 Express Gateway 標示 Legacy、Obsidian 雙向橋接標示 Hold。
+- [x] 已升級 `.agents/skills/cold-start-pack/cold-start-pack.ps1`，打包時疊加未 commit 工作樹修改並重跑 Rule-SEC-01 掃描；第二次 ZIP 已以 0 路徑違規、0 Secret 命中 PASS。
+- [ ] 執行第二次 100 分 Cold Start 考牌重考；要求新對話由置頂錨點／TODO 頂部鎖定 M1 Priority 1、Obsidian Hold 同 n8n 後勤定位。
+
 ## M1 下一階段
 
 > D-051 已正式批准 M0 PASS；`owner-private` 係唯一正本，M1 按以下最小圈逐步執行。

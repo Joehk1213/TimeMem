@@ -1,5 +1,28 @@
 # PROGRESS — 已完成事項
 
+## 2026-11-26 — Cold Start 考牌除錯、腳本升級及第二次重考準備
+
+- 已完成一次 M1 置頂錨點 Cold Start 考牌除錯；確認舊版架構敘述會造成 Lost in the Middle，新對話需以置頂指令及 TODO 頂部為最高準則。
+- 已升級 `cold-start-pack.ps1`：先匯出當前 HEAD，再疊加工作樹修改及未追蹤受控新檔，重新過濾敏感資料後重建 ZIP。
+- 最新 ZIP 已完成第二次重建及終檔核對：置頂指令、架構 Active Data Flow、PROGRESS 錨點三項均已命中；資安掃描為 352 個檔案、0 路徑違規、0 Secret 命中、SCAN_STATUS=PASS。
+- 已將兩大除錯教訓同步至 `docs/ERRORLOG.md`，並以 D-054 正式記錄置頂錨點機制及工作樹疊加打包規範。
+- 下一步進入第二次 100 分 Cold Start 考牌重考，重點驗證新對話能否自動鎖定 M1 Priority 1、Obsidian Hold、n8n 後勤定位及 FastAPI 核心閉環。
+
+## 2026-11-26 — M1 置頂錨點鎖死完成
+
+- 已將 `.github/copilot-instructions.md` 新對話置頂區塊更新為 `## 🚨 CURRENT ACTIVE DIRECTIVE (M1 OVERRIDE)`，並鎖定 M1 Priority 1、Obsidian Hold 同 n8n 後勤外掛定位。
+- 已明確要求所有新對話優先採用置頂指令及 `docs/TODO.md` 頂部，唔採信 `docs/archive/`、M0 草稿、舊版架構圖或衝突描述。
+- 已喺 `docs/ARCHITECTURE.md` 頂部加入一致嘅 M1 Active Data Flow，並將舊版 Express Gateway 同 Obsidian 雙向橋接標示為 Legacy／Hold。
+- 已修正 `cold-start-pack`，打包時疊加未 commit 嘅工作樹修改，避免新 ZIP 漏載置頂錨點；最終仍依 Rule-SEC-01 敏感資料過濾及 ZIP 掃描。
+- 本次只調整新對話指引及現行架構／進度文件，唔改產品批准範圍或程式碼。
+
+## 2026-11-26 — Cold Start 安全打包 Skill 完成
+
+- 已新增 `.agents/skills/cold-start-pack/SKILL.md`，定義 `cold-start-pack`、打包乾淨 Repo、做 Cold Start Test 等觸發條件。
+- 已新增 `.agents/skills/cold-start-pack/cold-start-pack.ps1`，使用 `git archive HEAD` 建立暫存匯出；強制剔除 Git metadata、全部 `.env*`、`reference/photo/`、`docs/` 圖片、虛擬環境、私鑰及私人資料目錄，並覆蓋 `C:\Project\TimeMem-clean.zip`。
+- 腳本會掃描 ZIP 路徑及文字內容，檔案、真實 Secret 或私鑰命中非零時回報 FAIL；PASS 時回報 HEAD、ZIP 路徑、檔案總數及 0 違規結果。
+- 已提供標準 Cold Start 測試官 Prompt，可直接複製到新聊天室作冷啓動理解測試。
+
 ## 2026-11-26 — M1 基底結構與核心主線正式對齊
 
 - 已精簡 `.github/copilot-instructions.md`，保留強制收尾同步、架構決策同步、繁體廣東話 Record 語言、Rule-SEC-01 資安紅線及 Obsidian Vault Hold 狀態。

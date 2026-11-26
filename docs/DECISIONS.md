@@ -765,3 +765,17 @@
   - 將可量測的多模態最小閉環集中喺 FastAPI，確保核心資料及模型路徑可審計、可停止及可本機驗證；n8n 只承擔非核心後勤工作。
 - 批准邊界:
   - 本決定固定 M1 主線及後勤分工；唔代表自動批准 production schema、真實個資、PDF、雲端部署或任何外部服務整合。
+
+### D-054 — 置頂錨點機制及工作樹疊加打包規範
+
+- 日期: 2026-11-26
+- 狀態: Approved
+- 決策:
+  - `.github/copilot-instructions.md` 必須喺最前 25 行保留顯眼嘅 `## 🚨 CURRENT ACTIVE DIRECTIVE (M1 OVERRIDE)`；新對話必須優先採用置頂區塊及 `docs/TODO.md` 頂部為最高準則。
+  - `docs/ARCHITECTURE.md` 頂部必須同步維護 M1 當前有效資料流；舊版 Express Gateway 及 Obsidian 雙向橋接分別標示 Legacy／Hold；`docs/archive/`、舊版 M0 草稿及舊架構圖不可凌駕現行決策。
+  - `cold-start-pack.ps1` 必須先匯出當前 `HEAD`，再疊加未 commit 嘅受控工作樹修改及新檔；疊加後仍執行完整 Rule-SEC-01 路徑及內容過濾。
+  - 重建 ZIP 後，需核對 `.github/copilot-instructions.md`、`docs/ARCHITECTURE.md` 及 `docs/PROGRESS.md` 嘅置頂錨點，以及 ZIP 掃描 0 路徑違規／0 Secret 命中。
+- 理由:
+  - 置頂錨點消除新對話讀取順序造成嘅 Lost in the Middle 與舊文件干擾；工作樹疊加避免打包產出只反映 HEAD 而漏載最新未提交紀錄。
+- 批准邊界:
+  - 本決策只規範 AI 新對話準則、現行架構錨點及 Cold Start 打包完整性；唔改變 M0 PASS 或 M1 product approval 範圍。

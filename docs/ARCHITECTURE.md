@@ -5,6 +5,25 @@ type: ARCHITECTURE
 status: Draft
 ---
 
+## 🚨 M1 當前有效資料流（Active Data Flow）
+
+**本區塊係當前架構最高準則之一；如與 `docs/archive/`、舊版 M0 草稿、舊架構圖或下文早期描述衝突，以呢個 M1 Active Data Flow 為準。**
+
+```text
+PWA / HTTP 圖片上傳
+  → FastAPI Multipart Upload
+  → 本地 Ollama qwen3:8b Vision / OCR 萃取
+  → 本地 bge-m3 embedding
+  → PostgreSQL + pgvector 寫入
+  → FastAPI 檢索／判定
+  → PWA 彈出式 RESULT 框
+```
+
+- **當前唯一主線：** M1 Priority 1 必須完成上述閉環；上傳、OCR、embedding、向量檢索、結果判定及資料寫入由 FastAPI＋本地服務完成。
+- **Obsidian：** Vault 整合目前為 **Hold（暫緩）**；Vault 唔係當前 M1 主線，亦唔凌駕 Repo 決策。
+- **n8n：** 本地 Docker n8n（Port `5678`）只係 **後勤自動化外掛／外部觸發器**，可接收 Backend Webhook 作日曆同步、通知或開發期測試；不可取代 FastAPI 核心閉環、不可直連 DB、亦不可成為資料寫入權威。
+- **Legacy 狀態：** 下文及舊圖中嘅 Node / Express Gateway / DAO 配置只保留為 **Legacy** 技術草案；Express Gateway 唔係 M1 FastAPI 圖片上傳閉環嘅主資料流。舊版 Obsidian 雙向橋接／同步構想亦標記為 **Hold**，唔作現行依據。
+
 # TimeMem 現行系統架構
 
 ## 範圍與依據
