@@ -1,5 +1,10 @@
 # TimeMem Copilot Instructions
 
+## 強制收尾同步
+
+- 每當完成任何程式碼修改、架構調整或腳本執行後，無需等待使用者額外指示，必須自動執行「收尾同步」：更新 `docs/PROGRESS.md`、`docs/TODO.md`（勾選已完成項目）及 `docs/working/AGENT-STATE.md`。
+- 若涉及架構或技術選型變更，同步追加記錄至 `docs/DECISIONS.md`。
+
 ## 強制 Multi-Agent 交接規則
 
 - 任何 AI Agent 開始工作前必須先讀取 `docs/PROGRESS.md` 與 `docs/working/AGENT-STATE.md`；每次完成任務後，必須同步更新這兩個檔案。

@@ -1,5 +1,13 @@
 # PROGRESS — 已完成事項
 
+## 2026-11-26 — 文件瘦身及腳本導覽完成
+
+- 已完成 `docs/` 根目錄瘦身；保留 `PRD.md`、`TODO.md`、`PROGRESS.md`、`DECISIONS.md`、`ARCHITECTURE.md` 作核心現行文件。
+- 已將 `GATE.md`、`ERRORLOG.md`、`REQUIREMENTS.md`、`RISKS.md`、`TEST-PLAN.md`、`plan4.md` 歸入 `docs/archive/`；同名衝突時會加上 `2026-11-` 前綴。
+- 已更新 `docs/README.md`，只索引五份核心文件、`docs/working/` 及歷史 `docs/archive/`。
+- 已建立 `scripts/README.md`，按環境安裝與啟動、日常檢查與驗證、備份與證據同步、AI Skills 維護四類整理現有 `.ps1` Script。
+- 專案準備度已達滿分狀態，M0 已 PASS，並已準備隨時開啟 M1 功能模組開發；後續仍須按範圍及批准流程逐步執行。
+
 ## 2026-11-25 — Multi-Agent 交接機制同專案文件重整
 
 - 已新增 `docs/working/AGENT-STATE.md`，作為 Multi-Agent 唯一交接狀態板。

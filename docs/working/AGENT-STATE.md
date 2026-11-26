@@ -8,11 +8,11 @@
 # AGENT-STATE — Multi-Agent 交接狀態板
 
 - **Last Active Agent：** Copilot SDK in VS Code
-- **Timestamp：** 2026-11-25T21:31:47+08:00
-- **Current Milestone：** TimeMem 專案結構及 Multi-Agent 交接機制重整
-- **Last Completed Task：** 建立交接狀態板、加入 AI 協作強制規則、確認 PRD V10.2、歸檔根目錄舊架構參考、盤點 PWA 合併清單
-- **Next Immediate Action：** 由 Joe 確認 `manifest.json` 同 `sw.js` 嘅合併版本後，先更新 `frontend/public/`，再驗證 PWA 註冊及快取行為
-- **Important Warnings：** M0 已正式通過；後續仍須按 `docs/GATE.md`、`docs/TODO.md`、`docs/DECISIONS.md` 同 `docs/PRD.md` 批准範圍執行。呢輪冇刪除任何程式碼。
+- **Timestamp：** 2026-11-26T19:15:47+08:00
+- **Current Milestone：** TimeMem 專案結構精簡、腳本導覽及 M1 開發準備
+- **Last Completed Task：** 完成 `docs/` 文件瘦身、歷史文件歸檔、更新 `docs/README.md`，並建立 `scripts/README.md` 自動化腳本導覽地圖
+- **Next Immediate Action：** 可隨時開啟 M1 功能模組開發；按批准範圍逐步執行最小實作圈，完成一項即停止等候下一次批核
+- **Important Warnings：** 專案準備度已達滿分狀態，M0 已正式 PASS；後續仍須按 `docs/TODO.md`、`docs/DECISIONS.md`、`docs/ARCHITECTURE.md` 同 `docs/PRD.md` 批准範圍執行。呢輪冇刪除任何程式碼。
 
 ## PWA 合併候選清單（待確認）
 
