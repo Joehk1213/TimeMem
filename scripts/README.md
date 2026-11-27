@@ -42,3 +42,14 @@
 | `check-skills-sync.ps1` | 檢查 AI Skills 同步狀態 | 提交前或例行 Skills 綜合檢查 |
 
 筆記參考：`run sync skill.txt`；只作 AI Skills 維護操作提示，不屬可執行 `.ps1`。
+
+## 部署與共識同步
+
+| Script | 用途 | 執行時機 |
+|---|---|---|
+| `deploy_all.bat` | Direct Mode 部署：本機 Commit／Push，再透過 PPK 私鑰同 `plink.exe`由 JOE-SERVER 執行 Git pull 及 `docker compose up -d` | 手動部署至 JOE-SERVER；Docker Desktop 必須保持常駐 |
+| `sync_consensus.bat` | 納入 `docs/Summary/`共識摘要、Commit及 Push 到主 Repo | 手動同步多份 Summary；現時保留終端輸出及人工確認 |
+
+執行部署時，只可使用本機 `%USERPROFILE%\.ssh\joe-server.ppk` 私鑰；不得將密碼、Private Key、API Key或 `.env`寫入批次檔或 Git。Docker daemon、npipe、SSH Host Key或容器異常時停止並由 Joe 人手登入 JOE-SERVER 排查。
+
+n8n 及外部知識同步目前只作後勤 Workflow 設計；若要以 n8n 自動呼叫腳本，需另行完成及驗證靜默參數、Workflow JSON、Google Drive Archive、香港時間檔名及資料脫敏，不可視為已實際落地。

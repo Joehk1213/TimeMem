@@ -857,3 +857,45 @@
   - 完成舊 Repo Autopsy 後，可將確定可利用資產、只可參考資產及絕對禁止區域分開，避免資產價值被誤解為功能批准、或資安紅線在不同 Cold Start／備份流程中漏失。
 - 批准邊界:
   - 本決策批准上述歷史資產分類、資料庫／PDF 架構參考用途及打包資安共識；未批准直接復用舊程式碼、遷移密碼資料、處理真實相片、修改現行資料流、建立正式 migration 或更新 UI／部署。
+
+### D-059 — Direct Mode 遠端部署與 Docker 常駐規範
+
+- 日期: 2026-11-28
+- 狀態: Approved；只適用現有部署操作，唔改動 M1 產品資料流
+- 決策:
+  - `scripts\deploy_all.bat`係 JOE-DESKTOP 至 JOE-SERVER 嘅現行 Direct Mode 部署入口：本機先做 Git 狀態檢查、Commit／Push，再以 `plink.exe`連線遠端，執行 `cd /d C:\Project\TimeMem && git pull origin main && docker compose up -d`。
+  - 部署腳本唔再透過批次檔、非互動 SSH 或背景工序停止／重啟 Docker Desktop；JOE-SERVER 嘅 Docker Desktop 必須保持常駐以避免 `npipe:////./pipe/dockerDesktopLinuxEngine`等進程認證死結。
+  - 遠端 Docker engine、Compose、Git 或容器健康出現異常時，腳本只可停止並報錯，不得盲目重試、改遠端設定或扮成功。
+  - 對失敗嘅 Docker daemon 或認證狀況，Joe 必須人手登入 JOE-SERVER 排查；腳本恢復前以實際容態及日誌為準。
+- 理由:
+  - Direct Mode 將本機同步與遠端拉取／啟動分成可觀察步驟，避開在無互動 SSH 會話背景重啟 Docker 所引致嘅 Windows 憑證及命名管道失效。
+- 批准邊界:
+  - 本決策批准現行部署走線及遠端人工介入規則，不批准背景 daemon 自癒、外部公開入口、DB 直連或更改 M1 核心閉環。
+
+### D-060 — 雙軌雙庫與 n8n 知識同步閉環
+
+- 日期: 2026-11-28
+- 狀態: Approved，n8n Workflow 實作及腳本靜默整合仍為待落地事項
+- 決策:
+  - 軌道 A 固定為 TimeMem 程式碼及遠端部署：`C:\Project\TimeMem`負責開發、PWA、Docker及遠端容器更新；現行入口為 `scripts\deploy_all.bat`。
+  - 軌道 B 固定為跨專案知識同步：`C:\Project\REPO`負責知識、中介模板、Cold Start 範本及規範；現行共識產物可由 `scripts\sync_consensus.bat`納入 `docs/Summary/`後提交。
+  - n8n 可經 Google Drive Dropzone 偵測 Gemini 產生嘅 Summary、判斷目標庫、呼叫本地腳本及移動至 Archive；本地時間命名必須使用香港時區格式 `YYYYMMDDHHMM_latest_summary.md`。
+  - n8n 自動呼叫腳本時應傳入靜默參數以跳過手動 `pause`；手動執行仍保留終端檢視及確認停頓。
+- 資安邊界:
+  - n8n 僅作雲端觸發／本地知識同步及後勤通知，不得進入 FastAPI 核心閉環，不得直連或寫入 PostgreSQL，不得保存真實相片、OCR、個資、憑證、log或 backup。
+- 批准邊界:
+  - 本決策批准雙軌定位及閉環方向；實際 Workflow JSON、`--silent`完整整合及跨庫自動提交仍須逐項驗證，不視為已存在。
+
+### D-061 — SSH 私鑰鑑權與人工介入資安政策
+
+- 日期: 2026-11-28
+- 狀態: Approved
+- 決策:
+  - 遠端部署不得將密碼、Private Key、Token或任何秘密寫入 `.bat`、`.ps1`、Markdown、Git或 n8n Workflow。
+  - 現行 `deploy_all.bat`使用本機 `%USERPROFILE%\.ssh\joe-server.ppk` 私鑰及 `plink.exe`進行 SSH 驗證；私鑰只留在控制主機受控目錄，腳本只以環境位置引用。
+  - Host Key 指紋、私鑰產生、權限與伺服器帳號鑑權應由 Joe 人手確認；腳本不得把已知密碼硬寫入指令列或自動繞過 fingerprint 確認。
+  - 發現明文密碼時立即停止相關腳本，移除及輪換秘密，並不得將含秘密嘅提交推送到任何遠端。
+- 理由:
+  - 由密鑰鑑權取代密碼硬寫可降低來源控制洩漏及批次檔重播風險；人手介入仍是 Docker／SSH 失效時嘅受控止境。
+- 批准邊界:
+  - 本決策只固定資安實作與停止規則，不批准處理任何未經脫敏嘅真實私密資料。

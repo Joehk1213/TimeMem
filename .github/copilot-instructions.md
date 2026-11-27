@@ -7,6 +7,7 @@
 3. **n8n 定位：** 本地 Docker n8n（Port `5678`）只作**後勤自動化外掛／外部觸發器**，負責接收 Backend Webhook 觸發日曆同步／通知或開發期測試；嚴禁取代 FastAPI 核心閉環，亦嚴禁直連或寫入 DB。
 4. **品牌與閉環：** 中文名「時光管家」、英文名「TimeMem」、Slogan「守護每一刻時光／Remember what matters.」；堅持 100% Self-Host、資料不出雲。
 5. **雙機與網絡：** 兩部 Fujitsu Lifebook U9311X；JOE-DESKTOP 為 Windows 10 僅 C 槽隨身開發及 Tailscale RDP 機；JOE-SERVER 為 Windows 11 C+D 槽家中主力機及唯一可寫生產資料庫主機，資料放 `D:\docker-data\timemem\`，只限 Tailscale、禁止開 Router Port。
+6. **部署與資安：** `scripts\deploy_all.bat`只作 Direct Mode 部署，使用本機 PPK 私鑰及 `plink.exe`，Docker Desktop 需常駐；不得內嵌密碼、私鑰或秘密，Docker／SSH 異常時必須停止並由 Joe 人手介入。n8n 只作後勤觸發及知識同步，不得直連 PostgreSQL、取代 FastAPI 或保存真實私人資料。
 
 # TimeMem Copilot Instructions
 

@@ -2,6 +2,15 @@
 
 > 以下只列未完成工作。原有 Family Calendar System MVP + AI Co-Pilot 清單中的已完成項目已移至 [PROGRESS.md](PROGRESS.md)；該清單的雲端／舊架構工作須先對照現行 PRD V10.3，不能直接視為已批准的 TimeMem 方向。
 
+## 部署、自動化及資安收尾
+
+- [ ] 補齊 `scripts\deploy_all.bat`與現行部署 SOP 嘅實機 evidence：確認 PPK 私鑰路徑、Tailscale／Host fingerprint、Docker 常駐及 `docker compose up -d`結果。
+- [ ] 決定並驗證前端更新時是否需要 `docker compose build --no-cache frontend`；完成前不得將 Summary 中嘅 rebuild 步驟描述為現行腳本已實作。
+- [ ] 為 `sync_consensus.bat`及部署入口補上一致嘅 `--silent`靜默參數；手動執行保留 `pause`及可讀結果，自動流程避免阻塞。
+- [ ] 取得可審核嘅 n8n Workflow JSON：包含 Google Drive Dropzone Trigger、TimeMem／REPO 路由、本地腳本呼叫、Archive 移動及香港時區重命名節點。
+- [ ] 驗證 n8n Archive 命名只產生 `YYYYMMDDHHMM_latest_summary.md`，並確認工作流唔保存秘密、私人相片、OCR、個資、embedding、log或 backup。
+- [ ] 審查所有部署及自動化腳本中嘅密碼、PPK 私鑰、API Key、`.env`及目錄引用；確認不存在明文秘密或自動繞過 Host Key fingerprint確認。
+
 ## Canonical Files 收尾及最新 Cold Start
 
 - [ ] 完成 `README.md`及七份 Canonical Files 的最終一致性覆核；確認品牌、雙機硬體、M1 閉環、Obsidian Hold、n8n 邊界及資料不出雲規則毫無矛盾。

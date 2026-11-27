@@ -1,5 +1,16 @@
 # PROGRESS — 已完成事項
 
+## 2026-11-28 — Direct Mode、雙軌雙庫及部署資安共識落檔
+
+- 已核實 `scripts\deploy_all.bat`係現行 Direct Mode 入口：本機先執行 Git 狀態檢查、Commit／Push，再透過 `plink.exe -i %USERPROFILE%\.ssh\joe-server.ppk`連至 `joe-server`，遠端執行 `git pull origin main && docker compose up -d`。
+- 已確認 JOE-SERVER Docker Desktop 需保持常駐；不再由腳本背景執行遠端 `net stop/start`或把 Docker daemon 崩潰設為可盲目自癒流程。若遇 npipe、認證或容器異常，由 Joe 人手登入伺服器排查。
+- 已確認雙軌定位：`C:\Project\TimeMem`負責產品、PWA及部署；`C:\Project\REPO`負責跨專案知識、模板及 Cold Start；兩者使用獨立 Repo 與資料邊界。
+- 已落實 n8n 為雲端觸發與本地知識同步閉環嘅後勤設計，但未核實可匯入嘅 Workflow JSON；n8n 仍不得直連 PostgreSQL、不能取代 FastAPI核心閉環或保存私人內容。
+- 已確認香港時間 Summary 歷史檔名規範為 `YYYYMMDDHHMM_latest_summary.md`；自動歸檔使用 Luxon `Asia/Hong_Kong`轉換。
+- 已核實部署腳本使用 PPK 私鑰而非內嵌密碼；部署密碼、API Key、Private Key及 `.env`不得提交 Git。未發現遠端密碼明文寫入現行 `deploy_all.bat`；文件仍記錄歷史教訓及人工介入止境。
+- 已將三項共識沉澱至 `docs/DECISIONS.md`：D-059 Direct Mode 部署、D-060 雙軌雙庫及 n8n 閉環、D-061 SSH 私鑰鑑權與人工介入資安。
+- 下一步仍需核對及補齊：`sync_consensus.bat`靜默模式、n8n Workflow JSON、Google Drive Archive／命名節點，以及部署腳本是否需要前端 no-cache rebuild；未完成項目同步至 TODO，不得當作已落地。
+
 ## 2026-11-27 — FamilySystem 舊 Repo 歷史資產 Autopsy 共識落檔
 
 - 已完成舊 Repo 壓縮包 `C:\Project\FamilySystem-Cleaned.zip` 共 352 個檔案項目的歷史資產審查；呢次只確認可攜資產、架構參考及資安紅線，唔代表批准直接搬運舊程式碼、資料或相片。
