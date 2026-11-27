@@ -1,4 +1,4 @@
-const CACHE_NAME = "timemem-m0-shell-v1";
+const CACHE_NAME = "timemem-pwa-shell-v2";
 const SHELL_FILES = ["./", "./index.html", "./manifest.json"];
 
 self.addEventListener("install", (event) => {

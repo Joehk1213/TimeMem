@@ -1,15 +1,2662 @@
 <!doctype html>
 <html lang="zh-Hant">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#173c35" />
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" type="image/png" href="/icon.png" />
-    <title>TimeMem</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="description" content="TimeMem 示範介面：感受記憶回顧與記錄互動。">
+  <title>TimeMem｜Remember what matters?</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <style>
+    :root {
+      --頁面底色: #FFFFFF;
+      --卡片底色: #FFFFFF;
+      --對話框底色: #FFFFFF;
+      --品牌主色: #303030;
+      --品牌深色: #171717;
+      --品牌淺色: #F4F6F8;
+      --主要文字色: #1D1D1D;
+      --次要文字色: #4F4F4F;
+      --邊框色: #E1E5E9;
+      --成功色: #315D43;
+      --提醒色: #77500B;
+      --錯誤色: #9B3028;
+      --鍵盤焦點色: #175A83;
+      --遮罩色: rgba(24, 32, 40, 0.28);
+      --介面字體: system-ui, sans-serif;
+      --字元字體: ui-monospace, SFMono-Regular, Consolas, monospace;
+      --背景鯊魚透明度: 0.68;
+      --記憶卡透明面: rgba(255, 255, 255, 0.22);
+      --輸入聚焦底色: #F8FAFC;
+      --標題大小: 1.5rem;
+      --正文大小: 1rem;
+      --輔助文字大小: 0.875rem;
+      --正文行高: 1.6;
+      --間距極細: 0.25rem;
+      --間距細: 0.5rem;
+      --間距小: 0.75rem;
+      --間距中: 1rem;
+      --間距大: 1.5rem;
+      --間距特大: 2rem;
+      --小圓角: 0.5rem;
+      --欄位圓角: 0.75rem;
+      --卡片圓角: 1rem;
+      --浮層陰影: 0 12px 32px rgba(24, 32, 40, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-width: 320px;
+      background: #FFFFFF;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      position: relative;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+      margin: 0;
+      overflow-x: hidden;
+      background: linear-gradient(
+        180deg,
+        #C6C6C6 0%,
+        #F1F1F1 16%,
+        #FFFFFF 32%,
+        #FFFFFF 84%,
+        #F2F2F2 100%
+      );
+      color: var(--主要文字色);
+      font-family: var(--介面字體);
+      font-size: var(--正文大小);
+      line-height: var(--正文行高);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      min-width: 44px;
+      min-height: 44px;
+      border: 1px solid var(--邊框色);
+      border-radius: var(--小圓角);
+      padding: var(--間距細) var(--間距中);
+      background: #FFFFFF;
+      color: var(--主要文字色);
+      cursor: pointer;
+      text-decoration: none;
+      text-underline-offset: 0.2em;
+      transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+    }
+
+    button:hover {
+      border-color: #C8D0D8;
+      background: #F8FAFC;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--鍵盤焦點色);
+      outline-offset: 3px;
+    }
+
+    .site-header {
+      position: relative;
+      z-index: 4;
+      display: flex;
+      width: min(100% - 40px, 1120px);
+      min-height: 80px;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--間距中);
+      margin: 0 auto;
+      border-bottom: 1px solid var(--邊框色);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--間距小);
+      color: var(--主要文字色);
+      font-size: 1.125rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+    }
+
+    .demo-badge,
+    .demo-label {
+      display: inline-flex;
+      min-height: 28px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--邊框色);
+      border-radius: 999px;
+      padding: 0.1rem 0.65rem;
+      background: var(--品牌淺色);
+      color: var(--品牌深色);
+      font-size: var(--輔助文字大小);
+      font-weight: 700;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
+    .demo-badge,
+    .demo-label,
+    .header-actions,
+    .demo-controls,
+    .site-footer {
+      display: none;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: var(--間距細);
+    }
+
+    .button-secondary {
+      border-color: var(--邊框色);
+      background: #FFFFFF;
+      color: var(--品牌深色);
+    }
+
+    .button-secondary:hover {
+      border-color: #C8D0D8;
+      background: #F8FAFC;
+      color: var(--品牌深色);
+    }
+
+    .memory-field {
+      position: fixed;
+      z-index: 1;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .fish-field {
+      position: fixed;
+      z-index: 0;
+      width: 100vw;
+      height: 100vh;
+      inset: 0;
+      display: block;
+      overflow: hidden;
+      pointer-events: none;
+      color: #1B1B1B;
+      font-family: var(--字元字體);
+      filter: blur(0.32px);
+      opacity: var(--背景鯊魚透明度);
+    }
+
+    .memory-orbit {
+      position: absolute;
+      z-index: 2;
+      display: grid;
+      width: 196px;
+      min-height: 84px;
+      justify-items: start;
+      align-content: start;
+      gap: var(--間距細);
+      border: 1px solid rgba(140, 150, 160, 0.34);
+      border-radius: var(--卡片圓角);
+      padding: var(--間距中);
+      background: var(--記憶卡透明面);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(24, 32, 40, 0.035);
+      color: var(--主要文字色);
+      pointer-events: auto;
+      text-align: left;
+      text-decoration: none;
+      animation: memory-drift var(--漂移時間, 28s) ease-in-out var(--漂移延遲, 0s) infinite alternate;
+      transform-origin: center;
+    }
+
+    .memory-orbit:hover,
+    .memory-orbit:focus-visible {
+      z-index: 2;
+      border-color: #C8D0D8;
+      background: var(--記憶卡透明面);
+      color: var(--主要文字色);
+    }
+
+    .memory-orbit:hover {
+      animation-play-state: paused;
+    }
+
+    body.回顧已開啟 .memory-orbit {
+      animation-play-state: paused;
+    }
+
+    .memory-orbit--one {
+      top: 20%;
+      left: max(18px, calc((100vw - 1160px) / 2));
+    }
+
+    .memory-orbit--two {
+      top: 24%;
+      right: max(18px, calc((100vw - 1160px) / 2));
+    }
+
+    .memory-orbit--three {
+      bottom: 17%;
+      left: max(42px, calc((100vw - 1100px) / 2));
+    }
+
+    .memory-orbit--four {
+      right: max(42px, calc((100vw - 1100px) / 2));
+      bottom: 14%;
+    }
+
+    .memory-orbit__topline {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--間距細);
+    }
+
+    .memory-orbit__category {
+      color: var(--次要文字色);
+      font-size: var(--輔助文字大小);
+    }
+
+    .memory-orbit__title {
+      font-size: 0.95rem;
+      font-weight: 650;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .memory-orbit__caption {
+      color: var(--次要文字色);
+      font-size: var(--輔助文字大小);
+    }
+
+    .memory-orbit__picture,
+    .dialog-picture {
+      display: flex;
+      width: 100%;
+      min-height: 68px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(140, 150, 160, 0.34);
+      border-radius: var(--小圓角);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--品牌深色);
+      font-size: var(--輔助文字大小);
+      font-weight: 650;
+    }
+
+    @keyframes memory-drift {
+      0% {
+        transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+        border-radius: 1rem;
+      }
+
+      24% {
+        transform: translate3d(var(--漂移一橫向), var(--漂移一縱向), 0) rotate(var(--漂移一角度)) scale(var(--縮放幅度));
+        border-radius: 1.45rem 0.85rem 1.2rem 0.75rem;
+      }
+
+      50% {
+        transform: translate3d(var(--漂移二橫向), var(--漂移二縱向), 0) rotate(var(--漂移二角度)) scale(0.98);
+        border-radius: 0.75rem 1.4rem 0.8rem 1.25rem;
+      }
+
+      76% {
+        transform: translate3d(var(--漂移三橫向), var(--漂移三縱向), 0) rotate(var(--漂移三角度)) scale(1.03);
+        border-radius: 1.2rem 0.8rem 1.45rem 0.85rem;
+      }
+
+      100% {
+        transform: translate3d(var(--漂移四橫向), var(--漂移四縱向), 0) rotate(var(--漂移四角度)) scale(1);
+        border-radius: 0.85rem 1.3rem 0.75rem 1.4rem;
+      }
+    }
+
+    .living-photo-wall {
+      position: fixed;
+      z-index: 0;
+      inset: 48px 0 0;
+      overflow: hidden;
+      background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.58) 0%, rgba(255, 255, 255, 0.24) 28%, transparent 74%);
+      pointer-events: none;
+    }
+
+    .living-photo-wall::after {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.28) 30%, transparent 76%);
+      content: "";
+      pointer-events: none;
+    }
+
+    .living-photo-wall img {
+      position: absolute;
+      top: var(--y);
+      left: var(--x);
+      width: var(--s);
+      height: var(--s);
+      border-radius: 16px;
+      object-fit: cover;
+      opacity: 0.28;
+      transform: translate(-50%, -50%) rotate(var(--r)) scale(0.9);
+      animation: living-photo-drift var(--d) infinite alternate ease-in-out;
+      transition: opacity 240ms ease;
+      pointer-events: none;
+    }
+
+    @keyframes living-photo-drift {
+      from {
+        transform: translate(-50%, -50%) rotate(var(--r)) scale(0.9);
+      }
+      to {
+        transform: translate(calc(-50% + 7px), calc(-50% - 10px)) rotate(var(--r)) scale(1.1);
+      }
+    }
+
+    .page-main {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      width: min(100% - 40px, 720px);
+      flex: 1;
+      align-self: center;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(1.5rem, 5vh, 3rem) 0;
+      background: transparent;
+      text-align: center;
+    }
+
+    .entry-layer {
+      position: relative;
+      isolation: isolate;
+    }
+
+    .entry-layer::before {
+      position: absolute;
+      z-index: 0;
+      inset: -0.75rem 15%;
+      border-radius: var(--卡片圓角);
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      content: "";
+      pointer-events: none;
+    }
+
+    .entry-layer > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      margin: 0 0 var(--間距小);
+      color: var(--品牌深色);
+      font-size: var(--輔助文字大小);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      text-wrap: balance;
+    }
+
+    .intro {
+      max-width: 36rem;
+      margin: var(--間距中) auto 0;
+      color: var(--次要文字色);
+    }
+
+    .entry-form {
+      display: grid;
+      width: 70%;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: "attachment field submit";
+      align-items: center;
+      gap: var(--間距細);
+      margin: var(--間距中) auto 0;
+      border: 1px solid rgba(140, 150, 160, 0.3);
+      border-radius: var(--卡片圓角);
+      padding: var(--間距細);
+      background: rgba(255, 255, 255, 0.72);
+      text-align: left;
+      transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .entry-form:focus-within {
+      border-color: #A8B3BD;
+      box-shadow: 0 0 0 3px rgba(48, 48, 48, 0.08);
+    }
+
+    .field-wrap {
+      grid-area: field;
+      display: grid;
+      gap: 0.125rem;
+    }
+
+    .field-wrap label {
+      color: var(--次要文字色);
+      font-size: var(--輔助文字大小);
+      font-weight: 500;
+    }
+
+    .field-wrap label,
+    .entry-note,
+    .demo-message {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    .field-wrap input {
+      width: 100%;
+      min-width: 0;
+      min-height: 44px;
+      border: 0;
+      border-radius: var(--小圓角);
+      padding: 0.5rem 0.75rem;
+      background: transparent;
+      color: var(--主要文字色);
+    }
+
+    .field-wrap input:focus {
+      background: transparent;
+      outline: none;
+    }
+
+    .field-wrap input:focus-visible {
+      outline: 3px solid var(--鍵盤焦點色);
+      outline-offset: 3px;
+    }
+
+    .field-wrap input::placeholder {
+      color: var(--次要文字色);
+      opacity: 1;
+    }
+
+    .entry-form > button[type="submit"] {
+      grid-area: submit;
+      width: 48px;
+      min-height: 44px;
+      padding: 0;
+      border-color: var(--品牌主色);
+      background: var(--品牌主色);
+      color: #FFFFFF;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .entry-form > button[type="submit"]:hover {
+      border-color: var(--品牌深色);
+      background: var(--品牌深色);
+      color: #FFFFFF;
+    }
+
+    .entry-form .attachment-button {
+      position: relative;
+      grid-area: attachment;
+      width: 44px;
+      min-height: 44px;
+      border-color: transparent;
+      padding: 0;
+      background: transparent;
+      color: var(--次要文字色);
+      font-size: 1.75rem;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .entry-form .attachment-button:hover {
+      border-color: transparent;
+      background: var(--品牌淺色);
+      color: var(--品牌深色);
+    }
+
+    .attachment-count {
+      position: absolute;
+      top: -0.2rem;
+      right: -0.2rem;
+      min-width: 1.1rem;
+      border: 1px solid var(--邊框色);
+      border-radius: 999px;
+      padding: 0 0.2rem;
+      background: #FFFFFF;
+      color: var(--次要文字色);
+      font-size: 0.65rem;
+      line-height: 1rem;
+    }
+
+    .entry-note {
+      margin: var(--間距細) 0 0;
+      color: var(--次要文字色);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .demo-message {
+      min-height: 1.6em;
+      margin: var(--間距小) 0 0;
+      color: var(--品牌深色);
+      text-align: left;
+    }
+
+    .demo-message[data-kind="error"] {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+      color: var(--錯誤色);
+    }
+
+    .demo-state-panel,
+    .demo-list {
+      border: 1px solid var(--邊框色);
+      border-radius: var(--卡片圓角);
+      padding: var(--間距大);
+      background: #FFFFFF;
+      text-align: left;
+    }
+
+    .demo-state-panel h2,
+    .demo-list h2 {
+      margin: var(--間距細) 0;
+      font-size: var(--標題大小);
+      line-height: 1.35;
+    }
+
+    .demo-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--間距細);
+      margin-top: var(--間距大);
+    }
+
+    .demo-state-panel,
+    .demo-list {
+      margin-top: var(--間距中);
+    }
+
+    .demo-state-panel[hidden],
+    .demo-list[hidden],
+    [hidden] {
+      display: none;
+    }
+
+    .demo-state-text {
+      margin: var(--間距細) 0 var(--間距中);
+      color: var(--次要文字色);
+    }
+
+    .demo-list ul {
+      display: grid;
+      gap: 0;
+      margin: var(--間距中) 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .demo-list li + li {
+      border-top: 1px solid var(--邊框色);
+    }
+
+    .demo-list-item {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--間距中);
+      border: 0;
+      border-radius: 0;
+      padding: var(--間距中) var(--間距細);
+      background: transparent;
+      color: var(--主要文字色);
+      text-decoration: none;
+      text-align: left;
+    }
+
+    .demo-list-item:hover {
+      border-color: transparent;
+      background: transparent;
+      color: var(--主要文字色);
+    }
+
+    .demo-list-item__title {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      font-weight: 650;
+    }
+
+    .demo-list-item__time {
+      flex: 0 0 auto;
+      color: var(--次要文字色);
+      font-size: var(--輔助文字大小);
+    }
+
+    .site-footer {
+      position: relative;
+      z-index: 1;
+      width: min(100% - 40px, 1120px);
+      margin: 0 auto;
+      border-top: 1px solid var(--邊框色);
+      padding: var(--間距中) 0 var(--間距大);
+      color: var(--次要文字色);
+      font-size: var(--輔助文字大小);
+      text-align: center;
+    }
+
+    body .site-header .header-actions,
+    body .page-main .demo-controls,
+    body .site-footer {
+      display: none;
+    }
+
+    dialog {
+      width: min(92vw, 480px);
+      max-height: min(82vh, 720px);
+      overflow: auto;
+      border: 1px solid var(--邊框色);
+      border-radius: var(--卡片圓角);
+      padding: var(--間距大);
+      background: var(--對話框底色);
+      color: var(--主要文字色);
+      box-shadow: var(--浮層陰影);
+    }
+
+    dialog::backdrop {
+      background: var(--遮罩色);
+    }
+
+    .memory-dialog--hover {
+      position: fixed;
+      inset: auto;
+      z-index: 20;
+      margin: 0;
+      border-color: rgba(140, 150, 160, 0.34);
+      pointer-events: none;
+      background: #FFFFFF;
+      opacity: 1;
+      box-shadow: 0 16px 40px rgba(24, 32, 40, 0.2);
+    }
+
+    .memory-dialog--hover .dialog-actions {
+      display: none;
+    }
+
+    dialog h2 {
+      margin: var(--間距中) 0 var(--間距細);
+      font-size: var(--標題大小);
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    dialog p {
+      overflow-wrap: anywhere;
+    }
+
+    .dialog-meta {
+      color: var(--次要文字色);
+      font-size: var(--輔助文字大小);
+    }
+
+    .dialog-picture {
+      min-height: 148px;
+      margin: var(--間距中) 0;
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: var(--間距大);
+    }
+
+    @media (max-width: 760px) {
+      :root {
+        --背景鯊魚透明度: 0.68;
+      }
+
+      .site-header {
+        width: min(100% - 28px, 1120px);
+        min-height: 72px;
+        gap: var(--間距細);
+      }
+
+      .brand {
+        gap: var(--間距細);
+        font-size: 1rem;
+      }
+
+      .header-actions {
+        gap: 0.35rem;
+      }
+
+      .header-actions button {
+        padding-inline: var(--間距細);
+        font-size: var(--輔助文字大小);
+      }
+
+      .page-main {
+        width: min(100% - 32px, 720px);
+        padding-top: clamp(2.5rem, 8vh, 4rem);
+        background: transparent;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: center;
+        padding: var(--間距小) 0;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .page-main {
+        width: min(100% - 32px, 720px);
+        padding-top: 3rem;
+      }
+
+      .entry-form {
+        width: 100%;
+        gap: var(--間距小);
+        margin-top: var(--間距大);
+      }
+
+      .entry-layer::before {
+        inset: -0.75rem -1rem;
+      }
+
+      .demo-state-panel,
+      .demo-list {
+        padding: var(--間距中);
+      }
+
+      .demo-list-item {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: var(--間距細);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .living-photo-wall img {
+        animation: none !important;
+      }
+
+      .memory-orbit {
+        animation-name: memory-drift !important;
+        animation-duration: var(--漂移時間, 15s) !important;
+        animation-iteration-count: infinite !important;
+        animation-direction: alternate !important;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="TimeMem 示範首頁">
+      <span>TimeMem</span>
+      <span class="demo-badge">示範</span>
+    </a>
+    <nav class="header-actions" aria-label="示範操作">
+      <button class="button-secondary" id="toggle-state" type="button" aria-controls="demo-state" aria-expanded="false">展示狀態</button>
+      <button class="button-secondary" id="toggle-list" type="button" aria-controls="demo-list" aria-expanded="false">查看示範列表</button>
+    </nav>
+  </header>
+
+  <main class="page-main">
+    <div class="entry-layer">
+      <h1>Remember what matters?</h1>
+
+      <form class="entry-form" id="memory-form" novalidate>
+        <div class="field-wrap">
+          <label class="visually-hidden" for="memory-input">此刻的想法</label>
+          <input id="memory-input" name="memory" type="text" maxlength="240" autocomplete="off" aria-describedby="entry-note">
+        </div>
+        <input class="visually-hidden" id="attachment-input" name="attachments" type="file" multiple tabindex="-1">
+        <button class="attachment-button" id="attachment-button" type="button" aria-label="加入附件">+<span class="attachment-count" id="attachment-count" hidden aria-live="polite"></span></button>
+        <button type="submit" aria-label="顯示預覽">→</button>
+      </form>
+    </div>
+    <p class="entry-note visually-hidden" id="entry-note">示範輸入不會保存；重新載入頁面後會消失。</p>
+    <p class="demo-message visually-hidden" id="form-message" role="status" aria-live="polite"></p>
+
+    <div class="demo-controls">
+      <button class="button-secondary" id="next-state" type="button">切換示範狀態</button>
+    </div>
+
+    <section class="demo-state-panel" id="demo-state" aria-labelledby="demo-state-title" hidden>
+      <span class="demo-label">介面狀態示範</span>
+      <h2 id="demo-state-title">示範狀態</h2>
+      <p class="demo-state-text" id="demo-state-text" role="status" aria-live="polite"></p>
+      <button class="button-secondary" id="reset-state" type="button">重設示範狀態</button>
+    </section>
+
+    <section class="demo-list" id="demo-list" aria-labelledby="demo-list-title" hidden>
+      <span class="demo-label">全部內容均為示範</span>
+      <h2 id="demo-list-title">最近的示範回顧</h2>
+      <ul id="demo-list-items"></ul>
+    </section>
+  </main>
+
+  <div class="living-photo-wall" id="living-photo-wall" aria-hidden="true"></div>
+  <div class="memory-field" id="memory-field" role="group" aria-label="示範漂浮記憶"></div>
+
+  <footer class="site-footer">
+    此頁只展示介面互動，未連接資料服務；所有回憶內容均為示範。
+  </footer>
+
+  <dialog id="memory-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-description">
+    <span class="demo-label">示範內容</span>
+    <div class="dialog-picture" id="dialog-picture" role="img" aria-label="記憶圖片預覽"></div>
+    <p class="dialog-meta" id="dialog-meta"></p>
+    <h2 id="dialog-title"></h2>
+    <p id="dialog-description"></p>
+    <div class="dialog-actions">
+      <button class="button-secondary" id="close-dialog" type="button">關閉回顧</button>
+    </div>
+  </dialog>
+
+  <script>
+    /*
+     * Adapted from stackedlol/ascii-sharks (https://github.com/stackedlol/ascii-sharks).
+MIT License
+
+Copyright (c) 2026 drewdi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+     */
+    "use strict";var TimeMemSharks=(()=>{var Ft=Object.defineProperty;var Qt=Object.getOwnPropertyDescriptor;var Jt=Object.getOwnPropertyNames;var te=Object.prototype.hasOwnProperty;var ee=(o,t)=>{for(var n in t)Ft(o,n,{get:t[n],enumerable:!0})},ne=(o,t,n,e)=>{if(t&&typeof t=="object"||typeof t=="function")for(let s of Jt(t))!te.call(o,s)&&s!==n&&Ft(o,s,{get:()=>t[s],enumerable:!(e=Qt(t,s))||e.enumerable});return o};var se=o=>ne(Ft({},"__esModule",{value:!0}),o);var de={};ee(de,{AsciiRenderer:()=>mt,OceanEngine:()=>At,World:()=>ut,paintGrid:()=>Zt});var ht=Math.PI*2,I=(o,t,n)=>o<t?t:o>n?n:o,z=(o,t)=>o+Math.random()*(t-o),Pt=(o,t)=>Math.floor(z(o,t+1));function Q(o,t,n){let e=I((n-o)/(t-o),0,1);return e*e*(3-2*e)}function Mt(o,t){let n=(t-o)%ht;return n>Math.PI&&(n-=ht),n<-Math.PI&&(n+=ht),n}function ct(o,t,n){let e=Math.imul(o|0,374761393)^Math.imul(t|0,668265263)^Math.imul(n|0,1442695041);return e=Math.imul(e^e>>>13,1274126177),e^=e>>>16,(e>>>0)/4294967296}var Ot=1/260,Wt=1/310,It=1/190,Lt=3400;function Nt(o,t,n,e){let s=o*Ot+n*.07,h=t*Wt-n*.05,r=(o+t)*It+n*.11;return e.x=(-Wt*Math.sin(s)*Math.sin(h)+.5*It*Math.cos(r))*Lt,e.y=(-Ot*Math.cos(s)*Math.cos(h)-.5*It*Math.cos(r))*Lt,e}var nt=[{name:"sardine",cruise:36,maxSpeed:64,minSpeed:18,weight:3,schoolSize:[18,28],spacing:[1.8,1.1],align:1.6,cohesion:1.6,jitter:40,mill:70,verticalDrag:.5},{name:"anchovy",cruise:46,maxSpeed:78,minSpeed:22,weight:3,schoolSize:[20,32],spacing:[1.5,1],align:3.2,cohesion:.45,jitter:30,mill:0,verticalDrag:1.4},{name:"silverside",cruise:40,maxSpeed:70,minSpeed:20,weight:3,schoolSize:[12,20],spacing:[2,1.1],align:2.4,cohesion:1.1,jitter:35,mill:0,verticalDrag:1.6},{name:"mackerel",cruise:32,maxSpeed:60,minSpeed:16,weight:2,schoolSize:[5,9],spacing:[2.6,1.3],align:2,cohesion:.9,jitter:25,mill:0,verticalDrag:2},{name:"goby",cruise:26,maxSpeed:56,minSpeed:10,weight:1,schoolSize:[8,12],spacing:[1.4,1.1],align:.35,cohesion:1.4,jitter:110,mill:0,verticalDrag:.3}],ie=nt.reduce((o,t)=>o+t.weight,0);function Dt(){let o=Math.random()*ie;for(let t=0;t<nt.length;t++)if(o-=nt[t].weight,o<=0)return t;return 0}var $=20,re=[{kind:"classic",size:1},{kind:"mako",size:.72},{kind:"tiger",size:.88},{kind:"thresher",size:.78}],Yt=420,oe=1.4,ae=1,yt=1100,he=-.6,ut=class{constructor(t=re,n){this.sharkSpecs=t;this.fishCount=n}width=0;height=0;time=0;fish=[];sharks=[];events=[];pointer={x:0,y:0,active:!1};noSwimZones=[];perception=60;sepX=[];sepY=[];foreignSep=40;bucketCols=0;bucketRows=0;bucketHead=new Int32Array(0);bucketCount=new Uint16Array(0);bucketNext=new Int32Array(0);lastSpawn=0;tmp={x:0,y:0};setNoSwimZones(t){this.noSwimZones=t}resize(t,n,e,s){let h=this.width===0;if(this.width=t,this.height=n,this.sepX=nt.map(r=>r.spacing[0]*e),this.sepY=nt.map(r=>r.spacing[1]*s),this.perception=Math.max(s*3,e*5.5),this.foreignSep=e*3,h||this.fish.length===0){this.seed();return}for(let r of this.fish)r.x=I(r.x,0,t),r.y=I(r.y,0,n)}seed(){let{width:t,height:n}=this,e=Math.min(t,n),s=I(e*.15,45,140),h=this.sharkSpecs.length;this.sharks=[];for(let a=0;a<h;a++){let{kind:p,size:i}=this.sharkSpecs[a],d=s*i,m=t*(a%2===0?.24:.76)+z(-e*.06,e*.06),f=n*(a<2?.22:.78)+z(-e*.06,e*.06),l=z(0,ht),g=new Float32Array($*2),u=d/($-1);for(let w=0;w<$;w++)g[w*2]=m-Math.cos(l)*u*w,g[w*2+1]=f-Math.sin(l)*u*w;this.sharks.push({id:a+1,kind:p,length:d,nodes:g,heading:l,speed:30,phase:z(0,ht),turn:0,hunger:z(.25,.75),wander:0,roamX:z(t*.08,t*.92),roamY:z(n*.08,n*.92),roamAt:z(8,16),pace:z(.9,1.12),target:null,retargetAt:0,depth:i})}this.sharks.sort((a,p)=>a.length-p.length);let r=this.fishCount??I(Math.round(t*n/4400),85,340);for(this.fish=[];this.fish.length<r;){let a=Dt(),p=nt[a],i=Math.min(Pt(p.schoolSize[0],p.schoolSize[1]),r-this.fish.length),d=Math.random()<.5?1:-1,m=z(t*.06,t*.94),f=z(n*.08,n*.92),l=(Math.random()<.5?0:Math.PI)+z(-.5,.5);for(let g=0;g<i;g++)this.fish.push({x:m+z(-1,1)*this.sepX[a]*Math.sqrt(i),y:f+z(-1,1)*this.sepY[a]*Math.sqrt(i)*.6,vx:Math.cos(l)*p.cruise,vy:Math.sin(l)*p.cruise,species:a,alarm:0,alive:!0,respawnAt:0,phase:z(0,ht),turn:0,depth:z(.55,1),millDir:d})}this.bucketNext=new Int32Array(this.fish.length)}splash(t,n){this.events.push({kind:"splash",x:t,y:n});let e=240;for(let s of this.fish){if(!s.alive)continue;let h=s.x-t,r=s.y-n,a=Math.hypot(h,r);if(a>e||a<.001)continue;let p=(1-a/e)*260;s.vx+=h/a*p,s.vy+=r/a*p,s.alarm=1}}step(t){this.time+=t,this.rebuildHash(),this.stepFish(t),this.stepSharks(t),this.respawn()}rebuildHash(){let t=this.perception,n=2;this.bucketCols=Math.ceil(this.width/t)+n*2,this.bucketRows=Math.ceil(this.height/t)+n*2;let e=this.bucketCols*this.bucketRows;this.bucketHead.length!==e&&(this.bucketHead=new Int32Array(e),this.bucketCount=new Uint16Array(e)),this.bucketHead.fill(-1),this.bucketCount.fill(0),this.bucketNext.length!==this.fish.length&&(this.bucketNext=new Int32Array(this.fish.length));for(let s=0;s<this.fish.length;s++){let h=this.fish[s];if(!h.alive)continue;let r=this.bucketOf(h.x,h.y);this.bucketNext[s]=this.bucketHead[r],this.bucketHead[r]=s,this.bucketCount[r]++}}bucketOf(t,n){let e=this.perception,s=I(Math.floor(t/e)+2,0,this.bucketCols-1);return I(Math.floor(n/e)+2,0,this.bucketRows-1)*this.bucketCols+s}stepFish(t){let{fish:n,sharks:e,pointer:s,width:h,height:r,time:a}=this,p=this.perception,i=p*p,d=this.foreignSep,m=this.perception,f=this.bucketCols,l=this.bucketRows,g=this.bucketHead,u=this.bucketNext,w=this.tmp,F=Math.exp(-t*.7),C=Math.min(1,t*6);for(let _=0;_<n.length;_++){let c=n[_];if(!c.alive)continue;let E=nt[c.species],L=1+1.8*c.alarm,U=this.sepX[c.species]*L,M=this.sepY[c.species]*L,T=Math.hypot(c.vx,c.vy)||1,k=c.vx/T,A=c.vy/T,y=0,x=0,R=0,N=0,b=0,P=0,D=0,S=0,H=0,j=0,v=I(Math.floor(c.x/m)+2,0,f-1),G=I(Math.floor(c.y/m)+2,0,l-1);for(let W=Math.max(0,G-1);W<=Math.min(l-1,G+1);W++)for(let O=Math.max(0,v-1);O<=Math.min(f-1,v+1);O++){let Y=g[W*f+O];for(;Y!==-1;){if(Y!==_){let K=n[Y],q=K.x-c.x,X=K.y-c.y,et=q*q+X*X;if(et<i&&et>1e-6){let lt=Math.sqrt(et);if((q*k+X*A)/lt>he){let ft=q/U,pt=X/M,bt=ft*ft+pt*pt;if(bt<1){let rt=Math.sqrt(bt)||.001,at=(1-rt)/rt;R-=ft*at,N-=pt*at}if(K.species===c.species)b+=K.vx,P+=K.vy,D+=q,S+=X,H++;else if(lt<d){let rt=(1-lt/d)/lt*.6;R-=q*rt,N-=X*rt}K.alarm>j&&(j=K.alarm)}}}Y=u[Y]}}if(y+=R*Yt,x+=N*Yt,H>0){let W=oe*E.align,O=ae*E.cohesion*(1-.8*c.alarm);if(y+=(b/H-c.vx)*W+D/H*O,x+=(P/H-c.vy)*W+S/H*O,E.mill>0){let Y=Math.hypot(D,S)||1;y+=-S/Y*c.millDir*E.mill*(1-c.alarm),x+=D/Y*c.millDir*E.mill*(1-c.alarm)}}let Z=0;for(let W of e){let O=W.length*.6+60,Y=1/0,K=0,q=0;for(let at=0;at<=12;at+=3){let Rt=W.nodes[at*2],Kt=W.nodes[at*2+1],_t=(c.x-Rt)**2+(c.y-Kt)**2;_t<Y&&(Y=_t,K=Rt,q=Kt)}let X=Math.sqrt(Y);if(X>=O||X<.001)continue;let et=1-X/O;et*=et;let lt=(c.x-K)/X,ft=(c.y-q)/X,pt=Math.cos(W.heading),bt=Math.sin(W.heading),rt=pt*(c.y-W.nodes[1])-bt*(c.x-W.nodes[0])>=0?1:-1;y+=(lt*.7-bt*rt*.9)*yt*et,x+=(ft*.7+pt*rt*.9)*yt*et,Z=Math.max(Z,Math.sqrt(et))}if(s.active){let O=c.x-s.x,Y=c.y-s.y,K=Math.hypot(O,Y);if(K<130&&K>.001){let q=(1-K/130)**2;y+=O/K*yt*q,x+=Y/K*yt*q,Z=Math.max(Z,Math.sqrt(q)*.8)}}let J=Math.max(c.alarm*F,Z),tt=j*.86;tt>J&&(J+=(tt-J)*C),c.alarm=J;let B=36;c.x<B?y+=(B-c.x)*7:c.x>h-B&&(y-=(c.x-(h-B))*7),c.y<B?x+=(B-c.y)*7:c.y>r-B&&(x-=(c.y-(r-B))*7),Nt(c.x,c.y,a,w),y+=w.x*.5+(Math.random()-.5)*E.jitter,x+=w.y*.5+(Math.random()-.5)*E.jitter,x-=c.vy*E.verticalDrag*(1-.7*c.alarm);let ot=E.cruise*(1+1.3*c.alarm);y+=(ot-T)*k*1.6,x+=(ot-T)*A*1.6;let gt=Math.atan2(c.vy,c.vx);c.vx+=y*t,c.vy+=x*t;let it=E.maxSpeed*(1+1.8*c.alarm),V=Math.hypot(c.vx,c.vy);V>it?(c.vx*=it/V,c.vy*=it/V):V<E.minSpeed&&V>.001&&(c.vx*=E.minSpeed/V,c.vy*=E.minSpeed/V),c.turn+=(Mt(gt,Math.atan2(c.vy,c.vx))/t-c.turn)*Math.min(1,t*8),c.phase+=t*(7+Math.hypot(c.vx,c.vy)*.12),c.x=I(c.x+c.vx*t,-60,h+60),c.y=I(c.y+c.vy*t,-60,r+60)}}stepSharks(t){let{sharks:n,width:e,height:s,time:h}=this,r=Math.min(e,s),a=e/2,p=s/2;for(let i of n){let d=i.length,m=i.nodes,f=m[0],l=m[1];i.hunger=Math.min(1,i.hunger+t*.03);let g=Math.cos(i.heading),u=Math.sin(i.heading);i.wander=I(i.wander+(Math.random()-.5)*t*3.2,-1.1,1.1),g+=Math.cos(i.heading+i.wander)*.45,u+=Math.sin(i.heading+i.wander)*.45,h>=i.retargetAt&&(i.target=this.findPrey(i),i.retargetAt=h+.45);let w=i.target,F=!1,C=0;if(w&&w.alive&&i.hunger>.3){let b=w.x+w.vx*.35-f,P=w.y+w.vy*.35-l,D=Math.hypot(b,P)||1,S=1.4+2.6*i.hunger;g+=b/D*S,u+=P/D*S,F=!0,C=I(1-D/(d*.9),0,1)}else{let b=Math.hypot(i.roamX-f,i.roamY-l);if(h>=i.roamAt||b<r*.1){for(let H=0;H<5&&(i.roamX=z(e*.06,e*.94),i.roamY=z(s*.06,s*.94),!(Math.hypot(i.roamX-f,i.roamY-l)>r*.45));H++);i.roamAt=h+z(12,20)}let P=i.roamX-f,D=i.roamY-l,S=Math.hypot(P,D)||1;g+=P/S*.55,u+=D/S*.55}for(let b of n)if(b!==i)for(let P=0;P<$;P+=4){let D=f-b.nodes[P*2],S=l-b.nodes[P*2+1],H=Math.hypot(D,S),j=(d+b.length)*.45;if(H<j&&H>.001){let v=(1-H/j)*3;g+=D/H*v,u+=S/H*v}}for(let b of this.noSwimZones){let P=Math.min(d*.5+16,r*.3),D=Math.max(1,(b.right-b.left)/2+P),S=Math.max(1,(b.bottom-b.top)/2+P),H=(f-(b.left+b.right)/2)/D,j=(l-(b.top+b.bottom)/2)/S,v=Math.hypot(H,j);if(v<1.15)if(v<.001)v=1,g+=Math.cos(i.heading+Math.PI/2),u+=Math.sin(i.heading+Math.PI/2);else{let G=(1.15-v)*(F?1.8:2.6);g+=H/v*G,u+=j/v*G}}let _=Math.max(-f,f-e,-l,l-s);if(_>-d*.05){let b=I((_+d*.05)/(d*.35),0,1)*3.5,P=a-f,D=p-l,S=Math.hypot(P,D)||1;g+=P/S*b,u+=D/S*b}let c=Math.atan2(u,g),E=i.kind==="mako"?1.15:i.kind==="thresher"?.82:1,U=Math.min(F?1.7+C:.8,i.speed/(d*.22))*E*t,M=I(Mt(i.heading,c),-U,U);i.heading+=M,i.turn+=(M/t-i.turn)*Math.min(1,t*3);let T=1+.12*Math.sin(h*.18+i.id*2.7),k=(30+d*.04)*i.pace*T,A=F?k*(1.45+C*1.5):k;i.speed+=(A-i.speed)*Math.min(1,t*1.1);let y=i.kind==="thresher"?2.4:i.kind==="mako"?2.2:i.kind==="tiger"?2.05:1.9;i.phase+=t*(y+i.speed/24),m[0]+=Math.cos(i.heading)*i.speed*t,m[1]+=Math.sin(i.heading)*i.speed*t;let x=d/($-1),R=.16,N=i.heading+Math.PI;for(let b=1;b<$;b++){let P=m[(b-1)*2],D=m[(b-1)*2+1],S=Math.atan2(m[b*2+1]-D,m[b*2]-P);S=N+I(Mt(N,S),-R,R),m[b*2]=P+Math.cos(S)*x,m[b*2+1]=D+Math.sin(S)*x,N=S}if(i.hunger>.15){let b=d*.05+8,P=m[0],D=m[1];for(let S of this.fish)S.alive&&(S.x-P)**2+(S.y-D)**2<b*b&&(S.alive=!1,S.respawnAt=h+z(3,8),i.hunger=Math.max(0,i.hunger-.16),this.events.push({kind:"eat",x:S.x,y:S.y}))}}}findPrey(t){let n=t.length*.9+160,e=t.nodes[0],s=t.nodes[1],h=Math.cos(t.heading),r=Math.sin(t.heading),a=null,p=1/0,i=1/0;for(let d of this.fish){if(!d.alive)continue;let m=d.x-e,f=d.y-s,l=Math.hypot(m,f);if(l>n||l<.001)continue;let g=(m*h+f*r)/l;if(g<.2)continue;let u=this.bucketCount[this.bucketOf(d.x,d.y)],w=l*(1+(1-g)*.8)*(1+u*.07);w<p&&(p=w,a=d),d===t.target&&(i=w)}return t.target&&i<p*1.3?t.target:a}respawn(){let{time:t,width:n,height:e}=this,s=[];for(let l of this.fish)!l.alive&&l.respawnAt<=t&&s.push(l);if(s.length===0||s.length<6&&t-this.lastSpawn<9)return;this.lastSpawn=t;let h=Pt(0,3),r=z(.15,.85),a=h===0?-20:h===1?n+20:r*n,p=h===2?-20:h===3?e+20:r*e,i=Math.atan2(e/2-p,n/2-a)+z(-.5,.5),d=Dt(),m=nt[d],f=Math.random()<.5?1:-1;for(let l of s.slice(0,m.schoolSize[1]))l.alive=!0,l.species=d,l.alarm=0,l.turn=0,l.millDir=f,l.x=a+z(-1,1)*this.perception,l.y=p+z(-1,1)*this.perception,l.vx=Math.cos(i)*m.cruise*1.4,l.vy=Math.sin(i)*m.cruise*1.4}};var st=6,wt=[.28,.42,.58,.74,.9],St=[[48,52,235],[52,205,60],[228,50,44],[190,212,255],[110,230,255]],ce=[1,1,1,1,1],qt=St.length-1;var Et=":;t%SX8#@",Ut="%;tS:",Gt="@8%",le=":;",pe=".',`",Xt=1,Bt=2,Tt=3,$t=4,kt=5,zt=6,jt="#%@",Ht=[.25,.3,.75,.3,.25,.72,.75,.72];function Ct(o){if(o<.13)return .09*Math.pow(Math.sin(o/.13*Math.PI/2),.95);if(o<.3)return .09+.016*Q(.13,.3,o);if(o<.84)return .019+.087*Math.pow(1-(o-.3)/.54,1.25);let t=(o-.84)/.16;return .019*(1-t)+.012*Math.sin(t*Math.PI)}var dt={classic:{halfWidth:Ct,pectoral:[.15,.43,.55,.26],falcate:!0,pelvic:[.57,.65,.69,.085],caudal:.085,dorsal:[.33,.47],secondDorsal:[.71,.76],eye:[.1,.14],gills:[.19,.29],tint:[.92,.97,1.05]},hammerhead:{halfWidth:o=>o<.06?.045:o<.3?.045+.061*Q(.06,.3,o):Ct(o)*.92,head:{span:.17,sweep:.035,depth:.09,notch:0},pectoral:[.17,.4,.5,.22],falcate:!0,pelvic:[.56,.63,.67,.075],caudal:.11,dorsal:[.28,.44],secondDorsal:[.7,.74],eye:null,gills:[.16,.26],tint:[.96,.98,.9]},tiger:{halfWidth:o=>{if(o<.13)return .1*Math.pow(Math.sin(o/.13*Math.PI/2),.45);if(o<.3)return .1+.014*Q(.13,.3,o);if(o<.84)return .019+.095*Math.pow(1-(o-.3)/.54,1.2);let t=(o-.84)/.16;return .019*(1-t)+.012*Math.sin(t*Math.PI)},pectoral:[.15,.42,.53,.25],falcate:!0,pelvic:[.57,.65,.69,.085],caudal:.095,dorsal:[.33,.46],secondDorsal:[.71,.75],eye:[.08,.12],gills:[.19,.28],tint:[1.02,.95,.84]},zebra:{halfWidth:o=>{if(o<.1)return .075*Math.pow(Math.sin(o/.1*Math.PI/2),.7);if(o<.28)return .075+.025*Q(.1,.28,o);if(o<.55)return .022+.078*Math.pow(1-(o-.28)/.27,1.1);let t=(o-.55)/.45;return .022*(1-t*t)+.012*Math.sin(t*Math.PI)},pectoral:[.12,.3,.36,.19],falcate:!1,pelvic:[.42,.48,.51,.065],caudal:0,dorsal:[.36,.44],secondDorsal:[.49,.53],eye:[.06,.09],gills:[.13,.2],tint:[1.08,.97,.74]},greathammer:{halfWidth:o=>o<.05?.04:o<.3?.04+.07*Q(.05,.3,o):Ct(o)*.95,head:{span:.21,sweep:.006,depth:.085,notch:.014},pectoral:[.16,.38,.49,.24],falcate:!0,pelvic:[.55,.62,.67,.085],caudal:.13,dorsal:[.24,.45],secondDorsal:[.68,.74],eye:null,gills:[.15,.25],tint:[.86,.93,1.02]},mako:{halfWidth:o=>{if(o<.17)return .088*Math.pow(Math.sin(o/.17*Math.PI/2),1.5);if(o<.32)return .088+.012*Q(.17,.32,o);if(o<.86)return .014+.086*Math.pow(1-(o-.32)/.54,1.45);let t=(o-.86)/.14;return .014*(1-t)+.01*Math.sin(t*Math.PI)},pectoral:[.18,.4,.5,.21],falcate:!0,pelvic:[.58,.64,.68,.06],caudal:.13,dorsal:[.34,.45],secondDorsal:[.76,.79],eye:[.11,.15],gills:[.2,.3],tint:[.78,.9,1.2]},thresher:{halfWidth:o=>{if(o<.08)return .07*Math.pow(Math.sin(o/.08*Math.PI/2),.75);if(o<.2)return .07+.02*Q(.08,.2,o);if(o<.48)return .012+.078*Math.pow(1-(o-.2)/.28,1.3);let t=(o-.48)/.52;return .012*(1-t)+.006*Math.sin(t*Math.PI*.9)+.002},pectoral:[.12,.27,.36,.2],falcate:!0,pelvic:[.37,.41,.44,.045],caudal:0,dorsal:[.24,.32],secondDorsal:[.45,.47],eye:[.05,.1],gills:[.11,.18],tint:[1,.9,1.08]},nurse:{halfWidth:o=>{if(o<.08)return .085*Math.pow(Math.sin(o/.08*Math.PI/2),.4);if(o<.3)return .085+.02*Q(.08,.3,o);if(o<.72)return .022+.083*Math.pow(1-(o-.3)/.42,1.1);let t=(o-.72)/.28;return .022*(1-t*t)+.014*Math.sin(t*Math.PI)},pectoral:[.16,.34,.4,.17],falcate:!1,pelvic:[.45,.52,.55,.075],caudal:0,dorsal:[.5,.58],secondDorsal:[.63,.69],eye:[.05,.075],gills:[.14,.22],tint:[1.1,.96,.76]}};dt.orca={halfWidth:o=>{if(o<.13)return .09*Math.pow(Math.sin(o/.13*Math.PI/2),.9);if(o<.32)return .09+.035*Q(.13,.32,o);if(o<.84)return .025+.1*Math.pow(1-(o-.32)/.52,1.2);let t=(o-.84)/.16;return .025*(1-t)+.014*Math.sin(t*Math.PI)},pectoral:[.13,.37,.53,.2],falcate:!0,pelvic:[.58,.66,.7,.08],caudal:.12,dorsal:[.3,.44],secondDorsal:[.72,.77],eye:[.07,.11],gills:[.13,.21],tint:[1,.98,.92]};dt.dolphin={halfWidth:o=>{if(o<.18)return .048*Math.pow(Math.sin(o/.18*Math.PI/2),1.4);if(o<.32)return .048+.027*Q(.18,.32,o);if(o<.84)return .018+.061*Math.pow(1-(o-.32)/.52,1.4);let t=(o-.84)/.16;return .018*(1-t)+.01*Math.sin(t*Math.PI)},pectoral:[.15,.42,.55,.16],falcate:!0,pelvic:[.58,.64,.68,.055],caudal:.12,dorsal:[.33,.46],secondDorsal:[.73,.77],eye:[.09,.12],gills:[0,0],tint:[.92,.98,1.04]};dt.manta={halfWidth:o=>{if(o<.15)return .04*Math.pow(Math.sin(o/.15*Math.PI/2),.7);if(o<.45)return .04+.014*Q(.15,.45,o);if(o<.82)return .018+.036*Math.pow(1-(o-.45)/.37,1.2);let t=(o-.82)/.18;return .018*(1-t)+.008*Math.sin(t*Math.PI)},pectoral:[.06,.14,.78,.32],falcate:!1,pelvic:[.72,.82,.9,.08],caudal:0,dorsal:[0,0],secondDorsal:[0,0],eye:[.04,.07],gills:[0,0],tint:[1.08,1.03,.96]};dt.turtle={halfWidth:o=>{if(o<.1)return .065*Math.pow(Math.sin(o/.1*Math.PI/2),.6);if(o<.3)return .065+.045*Q(.1,.3,o);if(o<.72)return .035+.075*Math.pow(1-(o-.3)/.42,1.1);let t=(o-.72)/.28;return .035*(1-t*t)+.012*Math.sin(t*Math.PI)},pectoral:[.1,.2,.39,.2],falcate:!1,pelvic:[.58,.72,.84,.16],caudal:.025,dorsal:[0,0],secondDorsal:[0,0],eye:[.055,.085],gills:[0,0],tint:[.98,1.04,.9]};dt.whale={halfWidth:o=>{if(o<.12)return .075*Math.pow(Math.sin(o/.12*Math.PI/2),.8);if(o<.32)return .075+.05*Q(.12,.32,o);if(o<.78)return .035+.09*Math.pow(1-(o-.32)/.46,1.15);let t=(o-.78)/.22;return .035*(1-t*t)+.012*Math.sin(t*Math.PI)},pectoral:[.17,.36,.53,.16],falcate:!1,pelvic:[.62,.68,.72,.045],caudal:.15,dorsal:[.48,.55],secondDorsal:[0,0],eye:[.08,.11],gills:[0,0],tint:[1.04,.98,.9]};dt.swordfish={halfWidth:o=>{if(o<.28)return .018+.047*Q(0,.28,o);if(o<.82)return .022+.055*Math.pow(1-(o-.28)/.54,1.35);let t=(o-.82)/.18;return .022*(1-t)+.01*Math.sin(t*Math.PI)},pectoral:[.18,.4,.52,.2],falcate:!0,pelvic:[.58,.65,.69,.06],caudal:.13,dorsal:[.22,.47],secondDorsal:[.72,.77],eye:[.12,.15],gills:[0,0],tint:[.9,1,1.08]};var ue=Object.keys(dt);function xt(o,t,n,e,s,h,r,a){let p=(o-s)*(e-h)-(n-s)*(t-h),i=(o-r)*(h-a)-(s-r)*(t-a),d=(o-n)*(a-e)-(r-n)*(t-e),m=p<0||i<0||d<0,f=p>0||i>0||d>0;return!(m&&f)}function Zt(o,t,n,e,s,h){o.setTransform(1,0,0,1,0,0),o.strokeStyle="rgba(255,255,255,0.055)",o.lineWidth=1,o.beginPath();for(let r=0;r<=Math.ceil(t/e);r++){let a=Math.round(r*e*h)+.5;o.moveTo(a,0),o.lineTo(a,n*h)}for(let r=0;r<=Math.ceil(n/s);r++){let a=Math.round(r*s*h)+.5;o.moveTo(0,a),o.lineTo(t*h,a)}o.stroke()}var mt=class{constructor(t){this.canvas=t;let n=t.getContext("2d",{alpha:!0});if(!n)throw new Error("2D canvas unavailable");this.ctx=n,this.bg=document.createElement("canvas");for(let e=0;e<St.length;e++){let[s,h,r]=St[e];for(let a=0;a<st;a++){let p=ce[e]*(a+1)/st;this.dotStyles.push(`rgba(${s},${h},${r},${p.toFixed(3)})`)}}}ctx;bg;dpr=1;width=0;height=0;cw=12;ch=18;cols=0;rows=0;fontFamily="ui-monospace, Menlo, monospace";dotKind=new Uint8Array(0);dotPhase=new Float32Array(0);dotFreq=new Float32Array(0);energy=new Float32Array(0);energyTmp=new Float32Array(0);heat=new Float32Array(0);bucketOf=new Uint8Array(0);bucketOrder=new Int32Array(0);bucketCounts=new Int32Array(St.length*st+1);dotStyles=[];sharkFlag=new Uint8Array(0);sharkShade=new Float32Array(0);sharkKey=new Uint32Array(0);sharkDepth=new Float32Array(0);sharkKind=new Uint8Array(0);sharkShadow=new Uint8Array(0);spine=new Float32Array($*2);arc=new Float32Array($);arcTotal=1;shape=dt.classic;sharkId=0;finTipLeft=0;finTipRight=0;hitFlag=0;hitShade=0;hitS=0;hitV=0;hitDist=0;fishStamp=new Uint32Array(0);frameId=0;fishBuckets=wt.map(()=>[]);fishStyles=wt.map(t=>`rgba(230,238,255,${t})`);get cellWidth(){return this.cw}get cellHeight(){return this.ch}setFontFamily(t){t&&(this.fontFamily=t)}resize(t,n,e){let s=this.cols,h=this.rows;this.width=t,this.height=n,this.dpr=e,this.cw=I(Math.round(t/180),4,9),this.ch=Math.round(this.cw*1.45),this.cols=Math.ceil(t/this.cw),this.rows=Math.ceil(n/this.ch),this.canvas.width=Math.round(t*e),this.canvas.height=Math.round(n*e),this.bg.width=this.canvas.width,this.bg.height=this.canvas.height;let r=this.cols*this.rows;(this.cols!==s||this.rows!==h)&&(this.dotKind=new Uint8Array(r),this.dotPhase=new Float32Array(r),this.dotFreq=new Float32Array(r),this.energy=new Float32Array(r),this.energyTmp=new Float32Array(r),this.heat=new Float32Array(r),this.bucketOf=new Uint8Array(r),this.bucketOrder=new Int32Array(r),this.sharkFlag=new Uint8Array(r),this.sharkShade=new Float32Array(r),this.sharkKey=new Uint32Array(r),this.sharkDepth=new Float32Array(r),this.sharkKind=new Uint8Array(r),this.sharkShadow=new Uint8Array(r),this.fishStamp=new Uint32Array(r));for(let a=0;a<r;a++){let p=a%this.cols,i=a/this.cols|0;this.dotKind[a]=0,this.dotPhase[a]=ct(p,i,23)*Math.PI*2,this.dotFreq[a]=.3+ct(p,i,37)*1.1}this.paintBackground()}paintBackground(){let t=this.bg.getContext("2d");if(!t)return;let{width:n,height:e,dpr:s,cw:h,ch:r}=this;t.setTransform(s,0,0,s,0,0),t.clearRect(0,0,n,e)}render(t,n){let{ctx:e,dpr:s,cols:h,ch:r}=this;if(h===0)return;let a=t.time;this.rasterizeSharks(t.sharks,a),e.setTransform(1,0,0,1,0,0),e.clearRect(0,0,this.canvas.width,this.canvas.height),e.setTransform(s,0,0,s,0,0),e.font=`600 ${Math.round(r*.74)}px ${this.fontFamily}`,e.textAlign="center",e.textBaseline="middle",this.drawSharks(a)}cellIndex(t,n){let e=Math.floor(t/this.cw),s=Math.floor(n/this.ch);return e<0||s<0||e>=this.cols||s>=this.rows?-1:s*this.cols+e}stamp(t,n,e,s,h){let r=Math.floor(n/this.cw),a=Math.floor(e/this.ch);for(let p=a-s;p<=a+s;p++)for(let i=r-s;i<=r+s;i++){if(i<0||p<0||i>=this.cols||p>=this.rows)continue;let d=Math.hypot(i-r,(p-a)*1.4);if(d>s+.5)continue;let m=p*this.cols+i;t[m]=Math.min(1.6,t[m]+h*(1-d/(s+1)))}}consumeEvents(t){for(let n of t.events)n.kind==="eat"?(this.stamp(this.heat,n.x,n.y,2,1),this.stamp(this.energy,n.x,n.y,3,.9)):this.stamp(this.energy,n.x,n.y,6,1.4);t.events.length=0}depositWake(t){let{energy:n}=this;for(let e of t.fish){if(!e.alive)continue;let s=this.cellIndex(e.x,e.y);s>=0&&(n[s]=Math.min(1.6,n[s]+.012+e.alarm*.03))}for(let e of t.sharks)for(let s=$-6;s<$;s++){let h=this.cellIndex(e.nodes[s*2],e.nodes[s*2+1]);h>=0&&(n[h]=Math.min(1.6,n[h]+.05+e.speed*.0012))}t.pointer.active&&this.stamp(n,t.pointer.x,t.pointer.y,1,.08)}diffuse(t){let{cols:n,rows:e,energy:s,energyTmp:h,heat:r}=this,a=Math.exp(-t*1.5);for(let i=0;i<e;i++)for(let d=0;d<n;d++){let m=i*n+d,f=d>0?s[m-1]:s[m],l=d<n-1?s[m+1]:s[m],g=i>0?s[m-n]:s[m],u=i<e-1?s[m+n]:s[m];h[m]=(s[m]*4+f+l+g+u)*.125*a}this.energy=h,this.energyTmp=s;let p=Math.exp(-t*2.2);for(let i=0;i<r.length;i++)r[i]*=p}sampleShark(t,n,e){let{spine:s,arc:h}=this,r=$,a=1/0,p=0,i=1,d=0,m=0;for(let k=0;k<r-1;k++){let A=s[k*2],y=s[k*2+1],x=s[(k+1)*2]-A,R=s[(k+1)*2+1]-y,N=x*x+R*R||1,b=I(((t-A)*x+(n-y)*R)/N,0,1),P=A+x*b,D=y+R*b,S=(t-P)**2+(n-D)**2;if(S<a){a=S;let H=Math.sqrt(N);p=(h[k]+b*H)/this.arcTotal,i=x*(n-y)-R*(t-A)>=0?1:-1,d=-R/H*i,m=x/H*i}}let f=Math.sqrt(a),l=p,g=l*e,u=this.shape,w=u.halfWidth(l)*e;this.hitDist=f,this.hitS=l,this.hitV=f*i;let F=this.shape.head;if(F&&g<e*(F.sweep+F.depth+F.notch)){let k=e*F.span,A=f/k,y=e*F.sweep*A*A+e*F.notch*Math.max(0,1-A/.14),x=e*F.depth*(1-.2*A*A*A*A);if(A<=1&&g>=y&&g<=y+x)return this.hitFlag=A>.84?kt:Xt,this.hitShade=A>.84?0:.62-.2*A+(g<y+e*.012?.1:0),!0}if(f<=w){let k=f/(w||1),A=(d*-.6+m*-.8)*k,y=.58-k*k*.42+A*.26,x=Xt;return l>u.dorsal[0]&&l<u.dorsal[1]&&k<.3?(x=$t,y=1):l>u.secondDorsal[0]&&l<u.secondDorsal[1]&&k<.4?y=Math.max(y,.82):u.eye&&l>u.eye[0]&&l<u.eye[1]&&k>.6?(x=kt,y=0):l>u.gills[0]&&l<u.gills[1]&&k>.58?Math.floor((l-u.gills[0])/(u.gills[1]-u.gills[0])*5)%2===0&&(y*=.45):l<.05?y=Math.max(y,.7):u===dt.zebra&&l>.08&&l<.55&&(k<.1||Math.abs(k-.6)<.08)?y=Math.max(y,.8):this.marked(l,f*i,e,k)&&(x=zt),this.hitFlag=x,this.hitShade=y,!0}let C=i>0?this.finTipRight:this.finTipLeft,[_,c,E]=u.pectoral;if(xt(g,f,e*_,0,e*c,0,e*E,C)&&!(u.falcate&&xt(g,f,e*c,0,e*(c+(E-c)*.33),C*.55,e*E,C)))return this.hitFlag=this.marked(l,f*i,e,0)?zt:Tt,this.hitShade=.38+.22*(1-I(f/C,0,1)),!0;let[L,U,M,T]=u.pelvic;return xt(g,f,e*L,0,e*U,0,e*M,e*T)||u.caudal>0&&xt(g,f,e*.86,0,e*.95,0,e,e*u.caudal)?(this.hitFlag=Tt,this.hitShade=.36,!0):!1}marked(t,n,e,s){if(this.shape===dt.tiger){if(t<.2||t>.9||s>.85)return!1;let h=.35*Math.sin(n/e*25+t*5);return Math.sin(t*Math.PI*2*9+h)>.65-.5*Q(.2,.42,t)+.4*Q(.8,.9,t)}if(this.shape===dt.zebra){if(t<.07)return!1;let h=t*e/(e*.06),r=n/(e*.045),a=Math.floor(h),p=Math.floor(r),i=ct(a,p,this.sharkId)*.5+.25,d=ct(a,p,this.sharkId+11)*.5+.25;return(h-a-i)**2+(r-p-d)**2<.08}return!1}rasterizeSharks(t,n){let{sharkFlag:e,sharkShade:s,sharkKey:h,sharkDepth:r,sharkKind:a,sharkShadow:p,spine:i,arc:d,cw:m,ch:f,cols:l,rows:g}=this;e.fill(0),p.fill(0);for(let u of t){let w=u.length,F=$,C=u.nodes,_=I(u.speed/60,.4,1.4);this.shape=dt[u.kind],this.sharkId=u.id;let c=ue.indexOf(u.kind),E=u.kind==="thresher"?.068:u.kind==="mako"?.046:.052,L=u.kind==="thresher"?6.1:u.kind==="mako"?5.6:5.2;for(let v=0;v<F;v++){let G=v/(F-1),Z=Math.max(0,v-1),J=Math.min(F-1,v+1),tt=C[Z*2]-C[J*2],B=C[Z*2+1]-C[J*2+1],ot=Math.hypot(tt,B)||1;tt/=ot,B/=ot;let it=w*E*(.1+.9*Math.pow(G,1.8))*_*Math.sin(u.phase-G*L);i[v*2]=C[v*2]-B*it,i[v*2+1]=C[v*2+1]+tt*it}d[0]=0;for(let v=1;v<F;v++)d[v]=d[v-1]+Math.hypot(i[v*2]-i[(v-1)*2],i[v*2+1]-i[(v-1)*2+1]);this.arcTotal=d[F-1]||1;let U=I(u.turn*.45,-.35,.35),M=1+.06*Math.sin(u.phase*.5),T=this.shape.pectoral[3];this.finTipRight=w*T*M*(1-U),this.finTipLeft=w*T*M*(1+U);let k=1/0,A=1/0,y=-1/0,x=-1/0;for(let v=0;v<F;v++)k=Math.min(k,i[v*2]),y=Math.max(y,i[v*2]),A=Math.min(A,i[v*2+1]),x=Math.max(x,i[v*2+1]);let R=w*.36,N=Math.max(0,Math.floor((k-R)/m)),b=Math.min(l-1,Math.floor((y+R)/m)),P=Math.max(0,Math.floor((A-R)/f)),D=Math.min(g-1,Math.floor((x+R)/f));if(N>b||P>D)continue;let S=R+Math.hypot(m,f),H=Math.round(w*.035/m)+1,j=Math.round(w*.02/f)+1;for(let v=P;v<=D;v++)for(let G=N;G<=b;G++){let Z=G*m,J=v*f,tt=this.sampleShark(Z+m/2,J+f/2,w);if(!tt&&this.hitDist>S)continue;let B=this.hitFlag,ot=this.hitShade,gt=this.hitS,it=this.hitV,V=tt?1:0;for(let K=0;K<Ht.length;K+=2)this.sampleShark(Z+Ht[K]*m,J+Ht[K+1]*f,w)&&V++;if(V===0)continue;let W=V/5,O=v*l+G,Y=ct(Math.round(gt*52),Math.round(it/(m*.9)),u.id)*4294967295>>>0;if(h[O]=Y,r[O]=u.depth,a[O]=c,tt&&W>=.6){e[O]=B;let K=(ct(G,v,Math.floor(n*6))-.5)*.06;s[O]=I(ot+K,0,1);let q=G+H,X=v+j;q<l&&X<g&&(p[X*l+q]=1)}else e[O]=Bt,s[O]=W}}}drawSharks(t){
+let{ctx,cols,rows,cw,ch,sharkFlag,sharkShade,sharkKey,sharkDepth}=this,total=cols*rows;
+const styles=this.sharkPixelStyles||(this.sharkPixelStyles=new Map());
+for(let index=0;index<total;index++){
+let flag=sharkFlag[index];if(!flag)continue;
+let column=index%cols,row=Math.floor(index/cols),shade=sharkShade[index],key=sharkKey[index];
+if(flag===kt){
+let surroundingShade=0,surroundingCells=0;
+for(let offsetY=-1;offsetY<=1;offsetY++)for(let offsetX=-1;offsetX<=1;offsetX++){
+let neighborX=column+offsetX,neighborY=row+offsetY;
+if(neighborX<0||neighborY<0||neighborX>=cols||neighborY>=rows)continue;
+let neighborIndex=neighborY*cols+neighborX,neighborFlag=sharkFlag[neighborIndex];
+if(neighborIndex===index||!neighborFlag||neighborFlag===kt)continue;
+surroundingShade+=sharkShade[neighborIndex];surroundingCells++;
+}
+if(!surroundingCells)continue;
+shade=surroundingShade/surroundingCells;
+flag=1;
+}
+let coverage=flag===Bt?I(shade,0,1):1;
+let gap=Math.max(.3,Math.min(cw,ch)*.075),margin=gap*.45;
+let pixelWidth=(cw-gap-margin*2)/2,pixelHeight=(ch-gap-margin*2)/2;
+let coverageStep=Math.round(coverage*4);
+for(let quadrant=0;quadrant<4;quadrant++){
+let grain=((key>>>(quadrant*6))&63)/63;
+if(flag===Bt&&grain>coverage)continue;
+let tone=I((flag===Bt?shade*.55:shade)+(grain-.5)*.2,0,1);
+let toneStep=Math.round(tone*10),styleKey=toneStep*5+coverageStep,style=styles.get(styleKey);
+if(!style){
+let gray=I(Math.round(199-toneStep*8.3),112,199);
+let alpha=coverageStep<4?.18+coverageStep*.12:.72;
+style="rgba("+gray+","+gray+","+gray+","+alpha.toFixed(2)+")";
+styles.set(styleKey,style);
+}
+let subColumn=quadrant%2,subRow=quadrant>>1;
+let jitterX=(grain-.5)*pixelWidth*.1,jitterY=(grain-.5)*pixelHeight*.1;
+let size=1+(grain-.5)*.12;
+ctx.fillStyle=style;
+ctx.fillRect(
+column*cw+margin+subColumn*(pixelWidth+gap)+jitterX,
+row*ch+margin+subRow*(pixelHeight+gap)+jitterY,
+pixelWidth*size,
+pixelHeight*size
+);
+}
+}
+}
+markFish(t){let{fishStamp:n,fishBuckets:e,sharkFlag:s}=this,h=++this.frameId;for(let r of e)r.length=0;for(let r=0;r<2;r++)for(let a of t.fish){if(!a.alive||(a.depth>.78?0:1)!==r)continue;let p=this.cellIndex(a.x,a.y);if(p<0||n[p]===h||s[p])continue;n[p]=h;let i=I(Math.abs(a.turn)/3.5,0,1),d=.3+.4*(a.depth-.55)/.45+.3*Math.max(i,a.alarm);e[I(Math.floor(d*wt.length),0,wt.length-1)].push(p)}}drawFish(){let{ctx:t,cw:n,ch:e,cols:s,fishBuckets:h}=this;for(let r=0;r<h.length;r++){let a=h[r];if(a.length){t.fillStyle=this.fishStyles[r];for(let p of a)t.fillText("-",p%s*n+n/2,(p/s|0)*e+e/2+1)}}}drawHeat(){let{ctx:t,heat:n,cols:e,cw:s,ch:h}=this;for(let r=0;r<n.length;r++){let a=n[r];if(a<.08)continue;let p=r%e,i=r/e|0;t.fillStyle=a>.5?`rgba(255,120,60,${a.toFixed(2)})`:`rgba(220,40,40,${(a*1.6).toFixed(2)})`,t.fillText(a>.6?"*":"\xB7",p*s+s/2,i*h+h/2+1)}}drawDots(t){let{ctx:n,cols:e,rows:s,cw:h,ch:r,dotKind:a,dotPhase:p,dotFreq:i,energy:d,sharkFlag:m,sharkShadow:f,fishStamp:l,frameId:g}=this,{bucketOf:u,bucketOrder:w,bucketCounts:F}=this,C=e*s,_=F.length-1;F.fill(0);for(let M=0;M<C;M++){let T=d[M],k=a[M];if(m[M]||l[M]===g||k===0&&T<.45){u[M]=_;continue}let A;if(T>.45){let y=I(Math.floor((T-.45)*5),0,st-1);A=qt*st+y}else{let y=M%e,x=M/e|0,R=.5+.5*Math.sin(t*i[M]+p[M]),N=.85+.15*Math.sin(y*.11+t*.35)*Math.sin(x*.17-t*.27),b=I((.55+.45*R)*N+T*2,0,1);f[M]&&(b*=.2),A=(k-1)*st+I(Math.floor(b*st),0,st-1)}u[M]=A,F[A]++}let c=new Int32Array(F.length);for(let M=1;M<F.length;M++)c[M]=c[M-1]+F[M-1];let E=c.slice();for(let M=0;M<C;M++){let T=u[M];T!==_&&(w[E[T]++]=M)}let L=Math.max(2,Math.round(h*.19)),U=L+1;for(let M=0;M<_;M++){let T=F[M];if(!T)continue;n.fillStyle=this.dotStyles[M];let k=M>=qt*st?U:L,A=c[M];for(let y=A;y<A+T;y++){let x=w[y],R=x%e,N=x/e|0;n.fillRect(Math.round(R*h+h*.66-k/2),Math.round(N*r+r*.64-k/2),k,k)}}}};var vt=1/60,Vt=4,At=class{constructor(t,n){this.canvas=t;this.world=new ut(n),this.renderer=new mt(t),this.renderer.setFontFamily(getComputedStyle(t).fontFamily),this.reducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)"),this.resizeObserver=new ResizeObserver(()=>this.resize()),this.resizeObserver.observe(t),this.intersectionObserver=new IntersectionObserver(([e])=>{this.visible=e.isIntersecting,this.schedule()}),this.intersectionObserver.observe(t),this.reducedMotion.addEventListener("change",this.onMotionPreference),window.addEventListener("pointermove",this.onPointerMove,{passive:!0}),window.addEventListener("pointerdown",this.onPointerDown,{passive:!0}),document.documentElement.addEventListener("pointerleave",this.onPointerLeave),window.addEventListener("blur",this.onPointerLeave),this.resize(),document.fonts?.load(`600 16px ${getComputedStyle(t).fontFamily}`).then(()=>{!this.disposed&&this.reducedMotion.matches&&this.drawStill()}),this.schedule()}world;renderer;raf=0;last=0;acc=0;visible=!0;reducedMotion;resizeObserver;intersectionObserver;disposed=!1;destroy(){this.disposed=!0,cancelAnimationFrame(this.raf),this.resizeObserver.disconnect(),this.intersectionObserver.disconnect(),this.reducedMotion.removeEventListener("change",this.onMotionPreference),window.removeEventListener("pointermove",this.onPointerMove),window.removeEventListener("pointerdown",this.onPointerDown),document.documentElement.removeEventListener("pointerleave",this.onPointerLeave),window.removeEventListener("blur",this.onPointerLeave)}resize(){let t=this.canvas.getBoundingClientRect();if(t.width<1||t.height<1)return;let n=Math.min(window.devicePixelRatio||1,2);this.renderer.resize(t.width,t.height,n),this.world.resize(t.width,t.height,this.renderer.cellWidth,this.renderer.cellHeight),this.reducedMotion.matches&&this.drawStill()}schedule(){cancelAnimationFrame(this.raf),!(this.disposed||!this.visible||this.reducedMotion.matches)&&(this.last=performance.now(),this.raf=requestAnimationFrame(this.frame))}frame=t=>{let n=Math.min(.1,(t-this.last)/1e3);this.last=t,this.acc+=n;let e=0;for(;this.acc>=vt&&e<Vt;)this.world.step(vt),this.acc-=vt,e++;e===Vt&&(this.acc=0),this.renderer.render(this.world,n),this.raf=requestAnimationFrame(this.frame)};drawStill(){if(this.world.time<4)for(let t=0;t<240;t++)this.world.step(vt);this.renderer.render(this.world,vt)}onMotionPreference=()=>{this.reducedMotion.matches?(cancelAnimationFrame(this.raf),this.drawStill()):this.schedule()};toLocal(t){let n=this.canvas.getBoundingClientRect(),e=t.clientX-n.left,s=t.clientY-n.top,h=e>=0&&s>=0&&e<=n.width&&s<=n.height;return{x:e,y:s,inside:h}}onPointerMove=t=>{let{x:n,y:e,inside:s}=this.toLocal(t),h=this.world.pointer;h.x=n,h.y=e,h.active=s&&t.pointerType!=="touch"};onPointerDown=t=>{let{x:n,y:e,inside:s}=this.toLocal(t);s&&!this.reducedMotion.matches&&this.world.splash(n,e)};onPointerLeave=()=>{this.world.pointer.active=!1}};return se(de);})();
+
+    const exampleMemories = [
+      {
+        title: "一個安靜的早晨",
+        category: "示範時刻",
+        time: "示範時間・早晨",
+        description: "這是用來展示時間分類和回顧卡片的示範文字，並非真實記錄。"
+      },
+      {
+        title: "同行的朋友",
+        category: "示範人物",
+        time: "示範人物・同行者",
+        description: "這是用來展示人物分類的示範文字，沒有指向任何真實人物。"
+      },
+      {
+        title: "窗邊的一角",
+        category: "示範地點",
+        time: "示範地點・窗邊",
+        description: "這是用來展示地點分類的示範文字，不代表真實到訪位置。"
+      },
+      {
+        title: "散步途中",
+        category: "示範事件",
+        time: "示範事件・散步",
+        description: "這是用來展示事件分類的示範文字，並非真實發生的事情。"
+      },
+      {
+        title: "午後的色彩",
+        category: "示範相片",
+        time: "示範相片・圖片佔位",
+        description: "這裡只用標明為示範的圖片佔位展示相片卡片，不是真實相片。",
+        isPhoto: true
+      }
+    ];
+
+    const memoryField = document.getElementById("memory-field");
+    const fishCanvas = document.createElement("canvas");
+    fishCanvas.className = "fish-field";
+    fishCanvas.setAttribute("aria-hidden", "true");
+    document.body.prepend(fishCanvas);
+
+    const fishContext = fishCanvas.getContext("2d", { alpha: true });
+    if (!fishContext) {
+      console.error("Canvas 2D context is unavailable; the decorative sharks are disabled.");
+    } else {
+      createTimeMemSharks(fishCanvas);
+    }
+
+    function createTimeMemSharks(canvas) {
+      const organismKinds = ["orca", "dolphin", "manta", "turtle", "whale", "swordfish", "classic"];
+      const minimumSharks = 3;
+      const maximumSharks = 8;
+      const organismCount = Math.floor(Math.random() * (maximumSharks - minimumSharks + 1)) + minimumSharks;
+      const organisms = [];
+      for (let index = 0; index < organismCount; index++) {
+        organisms.push({
+          kind: organismKinds[Math.floor(Math.random() * organismKinds.length)],
+          size: randomBetween(1, 3)
+        });
+      }
+      const world = new TimeMemSharks.World(organisms, 0);
+      const renderer = new TimeMemSharks.AsciiRenderer(canvas);
+      const opacityByDepth = new Map();
+      const shadeFactorByDepth = new Map();
+      const modifiedShadeCells = [];
+      const originalShadeValues = [];
+      const drawSharks = renderer.drawSharks.bind(renderer);
+      renderer.drawSharks = function () {
+        const context = renderer.ctx;
+        const originalFillRect = context.fillRect;
+        const originalAlpha = context.globalAlpha;
+        const flags = renderer.sharkFlag;
+        const shades = renderer.sharkShade;
+        for (let index = 0; index < flags.length; index++) {
+          if (!flags[index]) {
+            continue;
+          }
+          const factor = shadeFactorByDepth.get(renderer.sharkDepth[index]) || 1;
+          if (factor === 1) {
+            continue;
+          }
+          const shade = shades[index];
+          modifiedShadeCells.push(index);
+          originalShadeValues.push(shade);
+          shades[index] = Math.max(0, Math.min(1, shade * factor));
+        }
+        context.fillRect = function (x, y, width, height) {
+          const column = Math.floor(x / renderer.cellWidth);
+          const row = Math.floor(y / renderer.cellHeight);
+          const cellIndex = row * renderer.cols + column;
+          const depth = renderer.sharkDepth[cellIndex];
+          context.globalAlpha = originalAlpha * (opacityByDepth.get(depth) || 1);
+          originalFillRect.call(context, x, y, width, height);
+        };
+        try {
+          drawSharks();
+        } finally {
+          context.fillRect = originalFillRect;
+          context.globalAlpha = originalAlpha;
+          for (let index = 0; index < modifiedShadeCells.length; index++) {
+            shades[modifiedShadeCells[index]] = originalShadeValues[index];
+          }
+          modifiedShadeCells.length = 0;
+          originalShadeValues.length = 0;
+        }
+      };
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const resizeObserver = new ResizeObserver(resizeWorld);
+      const fixedStep = 1 / 60;
+      const simulationSpeed = 2;
+      const maxStepsPerFrame = Math.ceil(0.1 * simulationSpeed / fixedStep);
+      let nextSpawnAt = randomBetween(3, 8);
+      let nextEdgeTransitAt = randomBetween(4, 8);
+      let nextMutationCheckAt = 5 * simulationSpeed;
+      let mutateNextIncoming = false;
+      let frameHandle = 0;
+      let lastFrameTime = 0;
+      let accumulator = 0;
+      let sharkSpeedsAssigned = false;
+
+      renderer.setFontFamily(getComputedStyle(canvas).fontFamily);
+
+      function isPaused() {
+        return document.hidden ||
+        reducedMotion.matches ||
+        document.body.classList.contains("回顧已開啟");
+      }
+
+      function keepSharksInView() {
+        const margin = 8;
+        world.sharks.forEach(function (shark) {
+          const nodes = shark.nodes;
+          let minX = Infinity;
+          let maxX = -Infinity;
+          let minY = Infinity;
+          let maxY = -Infinity;
+          for (let index = 0; index < nodes.length; index += 2) {
+            minX = Math.min(minX, nodes[index]);
+            maxX = Math.max(maxX, nodes[index]);
+            minY = Math.min(minY, nodes[index + 1]);
+            maxY = Math.max(maxY, nodes[index + 1]);
+          }
+
+          const offsetX = minX < margin
+            ? margin - minX
+            : maxX > world.width - margin
+              ? world.width - margin - maxX
+              : 0;
+          const offsetY = minY < margin
+            ? margin - minY
+            : maxY > world.height - margin
+              ? world.height - margin - maxY
+              : 0;
+          if (offsetX === 0 && offsetY === 0) {
+            return;
+          }
+
+          for (let index = 0; index < nodes.length; index += 2) {
+            nodes[index] += offsetX;
+            nodes[index + 1] += offsetY;
+          }
+          shark.roamX = Math.min(world.width - margin, Math.max(margin, shark.roamX + offsetX));
+          shark.roamY = Math.min(world.height - margin, Math.max(margin, shark.roamY + offsetY));
+        });
+      }
+
+      function shiftWorld(dx, dy) {
+        world.sharks.forEach(function (shark) {
+          const nodes = shark.nodes;
+          for (let index = 0; index < nodes.length; index += 2) {
+            nodes[index] += dx;
+            nodes[index + 1] += dy;
+          }
+          shark.roamX += dx;
+          shark.roamY += dy;
+        });
+        world.fish.forEach(function (fish) {
+          fish.x += dx;
+          fish.y += dy;
+        });
+        world.noSwimZones.forEach(function (zone) {
+          zone.left += dx;
+          zone.right += dx;
+          zone.top += dy;
+          zone.bottom += dy;
+        });
+        world.pointer.x += dx;
+        world.pointer.y += dy;
+        world.events.forEach(function (event) {
+          event.x += dx;
+          event.y += dy;
+        });
+      }
+
+      function stepWithExitSpace(delta) {
+        const width = world.width;
+        const height = world.height;
+        const paddingX = width;
+        const paddingY = height;
+        shiftWorld(paddingX, paddingY);
+        world.width = width + paddingX * 2;
+        world.height = height + paddingY * 2;
+        try {
+          world.step(delta);
+        } finally {
+          shiftWorld(-paddingX, -paddingY);
+          world.width = width;
+          world.height = height;
+        }
+      }
+
+      function createIncomingShark() {
+        const kind = organismKinds[Math.floor(Math.random() * organismKinds.length)];
+        const size = randomBetween(1, 3);
+        const incomingWorld = new TimeMemSharks.World([{ kind: kind, size: size }], 0);
+        incomingWorld.resize(world.width, world.height, renderer.cellWidth, renderer.cellHeight);
+        const shark = incomingWorld.sharks[0];
+        const side = Math.floor(Math.random() * 4);
+        const headX = side === 0 ? -shark.length
+          : side === 1 ? world.width + shark.length
+            : randomBetween(world.width * 0.1, world.width * 0.9);
+        const headY = side === 2 ? -shark.length
+          : side === 3 ? world.height + shark.length
+            : randomBetween(world.height * 0.1, world.height * 0.9);
+        const heading = side === 0 ? 0
+          : side === 1 ? Math.PI
+            : side === 2 ? Math.PI / 2
+              : -Math.PI / 2;
+        const nodes = shark.nodes;
+        const segmentLength = shark.length / (nodes.length / 2 - 1);
+        shark.id = world.sharks.reduce(function (nextId, current) {
+          return Math.max(nextId, current.id + 1);
+        }, 1);
+        shark.heading = heading;
+        shark.speed = randomBetween(18, 30);
+        shark.pace = randomBetween(0.9, 2.2) / simulationSpeed;
+        shark.phase = randomBetween(0, Math.PI * 2);
+        shark.turn = 0;
+        shark.wander = 0;
+        shark.hunger = randomBetween(0.25, 0.75);
+        shark.target = null;
+        shark.retargetAt = world.time + randomBetween(2, 5);
+        shark.roamX = randomBetween(world.width * 0.1, world.width * 0.9);
+        shark.roamY = randomBetween(world.height * 0.1, world.height * 0.9);
+        shark.roamAt = world.time + randomBetween(8, 16);
+        shark.exitAt = world.time + randomBetween(15, 35);
+        shark.isExiting = false;
+        shark.isEntering = true;
+        shark.isEdgeSpawned = true;
+        shark.edgeEntrySide = side;
+        for (let index = 0; index < nodes.length; index += 2) {
+          const segment = index / 2;
+          nodes[index] = headX - Math.cos(heading) * segmentLength * segment;
+          nodes[index + 1] = headY - Math.sin(heading) * segmentLength * segment;
+        }
+        shark.depth = randomBetween(0.35, 1);
+        shark.visualOpacity = randomBetween(0.45, 1);
+        shark.targetVisualOpacity = shark.visualOpacity;
+        shark.shadeFactor = randomBetween(0.8, 2.5);
+        shark.targetShadeFactor = shark.shadeFactor;
+        shark.baseLength = shark.length;
+        shark.visualScale = 1;
+        shark.targetVisualScale = 1;
+        shark.appliedVisualScale = 1;
+        const depth = Math.fround(shark.depth);
+        opacityByDepth.set(depth, shark.visualOpacity);
+        shadeFactorByDepth.set(depth, shark.shadeFactor);
+        if (mutateNextIncoming) {
+          mutateNextIncoming = false;
+          return convertIncomingSharkToEdgeTransit(shark);
+        }
+        return shark;
+      }
+
+      function getEdgeTransitPoint(side, margin) {
+        return {
+          x: side === 0 ? -margin
+            : side === 1 ? world.width + margin
+              : randomBetween(0, world.width),
+          y: side === 2 ? -margin
+            : side === 3 ? world.height + margin
+              : randomBetween(0, world.height)
+        };
+      }
+
+      function getEdgeTransitActionPoint() {
+        return {
+          x: randomBetween(world.width * 0.25, world.width * 0.75),
+          y: randomBetween(world.height * 0.25, world.height * 0.75)
+        };
+      }
+
+      function getNextEdgeTransitSide(excludedSide, previousSide) {
+        const availableSides = [0, 1, 2, 3].filter(function (side) {
+          return side !== excludedSide && side !== previousSide;
+        });
+        return availableSides[Math.floor(Math.random() * availableSides.length)];
+      }
+
+      function convertIncomingSharkToEdgeTransit(shark) {
+        const startX = shark.nodes[0];
+        const startY = shark.nodes[1];
+        const startHeading = shark.heading;
+        const startSide = shark.edgeEntrySide;
+        const endSide = -1;
+        const end = getEdgeTransitActionPoint();
+        const duration = randomBetween(1, 3) * simulationSpeed;
+        const pauseEnabled = Math.random() < 0.4;
+        const transit = {
+          startX: startX,
+          startY: startY,
+          endX: end.x,
+          endY: end.y,
+          endSide: endSide,
+          originSide: startSide,
+          legEndsAtEdge: false,
+          startHeading: startHeading,
+          startTime: world.time,
+          duration: duration,
+          progress: 0,
+          pathLength: 0,
+          speed: 0,
+          actionsTotal: Math.floor(randomBetween(3, 6)),
+          actionsCompleted: 0,
+          actionMode: null,
+          actionStartedAt: 0,
+          actionDuration: 0,
+          pendingEndX: 0,
+          pendingEndY: 0,
+          pendingEndSide: -1,
+          pauseEnabled: pauseEnabled,
+          pauseProgress: pauseEnabled ? randomBetween(0.25, 0.75) : 0,
+          pauseDuration: pauseEnabled ? randomBetween(0.4, 0.8) * simulationSpeed : 0,
+          pauseTriggered: false,
+          isPaused: false,
+          pauseX: 0,
+          pauseY: 0,
+          pauseHeading: startHeading,
+          pauseStartedAt: 0
+        };
+        Object.assign(transit, createSpeedVariationState(world.time));
+        createEdgeTransitPath(transit, startHeading, shark.length);
+        transit.speed = transit.pathLength / duration;
+        shark.edgeTransit = transit;
+        shark.isEntering = false;
+        shark.isExiting = false;
+        shark.isEdgeSpawned = false;
+        shark.speed = 0;
+        shark.pace = 0;
+        shark.hunger = 0;
+        shark.target = null;
+        shark.swimMotion = null;
+        setEdgeTransitPosition(shark, transit, 0);
+        return shark;
+      }
+
+      function createEdgeTransitShark() {
+        const kind = organismKinds[Math.floor(Math.random() * organismKinds.length)];
+        const size = randomBetween(1, 3);
+        const transitWorld = new TimeMemSharks.World([{ kind: kind, size: size }], 0);
+        transitWorld.resize(world.width, world.height, renderer.cellWidth, renderer.cellHeight);
+        const shark = transitWorld.sharks[0];
+        const actionsTotal = Math.floor(randomBetween(3, 6));
+        const startSide = Math.floor(Math.random() * 4);
+        const margin = shark.length;
+        const start = getEdgeTransitPoint(startSide, margin);
+        const endSide = -1;
+        const end = getEdgeTransitActionPoint();
+        const startX = start.x;
+        const startY = start.y;
+        const endX = end.x;
+        const endY = end.y;
+        const heading = Math.atan2(endY - startY, endX - startX);
+        const duration = randomBetween(1, 3) * simulationSpeed;
+        const pauseEnabled = Math.random() < 0.4;
+        shark.id = world.sharks.reduce(function (nextId, current) {
+          return Math.max(nextId, current.id + 1);
+        }, 1);
+        shark.heading = heading;
+        shark.speed = 0;
+        shark.pace = 0;
+        shark.hunger = 0;
+        shark.target = null;
+        shark.isEntering = false;
+        shark.isExiting = false;
+        const transit = {
+          startX: startX,
+          startY: startY,
+          endX: endX,
+          endY: endY,
+          endSide: endSide,
+          originSide: startSide,
+          legEndsAtEdge: false,
+          startHeading: heading,
+          startTime: world.time,
+          duration: duration,
+          progress: 0,
+          pathLength: 0,
+          speed: 0,
+          actionsTotal: actionsTotal,
+          actionsCompleted: 0,
+          actionMode: null,
+          actionStartedAt: 0,
+          actionDuration: 0,
+          pendingEndX: 0,
+          pendingEndY: 0,
+          pendingEndSide: -1,
+          pauseEnabled: pauseEnabled,
+          pauseProgress: pauseEnabled ? randomBetween(0.25, 0.75) : 0,
+          pauseDuration: pauseEnabled ? randomBetween(0.4, 0.8) * simulationSpeed : 0,
+          pauseTriggered: false,
+          isPaused: false,
+          pauseX: 0,
+          pauseY: 0,
+          pauseHeading: heading,
+          pauseStartedAt: 0
+        };
+        Object.assign(transit, createSpeedVariationState(world.time));
+        createEdgeTransitPath(transit, heading, shark.length);
+        transit.speed = transit.pathLength / duration;
+        shark.edgeTransit = transit;
+        setEdgeTransitPosition(shark, transit, 0);
+        shark.depth = randomBetween(0.35, 1);
+        shark.visualOpacity = randomBetween(0.45, 1);
+        shark.targetVisualOpacity = shark.visualOpacity;
+        shark.shadeFactor = randomBetween(0.8, 2.5);
+        shark.targetShadeFactor = shark.shadeFactor;
+        shark.baseLength = shark.length;
+        shark.visualScale = 1;
+        shark.targetVisualScale = 1;
+        shark.appliedVisualScale = 1;
+        const depth = Math.fround(shark.depth);
+        opacityByDepth.set(depth, shark.visualOpacity);
+        shadeFactorByDepth.set(depth, shark.shadeFactor);
+        return shark;
+      }
+
+      function replaceExitedSharks() {
+        for (let index = world.sharks.length - 1; index >= 0; index--) {
+          const shark = world.sharks[index];
+          const nodes = shark.nodes;
+          let minX = Infinity;
+          let maxX = -Infinity;
+          let minY = Infinity;
+          let maxY = -Infinity;
+          for (let node = 0; node < nodes.length; node += 2) {
+            minX = Math.min(minX, nodes[node]);
+            maxX = Math.max(maxX, nodes[node]);
+            minY = Math.min(minY, nodes[node + 1]);
+            maxY = Math.max(maxY, nodes[node + 1]);
+          }
+          const overlapsViewport = maxX >= 0 && minX <= world.width && maxY >= 0 && minY <= world.height;
+          if (shark.isEntering) {
+            if (overlapsViewport) {
+              shark.isEntering = false;
+              shark.exitAt = world.time + randomBetween(15, 35);
+              if (shark.isEdgeSpawned && shark.swimMotion) {
+                shark.swimMotion.nextDartAt = world.time + randomBetween(0.3, 1.2);
+              }
+            }
+            continue;
+          }
+          if (shark.isExiting && (maxX < 0 || minX > world.width || maxY < 0 || minY > world.height)) {
+            const residentCount = world.sharks.filter(function (candidate) {
+              return !candidate.edgeTransit;
+            }).length;
+            if (residentCount > minimumSharks) {
+              opacityByDepth.delete(Math.fround(shark.depth));
+              shadeFactorByDepth.delete(Math.fround(shark.depth));
+              world.sharks.splice(index, 1);
+            } else {
+              shark.isExiting = false;
+              shark.isEntering = true;
+              shark.exitAt = world.time + randomBetween(8, 16);
+              shark.hunger = 0;
+              shark.target = null;
+              shark.roamX = randomBetween(world.width * 0.1, world.width * 0.9);
+              shark.roamY = randomBetween(world.height * 0.1, world.height * 0.9);
+              shark.roamAt = world.time + randomBetween(4, 8);
+            }
+          }
+        }
+      }
+
+      function updateSharkPopulation() {
+        if (world.time < nextSpawnAt) {
+          return;
+        }
+        nextSpawnAt = world.time + randomBetween(3, 8);
+        if (world.sharks.length < maximumSharks) {
+          world.sharks.push(createIncomingShark());
+        }
+      }
+
+      function updateRandomFishMutationCheck() {
+        if (world.time < nextMutationCheckAt) {
+          return;
+        }
+        nextMutationCheckAt = world.time + 5 * simulationSpeed;
+        if (Math.random() < 1 / 3) {
+          mutateNextIncoming = true;
+        }
+      }
+
+      function updateEdgeTransitPopulation() {
+        if (world.time < nextEdgeTransitAt) {
+          return;
+        }
+        nextEdgeTransitAt = world.time + randomBetween(4, 8);
+        if (world.sharks.length < maximumSharks) {
+          world.sharks.push(createEdgeTransitShark());
+        }
+      }
+
+      function getEdgeTransitPointOnPath(transit, progress) {
+        const t = Math.max(0, Math.min(1, progress));
+        if (!transit.pathSamples || transit.pathSamples.length < 2) {
+          return getEdgeTransitRawPoint(transit, t);
+        }
+        const targetDistance = t * transit.pathLength;
+        let low = 0;
+        let high = transit.pathSamples.length - 1;
+        while (low + 1 < high) {
+          const middle = Math.floor((low + high) / 2);
+          if (transit.pathSamples[middle].distance < targetDistance) {
+            low = middle;
+          } else {
+            high = middle;
+          }
+        }
+        const start = transit.pathSamples[low];
+        const end = transit.pathSamples[high];
+        const span = end.distance - start.distance;
+        const blend = span > 0 ? (targetDistance - start.distance) / span : 0;
+        return {
+          x: start.x + (end.x - start.x) * blend,
+          y: start.y + (end.y - start.y) * blend
+        };
+      }
+
+      function getEdgeTransitRawPoint(transit, progress) {
+        const t = Math.max(0, Math.min(1, progress));
+        const inverse = 1 - t;
+        const baseX = inverse * inverse * inverse * transit.startX
+          + 3 * inverse * inverse * t * transit.controlX1
+          + 3 * inverse * t * t * transit.controlX2
+          + t * t * t * transit.endX;
+        const baseY = inverse * inverse * inverse * transit.startY
+          + 3 * inverse * inverse * t * transit.controlY1
+          + 3 * inverse * t * t * transit.controlY2
+          + t * t * t * transit.endY;
+        const sine = Math.sin(Math.PI * t);
+        const taper = sine * sine;
+        let shape = 0;
+        if (transit.routeType === "S") {
+          shape = Math.sin(Math.PI * 2 * t) * taper;
+        } else if (transit.routeType === "U") {
+          shape = taper;
+        } else if (transit.routeType === "W") {
+          shape = Math.sin(Math.PI * 4 * t) * taper;
+        } else if (transit.routeType === "Z") {
+          const transition = Math.max(0, Math.min(1, (t - 0.2) / 0.6));
+          const smoothTransition = transition * transition * (3 - 2 * transition);
+          shape = (1 - 2 * smoothTransition) * taper;
+        }
+        const offset = shape * transit.routeAmplitude * transit.routeSign;
+        return {
+          x: baseX + transit.routeNormalX * offset,
+          y: baseY + transit.routeNormalY * offset
+        };
+      }
+
+      function createEdgeTransitPath(transit, startHeading, sharkLength) {
+        const dx = transit.endX - transit.startX;
+        const dy = transit.endY - transit.startY;
+        const distance = Math.hypot(dx, dy);
+        const endHeading = Math.atan2(dy, dx);
+        const controlDistance = Math.min(distance * 0.42, Math.max(sharkLength * 1.5, distance * 0.2));
+        const normalHeading = endHeading + Math.PI / 2;
+        transit.controlX1 = transit.startX + Math.cos(startHeading) * controlDistance;
+        transit.controlY1 = transit.startY + Math.sin(startHeading) * controlDistance;
+        transit.controlX2 = transit.endX - Math.cos(endHeading) * controlDistance;
+        transit.controlY2 = transit.endY - Math.sin(endHeading) * controlDistance;
+        transit.routeType = ["S", "U", "W", "Z"][Math.floor(Math.random() * 4)];
+        transit.routeSign = Math.random() < 0.5 ? -1 : 1;
+        transit.routeAmplitude = Math.min(
+          distance * 0.2,
+          Math.min(world.width, world.height) * randomBetween(0.12, 0.28)
+        );
+        transit.routeNormalX = Math.cos(normalHeading);
+        transit.routeNormalY = Math.sin(normalHeading);
+        const samples = [];
+        let pathLength = 0;
+        let previousPoint = null;
+        for (let index = 0; index <= 96; index++) {
+          const point = getEdgeTransitRawPoint(transit, index / 96);
+          if (previousPoint) {
+            pathLength += Math.hypot(point.x - previousPoint.x, point.y - previousPoint.y);
+          }
+          samples.push({
+            x: point.x,
+            y: point.y,
+            distance: pathLength
+          });
+          previousPoint = point;
+        }
+        transit.pathSamples = samples;
+        transit.pathLength = pathLength;
+      }
+
+      function getEdgeTransitHeading(transit, progress) {
+        const t = Math.max(0, Math.min(1, progress));
+        const before = getEdgeTransitPointOnPath(transit, Math.max(0, t - 0.005));
+        const after = getEdgeTransitPointOnPath(transit, Math.min(1, t + 0.005));
+        const dx = after.x - before.x;
+        const dy = after.y - before.y;
+        return Math.atan2(dy, dx);
+      }
+
+      function setEdgeTransitPosition(shark, transit, progress) {
+        const head = getEdgeTransitPointOnPath(transit, progress);
+        const heading = getEdgeTransitHeading(transit, progress);
+        const nodes = shark.nodes;
+        const segmentLength = shark.length / (nodes.length / 2 - 1);
+        const transitionNodes = transit.transitionNodes;
+        const transitionBlend = transitionNodes ? smoothStep(progress / 0.16) : 1;
+        shark.heading = heading;
+        for (let node = 0; node < nodes.length; node += 2) {
+          const segment = node / 2;
+          const nodeProgress = progress - segment * segmentLength / transit.pathLength;
+          let nodeX;
+          let nodeY;
+          if (nodeProgress < 0) {
+            const distanceBehindStart = -nodeProgress * transit.pathLength;
+            nodeX = transit.startX - Math.cos(transit.startHeading) * distanceBehindStart;
+            nodeY = transit.startY - Math.sin(transit.startHeading) * distanceBehindStart;
+          } else {
+            const point = getEdgeTransitPointOnPath(transit, nodeProgress);
+            nodeX = point.x;
+            nodeY = point.y;
+          }
+          nodes[node] = transitionNodes
+            ? transitionNodes[node] + (nodeX - transitionNodes[node]) * transitionBlend
+            : nodeX;
+          nodes[node + 1] = transitionNodes
+            ? transitionNodes[node + 1] + (nodeY - transitionNodes[node + 1]) * transitionBlend
+            : nodeY;
+        }
+        nodes[0] = head.x;
+        nodes[1] = head.y;
+        if (progress >= 0.16) {
+          transit.transitionNodes = null;
+        }
+      }
+
+      function configureEdgeTransitPause(transit) {
+        transit.pauseEnabled = Math.random() < 0.4;
+        transit.pauseProgress = transit.pauseEnabled ? randomBetween(0.25, 0.75) : 0;
+        transit.pauseDuration = transit.pauseEnabled ? randomBetween(0.4, 0.8) * simulationSpeed : 0;
+        transit.pauseTriggered = false;
+        transit.isPaused = false;
+      }
+
+      function startNextEdgeTransitLeg(shark, transit) {
+        const transitionNodes = new Float32Array(shark.nodes);
+        transit.startX = transit.endX;
+        transit.startY = transit.endY;
+        transit.startHeading = transit.pendingStartHeading;
+        transit.endX = transit.pendingEndX;
+        transit.endY = transit.pendingEndY;
+        transit.endSide = transit.pendingEndSide;
+        transit.legEndsAtEdge = Number.isInteger(transit.pendingEndSide);
+        transit.startTime = world.time;
+        transit.progress = 0;
+        transit.duration = randomBetween(1, 3) * simulationSpeed;
+        createEdgeTransitPath(transit, transit.startHeading, shark.length);
+        transit.speed = transit.pathLength / transit.duration;
+        transit.transitionNodes = transitionNodes;
+        transit.actionMode = null;
+        shark.orbitAction = null;
+        shark.speed = 0;
+        shark.pace = 0;
+        configureEdgeTransitPause(transit);
+        setEdgeTransitPosition(shark, transit, 0);
+      }
+
+      function finishEdgeTransitLeg(index, shark, transit) {
+        transit.actionsCompleted++;
+        if (transit.actionsCompleted >= transit.actionsTotal) {
+          opacityByDepth.delete(Math.fround(shark.depth));
+          shadeFactorByDepth.delete(Math.fround(shark.depth));
+          world.sharks.splice(index, 1);
+          return;
+        }
+        setEdgeTransitPosition(shark, transit, 1);
+        const nextIsFinalLeg = transit.actionsCompleted + 1 >= transit.actionsTotal;
+        let nextEnd;
+        let nextSide = -1;
+        if (nextIsFinalLeg) {
+          nextSide = getNextEdgeTransitSide(
+            transit.originSide,
+            Number.isInteger(transit.endSide) ? transit.endSide : -1
+          );
+          nextEnd = getEdgeTransitPoint(nextSide, shark.length);
+        } else {
+          nextEnd = getEdgeTransitActionPoint();
+        }
+        transit.pendingEndX = nextEnd.x;
+        transit.pendingEndY = nextEnd.y;
+        transit.pendingEndSide = nextSide;
+        transit.pendingStartHeading = getEdgeTransitHeading(transit, 1);
+        const actionRoll = Math.random();
+        if (actionRoll < 0.3) {
+          transit.actionMode = "rest";
+          transit.actionStartedAt = world.time;
+          transit.actionDuration = randomBetween(3, 6) * simulationSpeed;
+          setEdgeTransitPosition(shark, transit, 1);
+        } else if (actionRoll < 0.55) {
+          transit.actionMode = "orbit";
+          transit.actionStartedAt = world.time;
+          shark.orbitAction = createOrbitAction(shark, world.time);
+          transit.actionDuration = shark.orbitAction.duration;
+          shark.speed = 0;
+          shark.pace = 0;
+        } else {
+          startNextEdgeTransitLeg(shark, transit);
+        }
+      }
+
+      function updateEdgeTransits(delta) {
+        for (let index = world.sharks.length - 1; index >= 0; index--) {
+          const shark = world.sharks[index];
+          const transit = shark.edgeTransit;
+          if (!transit) {
+            continue;
+          }
+          updateSpeedVariation(transit, world.time);
+          if (transit.actionMode === "rest") {
+            setEdgeTransitPosition(shark, transit, 1);
+            if (world.time - transit.actionStartedAt >= transit.actionDuration) {
+              startNextEdgeTransitLeg(shark, transit);
+            }
+            continue;
+          }
+          if (transit.actionMode === "orbit") {
+            if (world.time - transit.actionStartedAt >= transit.actionDuration) {
+              startNextEdgeTransitLeg(shark, transit);
+            }
+            continue;
+          }
+          if (transit.isPaused) {
+            if (world.time - transit.pauseStartedAt < transit.pauseDuration) {
+              setEdgeTransitPosition(shark, transit, transit.pauseProgress);
+              continue;
+            }
+            let endSide = -1;
+            let end;
+            if (transit.legEndsAtEdge) {
+              endSide = getNextEdgeTransitSide(transit.originSide, transit.endSide);
+              end = getEdgeTransitPoint(endSide, shark.length);
+            } else {
+              end = getEdgeTransitActionPoint();
+            }
+            const transitionNodes = new Float32Array(shark.nodes);
+            transit.startX = transit.pauseX;
+            transit.startY = transit.pauseY;
+            transit.endX = end.x;
+            transit.endY = end.y;
+            transit.endSide = endSide;
+            transit.startHeading = transit.pauseHeading;
+            transit.transitionNodes = transitionNodes;
+            createEdgeTransitPath(transit, transit.startHeading, shark.length);
+            transit.startTime = world.time;
+            transit.duration = transit.pathLength / transit.speed;
+            transit.progress = 0;
+            transit.pauseTriggered = true;
+            transit.isPaused = false;
+            continue;
+          }
+          transit.progress = Math.min(
+            1,
+            transit.progress + delta * transit.speedFactor / transit.duration
+          );
+          const progress = transit.progress;
+          if (transit.pauseEnabled && !transit.pauseTriggered && progress >= transit.pauseProgress && progress < 1) {
+            const pausePoint = getEdgeTransitPointOnPath(transit, transit.pauseProgress);
+            transit.pauseX = pausePoint.x;
+            transit.pauseY = pausePoint.y;
+            transit.pauseHeading = getEdgeTransitHeading(transit, transit.pauseProgress);
+            transit.pauseStartedAt = world.time;
+            transit.isPaused = true;
+            setEdgeTransitPosition(shark, transit, transit.pauseProgress);
+            continue;
+          }
+          if (progress >= 1) {
+            finishEdgeTransitLeg(index, shark, transit);
+            continue;
+          }
+          setEdgeTransitPosition(shark, transit, progress);
+        }
+      }
+
+      function restoreSwimBends() {
+        world.sharks.forEach(function (shark) {
+          const motion = shark.swimMotion;
+          if (!motion) {
+            return;
+          }
+          const nodes = shark.nodes;
+          for (let index = 2; index < nodes.length; index += 2) {
+            nodes[index] -= motion.offsets[index];
+            nodes[index + 1] -= motion.offsets[index + 1];
+          }
+          motion.offsets.fill(0);
+        });
+      }
+
+      function restoreVisualSizes() {
+        world.sharks.forEach(function (shark) {
+          const scale = shark.appliedVisualScale || 1;
+          if (scale === 1 || !shark.baseLength) {
+            return;
+          }
+          const nodes = shark.nodes;
+          const headX = nodes[0];
+          const headY = nodes[1];
+          for (let index = 2; index < nodes.length; index += 2) {
+            nodes[index] = headX + (nodes[index] - headX) / scale;
+            nodes[index + 1] = headY + (nodes[index + 1] - headY) / scale;
+          }
+          shark.length = shark.baseLength;
+          shark.appliedVisualScale = 1;
+        });
+      }
+
+      function applyVisualSizes() {
+        world.sharks.forEach(function (shark) {
+          const scale = shark.visualScale || 1;
+          if (!shark.baseLength || scale === 1) {
+            return;
+          }
+          const nodes = shark.nodes;
+          const headX = nodes[0];
+          const headY = nodes[1];
+          for (let index = 2; index < nodes.length; index += 2) {
+            nodes[index] = headX + (nodes[index] - headX) * scale;
+            nodes[index + 1] = headY + (nodes[index + 1] - headY) * scale;
+          }
+          shark.length = shark.baseLength * scale;
+          shark.appliedVisualScale = scale;
+        });
+      }
+
+      function getBurstPulse(motion, time) {
+        if (time < motion.burstStart || time >= motion.burstUntil) {
+          return 0;
+        }
+        const progress = (time - motion.burstStart) / (motion.burstUntil - motion.burstStart);
+        const envelope = Math.sin(progress * Math.PI);
+        return envelope * envelope;
+      }
+
+      function smoothStep(value) {
+        const progress = Math.max(0, Math.min(1, value));
+        return progress * progress * (3 - 2 * progress);
+      }
+
+      function createSpeedVariationState(time) {
+        return {
+          speedFactor: 1,
+          speedFrom: 1,
+          speedTarget: 1,
+          speedChangeStart: time,
+          speedChangeEnd: time,
+          nextSpeedChangeAt: time + randomBetween(2, 5) * simulationSpeed
+        };
+      }
+
+      function updateSpeedVariation(state, time) {
+        const transition = state.speedChangeEnd > state.speedChangeStart
+          ? (time - state.speedChangeStart) / (state.speedChangeEnd - state.speedChangeStart)
+          : 1;
+        state.speedFactor = state.speedFrom
+          + (state.speedTarget - state.speedFrom) * smoothStep(transition);
+        if (time >= state.nextSpeedChangeAt) {
+          state.speedFrom = state.speedFactor;
+          state.speedTarget = randomBetween(0.65, 1.45);
+          state.speedChangeStart = time;
+          state.speedChangeEnd = time + randomBetween(0.8, 1.6) * simulationSpeed;
+          state.nextSpeedChangeAt = time + randomBetween(2, 5) * simulationSpeed;
+        }
+        return state.speedFactor;
+      }
+
+      function createOrbitAction(shark, time) {
+        const direction = Math.random() < 0.5 ? -1 : 1;
+        return {
+          startTime: time,
+          duration: randomBetween(2, 4) * simulationSpeed,
+          turns: Math.floor(randomBetween(1, 3)),
+          direction: direction,
+          radius: Math.min(
+            Math.max(shark.length * 0.8, 16),
+            Math.min(world.width, world.height) * 0.12
+          ),
+          baseNodes: null,
+          baseHeading: shark.heading,
+          centerX: 0,
+          centerY: 0,
+          startAngle: 0
+        };
+      }
+
+      function restoreSwimOrbits() {
+        world.sharks.forEach(function (shark) {
+          const orbit = shark.orbitAction;
+          if (!orbit || !orbit.baseNodes) {
+            return;
+          }
+          shark.nodes.set(orbit.baseNodes);
+          shark.heading = orbit.baseHeading;
+        });
+      }
+
+      function applySwimOrbits() {
+        world.sharks.forEach(function (shark) {
+          const orbit = shark.orbitAction;
+          if (!orbit) {
+            return;
+          }
+          if (!orbit.baseNodes) {
+            orbit.baseNodes = new Float32Array(shark.nodes);
+            orbit.baseHeading = shark.heading;
+            orbit.startAngle = orbit.baseHeading - orbit.direction * Math.PI / 2;
+            orbit.centerX = shark.nodes[0] - Math.cos(orbit.startAngle) * orbit.radius;
+            orbit.centerY = shark.nodes[1] - Math.sin(orbit.startAngle) * orbit.radius;
+          }
+          const progress = Math.max(0, Math.min(1, (world.time - orbit.startTime) / orbit.duration));
+          const blend = Math.min(smoothStep(progress / 0.12), smoothStep((1 - progress) / 0.12));
+          const angle = orbit.startAngle + orbit.direction * Math.PI * 2 * orbit.turns * progress;
+          const nodes = shark.nodes;
+          const segmentLength = shark.length / (nodes.length / 2 - 1);
+          for (let index = 0; index < nodes.length; index += 2) {
+            const segment = index / 2;
+            const nodeAngle = angle - orbit.direction * segmentLength * segment / orbit.radius;
+            const circleX = orbit.centerX + Math.cos(nodeAngle) * orbit.radius;
+            const circleY = orbit.centerY + Math.sin(nodeAngle) * orbit.radius;
+            nodes[index] = orbit.baseNodes[index]
+              + (circleX - orbit.baseNodes[index]) * blend;
+            nodes[index + 1] = orbit.baseNodes[index + 1]
+              + (circleY - orbit.baseNodes[index + 1]) * blend;
+          }
+          if (blend > 0.01) {
+            shark.heading = angle + orbit.direction * Math.PI / 2;
+          }
+        });
+      }
+
+      function chooseMotionProfile() {
+        const roll = Math.random();
+        if (roll < 0.7) {
+          return {
+            mode: "cruise",
+            idlePace: randomBetween(0.72, 1.08),
+            phaseSpeed: randomBetween(0.35, 0.8),
+            burstGain: randomBetween(0.25, 0.65),
+            pauseChance: 0.03,
+            pauseMin: 0.25,
+            pauseMax: 0.6,
+            burstMin: 0.7,
+            burstMax: 1.2,
+          };
+        }
+        if (roll < 0.9) {
+          return {
+            mode: "drift",
+            idlePace: randomBetween(0.32, 0.58),
+            phaseSpeed: randomBetween(0.15, 0.4),
+            burstGain: randomBetween(1.2, 2),
+            pauseChance: 0.18,
+            pauseMin: 0.5,
+            pauseMax: 1.2,
+            burstMin: 0.8,
+            burstMax: 1.4,
+          };
+        }
+        return {
+          mode: "rest-burst",
+          idlePace: randomBetween(0, 0.12),
+          phaseSpeed: randomBetween(0, 0.16),
+          burstGain: randomBetween(2.4, 3.2),
+          pauseChance: 0.38,
+          pauseMin: 1,
+          pauseMax: 2.1,
+          burstMin: 0.9,
+          burstMax: 1.7,
+        };
+      }
+
+      function updateSwimMotion(delta) {
+        const time = world.time;
+        const residentCount = world.sharks.filter(function (shark) {
+          return !shark.edgeTransit;
+        }).length;
+        let exitingCount = world.sharks.filter(function (shark) {
+          return !shark.edgeTransit && shark.isExiting;
+        }).length;
+        world.sharks.forEach(function (shark) {
+          if (shark.edgeTransit) {
+            return;
+          }
+          if (!shark.isExiting && !shark.isEntering && time >= shark.exitAt) {
+            if (residentCount - exitingCount > minimumSharks) {
+              const exitSide = Math.floor(Math.random() * 4);
+              shark.isExiting = true;
+              exitingCount++;
+              shark.roamX = exitSide === 0 ? -world.width
+                : exitSide === 1 ? world.width * 2
+                  : randomBetween(world.width * 0.1, world.width * 0.9);
+              shark.roamY = exitSide === 2 ? -world.height
+                : exitSide === 3 ? world.height * 2
+                  : randomBetween(world.height * 0.1, world.height * 0.9);
+              shark.roamAt = Infinity;
+              shark.target = null;
+            } else {
+              shark.exitAt = time + randomBetween(5, 12);
+            }
+          }
+          if (shark.isExiting) {
+            shark.hunger = 0;
+          }
+          if (!shark.swimMotion) {
+            const profile = chooseMotionProfile();
+            shark.swimMotion = Object.assign({
+              phase: randomBetween(0, Math.PI * 2),
+              nextAction: time + randomBetween(2, 5),
+              nextDartAt: time + randomBetween(4, 12),
+              dartStart: 0,
+              dartUntil: 0,
+              dartGain: 1,
+              burstStart: 0,
+              burstUntil: 0,
+              pauseUntil: 0,
+              basePace: shark.pace,
+              offsets: new Float32Array(shark.nodes.length)
+            }, createSpeedVariationState(time), profile);
+          }
+          const motion = shark.swimMotion;
+          if (shark.orbitAction && time - shark.orbitAction.startTime >= shark.orbitAction.duration) {
+            shark.orbitAction = null;
+          }
+          if (time >= motion.nextAction && time >= motion.pauseUntil && !shark.orbitAction) {
+            Object.assign(motion, chooseMotionProfile());
+            shark.targetVisualScale = randomBetween(0.9, 1.1);
+            shark.targetVisualOpacity = randomBetween(0.45, 1);
+            shark.targetShadeFactor = randomBetween(0.8, 2.5);
+            motion.pauseUntil = Math.random() < motion.pauseChance
+              ? time + randomBetween(motion.pauseMin, motion.pauseMax)
+              : time;
+            motion.burstStart = motion.pauseUntil;
+            motion.burstUntil = motion.burstStart + randomBetween(motion.burstMin, motion.burstMax);
+            motion.nextAction = time + randomBetween(2, 5);
+            if (Math.random() < 0.08) {
+              motion.pauseUntil = time + randomBetween(3, 6) * simulationSpeed;
+              motion.burstStart = motion.pauseUntil;
+              motion.burstUntil = motion.burstStart + randomBetween(motion.burstMin, motion.burstMax);
+              motion.nextAction = motion.pauseUntil + randomBetween(2, 5) * simulationSpeed;
+            } else if (Math.random() < 0.08) {
+              shark.orbitAction = createOrbitAction(shark, time);
+              motion.nextAction = time + shark.orbitAction.duration + randomBetween(2, 5) * simulationSpeed;
+            }
+          }
+          const speedFactor = updateSpeedVariation(motion, time);
+          if (!shark.isExiting && !shark.isEntering && !shark.orbitAction && time >= motion.pauseUntil && time >= motion.nextDartAt) {
+            motion.nextDartAt = time + (shark.isEdgeSpawned ? randomBetween(2, 5) : randomBetween(4, 10));
+            const dartChance = shark.isEdgeSpawned ? 0.9 : 0.35;
+            if (Math.random() < dartChance) {
+              const isEdgeDash = shark.isEdgeSpawned;
+              motion.dartStart = time;
+              motion.dartUntil = time + randomBetween(isEdgeDash ? 0.9 : 0.7, isEdgeDash ? 1.6 : 1.4);
+              motion.dartGain = randomBetween(isEdgeDash ? 2.6 : 1.8, isEdgeDash ? 3.5 : 3);
+              motion.pauseUntil = Math.min(motion.pauseUntil, time);
+              const headX = shark.nodes[0];
+              const headY = shark.nodes[1];
+              const canExitDuringDart = shark.isEdgeSpawned
+                && headX >= 0 && headX <= world.width
+                && headY >= 0 && headY <= world.height
+                && residentCount - exitingCount > minimumSharks;
+              if (canExitDuringDart) {
+                let exitSide = shark.edgeEntrySide;
+                if (!Number.isInteger(exitSide)) {
+                  const exitDistances = [headX, world.width - headX, headY, world.height - headY];
+                  exitSide = 0;
+                  for (let side = 1; side < exitDistances.length; side++) {
+                    if (exitDistances[side] < exitDistances[exitSide]) {
+                      exitSide = side;
+                    }
+                  }
+                }
+                shark.roamX = exitSide === 0 ? -world.width
+                  : exitSide === 1 ? world.width * 2
+                    : headX;
+                shark.roamY = exitSide === 2 ? -world.height
+                  : exitSide === 3 ? world.height * 2
+                    : headY;
+                shark.roamAt = Infinity;
+                shark.target = null;
+                shark.isExiting = true;
+                shark.hunger = 0;
+                exitingCount++;
+                shark.isEdgeSpawned = false;
+              } else {
+                shark.roamX = randomBetween(world.width * 0.08, world.width * 0.92);
+                shark.roamY = randomBetween(world.height * 0.08, world.height * 0.92);
+                shark.roamAt = motion.dartUntil;
+              }
+            }
+          }
+          const paused = time < motion.pauseUntil || !!shark.orbitAction;
+          const burstPulse = getBurstPulse(motion, time);
+          const dartPulse = getBurstPulse({
+            burstStart: motion.dartStart,
+            burstUntil: motion.dartUntil
+          }, time);
+          shark.pace = paused ? 0 : motion.basePace * Math.min(
+            3.2,
+            motion.idlePace + burstPulse * motion.burstGain + dartPulse * motion.dartGain
+          ) * speedFactor;
+          if (paused) {
+            shark.speed = 0;
+          }
+          motion.phase += delta * (paused ? 0 : motion.phaseSpeed + burstPulse * 5.2 + dartPulse * 3.5);
+          const blend = Math.min(1, delta * 1.5);
+          shark.visualScale += (shark.targetVisualScale - shark.visualScale) * blend;
+          shark.visualOpacity += (shark.targetVisualOpacity - shark.visualOpacity) * blend;
+          shark.shadeFactor += (shark.targetShadeFactor - shark.shadeFactor) * blend;
+          const depth = Math.fround(shark.depth);
+          opacityByDepth.set(depth, shark.visualOpacity);
+          shadeFactorByDepth.set(depth, shark.shadeFactor);
+        });
+      }
+
+      function applySwimBends() {
+        world.sharks.forEach(function (shark) {
+          const motion = shark.swimMotion;
+          if (!motion) {
+            return;
+          }
+          const nodes = shark.nodes;
+          const headX = nodes[0];
+          const headY = nodes[1];
+          const sideX = -Math.sin(shark.heading);
+          const sideY = Math.cos(shark.heading);
+          const burstPulse = getBurstPulse(motion, world.time);
+          const amplitude = Math.min(20, shark.length * (0.01 + burstPulse * 0.075));
+          const lastNode = nodes.length - 2;
+          for (let index = 2; index <= lastNode; index += 2) {
+            const progress = index / lastNode;
+            const wave = progress * amplitude * Math.sin(motion.phase - progress * Math.PI * 2);
+            const offsetX = sideX * wave;
+            const offsetY = sideY * wave;
+            nodes[index] = headX + (nodes[index] - headX) + offsetX;
+            nodes[index + 1] = headY + (nodes[index + 1] - headY) + offsetY;
+            motion.offsets[index] = offsetX;
+            motion.offsets[index + 1] = offsetY;
+          }
+        });
+      }
+
+      function resizeWorld() {
+        const bounds = canvas.getBoundingClientRect();
+        if (bounds.width < 1 || bounds.height < 1) {
+          return;
+        }
+        restoreSwimBends();
+        restoreVisualSizes();
+        const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+        renderer.resize(bounds.width, bounds.height, pixelRatio);
+        world.resize(bounds.width, bounds.height, renderer.cellWidth, renderer.cellHeight);
+        if (!sharkSpeedsAssigned && world.sharks.length) {
+          world.sharks.forEach(function (shark) {
+            shark.pace = randomBetween(0.9, 2.2) / simulationSpeed;
+            shark.exitAt = world.time + randomBetween(15, 35);
+            shark.depth = randomBetween(0.35, 1);
+            shark.visualOpacity = randomBetween(0.45, 1);
+            shark.targetVisualOpacity = shark.visualOpacity;
+            shark.shadeFactor = randomBetween(0.8, 2.5);
+            shark.targetShadeFactor = shark.shadeFactor;
+            shark.baseLength = shark.length;
+            shark.visualScale = 1;
+            shark.targetVisualScale = 1;
+            shark.appliedVisualScale = 1;
+            const depth = Math.fround(shark.depth);
+            opacityByDepth.set(depth, shark.visualOpacity);
+            shadeFactorByDepth.set(depth, shark.shadeFactor);
+          });
+          sharkSpeedsAssigned = true;
+        }
+        keepSharksInView();
+        renderer.render(world);
+      }
+
+      function stopAnimation() {
+        if (frameHandle) {
+          window.cancelAnimationFrame(frameHandle);
+          frameHandle = 0;
+        }
+        lastFrameTime = 0;
+        accumulator = 0;
+      }
+
+      function animate(now) {
+        frameHandle = 0;
+        if (isPaused()) {
+          stopAnimation();
+          return;
+        }
+        const elapsed = lastFrameTime ? Math.min((now - lastFrameTime) / 1000, 0.1) : 0;
+        lastFrameTime = now;
+        accumulator += elapsed * simulationSpeed;
+        let steps = 0;
+        while (accumulator >= fixedStep && steps < maxStepsPerFrame) {
+          restoreSwimBends();
+          restoreSwimOrbits();
+          restoreVisualSizes();
+          updateSwimMotion(fixedStep);
+          stepWithExitSpace(fixedStep);
+          updateEdgeTransits(fixedStep);
+          applyVisualSizes();
+          applySwimOrbits();
+          applySwimBends();
+          replaceExitedSharks();
+          updateRandomFishMutationCheck();
+          updateSharkPopulation();
+          updateEdgeTransitPopulation();
+          accumulator -= fixedStep;
+          steps += 1;
+        }
+        if (steps === maxStepsPerFrame) {
+          accumulator = 0;
+        }
+        renderer.render(world);
+        frameHandle = window.requestAnimationFrame(animate);
+      }
+
+      function syncAnimation() {
+        if (isPaused()) {
+          stopAnimation();
+          return;
+        }
+        if (!frameHandle) {
+          lastFrameTime = 0;
+          frameHandle = window.requestAnimationFrame(animate);
+        }
+      }
+
+      resizeObserver.observe(canvas);
+      document.addEventListener("visibilitychange", syncAnimation);
+      new MutationObserver(syncAnimation).observe(document.body, {
+        attributes: true,
+        attributeFilter: ["class"]
+      });
+      if (typeof reducedMotion.addEventListener === "function") {
+        reducedMotion.addEventListener("change", syncAnimation);
+      } else {
+        reducedMotion.addListener(syncAnimation);
+      }
+      resizeWorld();
+      syncAnimation();
+    }
+    const memoryDialog = document.getElementById("memory-dialog");
+    const dialogMeta = document.getElementById("dialog-meta");
+    const dialogTitle = document.getElementById("dialog-title");
+    const dialogDescription = document.getElementById("dialog-description");
+    const dialogPicture = document.getElementById("dialog-picture");
+    const closeDialogButton = document.getElementById("close-dialog");
+    const form = document.getElementById("memory-form");
+    const memoryInput = document.getElementById("memory-input");
+    const attachmentInput = document.getElementById("attachment-input");
+    const attachmentButton = document.getElementById("attachment-button");
+    const attachmentCount = document.getElementById("attachment-count");
+    const formMessage = document.getElementById("form-message");
+    const statePanel = document.getElementById("demo-state");
+    const stateText = document.getElementById("demo-state-text");
+    const stateToggleButton = document.getElementById("toggle-state");
+    const nextStateButton = document.getElementById("next-state");
+    const resetStateButton = document.getElementById("reset-state");
+    const listPanel = document.getElementById("demo-list");
+    const listToggleButton = document.getElementById("toggle-list");
+    const listItems = document.getElementById("demo-list-items");
+    let activeTrigger = null;
+    let activeHoverPreview = false;
+    let stateIndex = -1;
+    let hoverSuppressed = false;
+    let closeHandled = true;
+
+    function randomBetween(minimum, maximum) {
+      return Math.random() * (maximum - minimum) + minimum;
+    }
+
+    function completeMemoryClose() {
+      if (closeHandled) {
+        return;
+      }
+
+      closeHandled = true;
+      document.body.classList.remove("回顧已開啟");
+      hoverSuppressed = true;
+      if (activeTrigger && activeTrigger.isConnected && !activeHoverPreview) {
+        activeTrigger.focus();
+      }
+      activeTrigger = null;
+      activeHoverPreview = false;
+      memoryDialog.classList.remove("memory-dialog--hover");
+      memoryDialog.style.removeProperty("left");
+      memoryDialog.style.removeProperty("top");
+    }
+
+    function closeMemory() {
+      if (!memoryDialog.open) {
+        return;
+      }
+
+      memoryDialog.close();
+      completeMemoryClose();
+    }
+
+    function positionHoverDialog() {
+      const dialogBounds = memoryDialog.getBoundingClientRect();
+      const left = (window.innerWidth - dialogBounds.width) / 2;
+      const top = (window.innerHeight - dialogBounds.height) / 2;
+      memoryDialog.style.left = left + "px";
+      memoryDialog.style.top = top + "px";
+    }
+
+    function openMemory(memory, trigger, hoverPreview) {
+      if (memoryDialog.open) {
+        return;
+      }
+
+      closeHandled = false;
+      activeTrigger = trigger;
+      activeHoverPreview = hoverPreview;
+      dialogMeta.textContent = memory.category + "・" + memory.time;
+      dialogTitle.textContent = memory.title;
+      dialogDescription.textContent = memory.description;
+      dialogPicture.hidden = !memory.isPhoto;
+
+      if (hoverPreview) {
+        memoryDialog.classList.add("memory-dialog--hover");
+        memoryDialog.show();
+        positionHoverDialog();
+      } else {
+        memoryDialog.classList.remove("memory-dialog--hover");
+        memoryDialog.style.removeProperty("left");
+        memoryDialog.style.removeProperty("top");
+        document.body.classList.add("回顧已開啟");
+        memoryDialog.showModal();
+        closeDialogButton.focus();
+      }
+    }
+
+    function makeMemoryButton(memory, positionClass) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "memory-orbit " + positionClass;
+      button.setAttribute("aria-label", memory.title);
+      button.dataset.memoryTitle = memory.title;
+      button.style.setProperty("--漂移一橫向", Math.round(randomBetween(-42, 42)) + "px");
+      button.style.setProperty("--漂移一縱向", Math.round(randomBetween(-32, 32)) + "px");
+      button.style.setProperty("--漂移二橫向", Math.round(randomBetween(-36, 36)) + "px");
+      button.style.setProperty("--漂移二縱向", Math.round(randomBetween(-38, 38)) + "px");
+      button.style.setProperty("--漂移三橫向", Math.round(randomBetween(-40, 40)) + "px");
+      button.style.setProperty("--漂移三縱向", Math.round(randomBetween(-30, 30)) + "px");
+      button.style.setProperty("--漂移四橫向", Math.round(randomBetween(-34, 34)) + "px");
+      button.style.setProperty("--漂移四縱向", Math.round(randomBetween(-36, 36)) + "px");
+      button.style.setProperty("--漂移一角度", randomBetween(-4, 4).toFixed(1) + "deg");
+      button.style.setProperty("--漂移二角度", randomBetween(-4, 4).toFixed(1) + "deg");
+      button.style.setProperty("--漂移三角度", randomBetween(-4, 4).toFixed(1) + "deg");
+      button.style.setProperty("--漂移四角度", randomBetween(-4, 4).toFixed(1) + "deg");
+      button.style.setProperty("--縮放幅度", randomBetween(0.96, 1.05).toFixed(3));
+      button.style.setProperty("--漂移時間", randomBetween(5.5, 8.5).toFixed(2) + "s");
+      button.style.setProperty("--漂移延遲", -Math.round(randomBetween(0, 8)) + "s");
+
+      const category = document.createElement("span");
+      category.className = "memory-orbit__category";
+      category.textContent = memory.category.replace(/^示範/, "");
+
+      const title = document.createElement("span");
+      title.className = "memory-orbit__title";
+      title.textContent = memory.title;
+
+      button.append(category);
+      if (memory.isPhoto) {
+        const picture = document.createElement("span");
+        picture.className = "memory-orbit__picture";
+        picture.setAttribute("aria-hidden", "true");
+        button.append(picture);
+      }
+      button.append(title);
+
+      button.addEventListener("click", function () {
+        if (activeHoverPreview && activeTrigger === button) {
+          closeMemory();
+          return;
+        }
+        openMemory(memory, button, false);
+      });
+
+      return button;
+    }
+
+    function shuffledMemories(memories) {
+      const items = memories.slice();
+      for (let index = items.length - 1; index > 0; index -= 1) {
+        const otherIndex = Math.floor(Math.random() * (index + 1));
+        [items[index], items[otherIndex]] = [items[otherIndex], items[index]];
+      }
+      return items;
+    }
+
+    function renderMemoryExamples() {
+      const positions = [
+        "memory-orbit--one",
+        "memory-orbit--two",
+        "memory-orbit--three",
+        "memory-orbit--four"
+      ];
+      const photoMemory = exampleMemories.find(function (memory) {
+        return memory.isPhoto;
+      });
+      const otherMemories = exampleMemories.filter(function (memory) {
+        return !memory.isPhoto;
+      });
+      const examples = shuffledMemories(otherMemories).slice(0, 3);
+      examples.push(photoMemory);
+      const arrangedExamples = shuffledMemories(examples);
+      arrangedExamples.forEach(function (memory, index) {
+        memoryField.append(makeMemoryButton(memory, positions[index]));
+      });
+    }
+
+    function renderExampleList() {
+      const examples = shuffledMemories(exampleMemories);
+      examples.forEach(function (memory) {
+        const item = document.createElement("li");
+        const button = document.createElement("button");
+        const title = document.createElement("span");
+        const time = document.createElement("span");
+
+        button.type = "button";
+        button.className = "demo-list-item";
+        button.setAttribute("aria-label", "開啟示範內容：" + memory.title);
+        title.className = "demo-list-item__title";
+        title.textContent = "示範內容・" + memory.title;
+        time.className = "demo-list-item__time";
+        time.textContent = memory.time;
+        button.append(title, time);
+        button.addEventListener("click", function () {
+          openMemory(memory, button);
+        });
+        item.append(button);
+        listItems.append(item);
+      });
+    }
+
+    const demoStates = [
+      "示範空資料狀態：目前沒有真實記錄；畫面上的卡片只用來展示樣式。",
+      "示範載入狀態：這是介面預覽，沒有讀取網絡或資料。",
+      "示範錯誤狀態：沒有連接資料服務；可重設此示範狀態。"
+    ];
+
+    function showNextState() {
+      stateIndex = (stateIndex + 1) % demoStates.length;
+      statePanel.hidden = false;
+      stateText.textContent = demoStates[stateIndex];
+      stateToggleButton.setAttribute("aria-expanded", "true");
+      statePanel.scrollIntoView({ block: "nearest" });
+    }
+
+    function resetState() {
+      stateIndex = -1;
+      stateText.textContent = "示範狀態已重設；沒有進行資料操作。";
+    }
+
+    attachmentButton.addEventListener("click", function () {
+      attachmentInput.click();
+    });
+
+    attachmentInput.addEventListener("change", function () {
+      const attachments = Array.from(attachmentInput.files || []);
+      attachmentCount.hidden = attachments.length === 0;
+      attachmentCount.textContent = attachments.length ? String(attachments.length) : "";
+      attachmentButton.setAttribute(
+        "aria-label",
+        attachments.length
+          ? "加入更多附件；已選擇 " + attachments.length + " 個附件"
+          : "加入附件"
+      );
+      if (formMessage.dataset.kind === "error") {
+        delete formMessage.dataset.kind;
+      }
+      formMessage.textContent = attachments.length
+        ? "已選擇 " + attachments.length + " 個附件；示範不會上傳。"
+        : "";
+    });
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const value = memoryInput.value.trim();
+      const attachments = Array.from(attachmentInput.files || []);
+
+      if (!value && attachments.length === 0) {
+        formMessage.dataset.kind = "error";
+        memoryInput.setAttribute("aria-invalid", "true");
+        formMessage.textContent = "示範提示：先寫一點內容再預覽；輸入不會保存。";
+        memoryInput.focus();
+        return;
+      }
+
+      delete formMessage.dataset.kind;
+      memoryInput.removeAttribute("aria-invalid");
+      const attachmentNames = attachments.map(function (file) {
+        return file.name;
+      });
+      formMessage.textContent = attachments.length
+        ? "示範卡片已開啟；附件不會保存或上傳。"
+        : "示範卡片已開啟；輸入不會保存。";
+      openMemory({
+        category: "此刻的想法",
+        time: "剛剛",
+        title: value || attachmentNames[0],
+        description: attachments.length
+          ? "附件：" + attachmentNames.join("、") + "。這是暫時的示範內容，不會保存或上傳。"
+          : "這是暫時的示範輸入，不會保存。",
+        isPhoto: false
+      }, memoryInput, false);
+    });
+
+    stateToggleButton.addEventListener("click", function () {
+      if (statePanel.hidden) {
+        statePanel.hidden = false;
+        stateToggleButton.setAttribute("aria-expanded", "true");
+        showNextState();
+      } else {
+        statePanel.hidden = true;
+        stateToggleButton.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    nextStateButton.addEventListener("click", showNextState);
+    resetStateButton.addEventListener("click", resetState);
+
+    listToggleButton.addEventListener("click", function () {
+      const willOpen = listPanel.hidden;
+      listPanel.hidden = !willOpen;
+      listToggleButton.setAttribute("aria-expanded", String(willOpen));
+      if (willOpen) {
+        listPanel.scrollIntoView({ block: "nearest" });
+      }
+    });
+
+    memoryInput.addEventListener("input", function () {
+      memoryInput.removeAttribute("aria-invalid");
+      if (formMessage.dataset.kind === "error") {
+        delete formMessage.dataset.kind;
+        formMessage.textContent = "";
+      }
+    });
+
+    closeDialogButton.addEventListener("click", function () {
+      closeMemory();
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && memoryDialog.open) {
+        event.preventDefault();
+        closeMemory();
+      }
+    });
+
+    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      document.addEventListener("pointermove", function (event) {
+        if (
+          event.pointerType !== "mouse" ||
+          (event.movementX === 0 && event.movementY === 0)
+        ) {
+          return;
+        }
+
+        const trigger = event.target instanceof Element
+          ? event.target.closest(".memory-orbit")
+          : null;
+        if (!trigger) {
+          if (activeHoverPreview) {
+            closeMemory();
+          }
+          hoverSuppressed = false;
+          return;
+        }
+        if (hoverSuppressed || memoryDialog.open) {
+          return;
+        }
+
+        const memory = exampleMemories.find(function (item) {
+          return item.title === trigger.dataset.memoryTitle;
+        });
+        if (memory) {
+          openMemory(memory, trigger, true);
+        }
+      });
+
+      document.addEventListener("pointerleave", function (event) {
+        if (event.pointerType === "mouse" && activeHoverPreview) {
+          closeMemory();
+        }
+      });
+    }
+
+    memoryDialog.addEventListener("close", completeMemoryClose);
+
+    const livingPhotoWall = document.getElementById("living-photo-wall");
+    const livingPhotoUrls = [
+      "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=320&q=70",
+      "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&w=320&q=70",
+      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=320&q=70",
+      "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=320&q=70",
+      "https://images.unsplash.com/photo-1511988617509-a57c8a288659?auto=format&fit=crop&w=320&q=70",
+      "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=320&q=70",
+      "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?auto=format&fit=crop&w=320&q=70",
+      "https://images.unsplash.com/photo-1491013516836-7db643ee125a?auto=format&fit=crop&w=320&q=70",
+      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=320&q=70",
+      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=320&q=70",
+      "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=320&q=70",
+      "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=320&q=70"
+    ];
+
+    livingPhotoUrls.forEach(function (url) {
+      const image = document.createElement("img");
+      image.src = url;
+      image.alt = "";
+      image.loading = "eager";
+      image.decoding = "async";
+      image.style.setProperty("--x", `${Math.random() * 100}vw`);
+      image.style.setProperty("--y", `${Math.random() * 100}vh`);
+      image.style.setProperty("--r", `${Math.random() * 24 - 12}deg`);
+      image.style.setProperty("--s", `${Math.round(80 + Math.random() * 140)}px`);
+      image.style.setProperty("--d", `${(8 + Math.random() * 7).toFixed(1)}s`);
+      image.addEventListener("error", function () {
+        image.remove();
+      }, { once: true });
+      livingPhotoWall.append(image);
+    });
+
+    window.addEventListener("resize", function () {
+      if (memoryDialog.open && activeHoverPreview) {
+        positionHoverDialog();
+      }
+    });
+
+    renderMemoryExamples();
+    renderExampleList();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./sw.js").catch(function (error) {
+          console.error("Service worker registration failed.", error);
+        });
+      });
+    }
+  </script>
+</body>
 </html>

@@ -1,5 +1,79 @@
 # PROGRESS — 已完成事項
 
+## 2026-11-27 — FamilySystem 舊 Repo 歷史資產 Autopsy 共識落檔
+
+- 已完成舊 Repo 壓縮包 `C:\Project\FamilySystem-Cleaned.zip` 共 352 個檔案項目的歷史資產審查；呢次只確認可攜資產、架構參考及資安紅線，唔代表批准直接搬運舊程式碼、資料或相片。
+- 已確認可直接利用／搬遷保留嘅資產包括：`public/vendor/pdfjs/` 完整離線工具鏈（core、worker、cmaps、standard_fonts、WASM）；`supabase/migrations/` 與 `database/init/` 歷次演進、RLS 政策及資料庫初始化架構；`20261028000011_family_encryption_real.sql` 所示基於 `pgcrypto` 嘅欄位加密方案；以及經實戰驗證嘅 `scripts/` PowerShell 備份與維運檢核腳本。上述資產使用前仍須逐項資安審查、相容性評估及 Joe 批准；唔得直接匯入私人資料。
+- 已確認可作高價值架構參考嘅資產包括：`docs/obsidian/` 載入死循環與災難復原等除錯筆記，以及紅隊安全審查報告；`server/hybrid/` 與 `source/agents/` 嘅多 Agent 職責分工、編排設計及 Supabase 兼容層思維。兩者只作架構同除錯參考，不構成 M1 自動批准範圍。
+- 已正式沉澱 Cold Start／備份打包絕對排除清單：禁止 `.git/`、`node_modules/`、`.venv/`、`venv/`、`.validation-venv/`、`__pycache__/`；禁止全部 `.env*`、私鑰、憑證及 `.pem`、`.key`、`.p12`、`.pfx`、`id_rsa*`、`id_ed25519*` 等；禁止 `reference/photo/`、`docs/` 下私人相片及整個 `docs/working/` 草稿夾。
+- 已確認打包機制仍須重做工作樹疊加、強制路徑過濾、ZIP 串流文字掃描及 0 路徑違規／0 真實 Secret 命中兩項 PASS 門檻；任何路徑違規、Secret 命中、內容無法可靠讀取或掃描失敗均只得回報 FAIL，不得成功形態回報。
+- 完成規範落檔至 `docs/DECISIONS.md`（D-058）；現階段未搬移任何舊資產、未加入 PDF 工具鏈、未建立加密 migration、未執行資料庫變更、未修改現行 UI，仍需按功能逐項批准。
+
+## 2026-11-27 — Gemini 協同資安、備份及介面方向同步
+
+- 已確認舊 Repo 已完成嚴格資安脫敏及清理，安全備份產物為 `C:\Project\FamilySystem-Cleaned.zip`；實測包含 352 個檔案項目，後續以壓縮包實測清單及 Rule-SEC-01 掃描為證據，不把真實相片、credentials或私密目錄帶入現行 Repo。
+- 已確認全域共用入口 `C:\Project\REPO\README.md` 已建立標準知識產出物及可重用 Repo 模板，涵蓋文件權威次序、廣東話記錄規則、Cold Start 打包規範及新 Repo 建立清單；未將共享資料夾視為 TimeMem product code 或新 project approval。
+- 已確認 `.agents/skills/cold-start-pack/cold-start-pack.ps1` 為 TimeMem Cold Start 強制打包入口；腳本及 `SKILL.md` 已鎖定 `.git/`、`node_modules/`、`.venv/`、`venv/`、`.validation-venv/`、`__pycache__/`、全部 `.env*`、私鑰憑證、副檔名相片及 `docs/working/` 排除規則。
+- 已確認打包後必須逐項掃描 ZIP 路徑及文字內容；AWS Key、OpenAI／GitHub／Bearer／通用 Token、Password assignment、私鑰標頭等任何命中均須回報 FAIL；只有 0 路徑違規及 0 真實 Secret 命中才可回報 PASS。
+- 已將介面後續方向列案：重新融合舊 Repo 的「背景相片浮動縮放漫遊」與 TimeMem 現有「ASCII 鯊魚／魚群游動特效」；此項目前只作進度及設計方向紀錄，未執行程式碼還原、未改動現行 UI、未變更 M1 approved scope。
+- 下一步只可在開發者與 AI 協同檢視脫敏備份及現行介面後，再按各功能單獨需求取得批准並實作；不得直接自動把舊 Repo 整體功能或私人內容帶回現行專案。
+
+## 2026-11-27 — Canonical Files 全倉核心規範同步
+
+- 已把品牌、初心、願景、商業模式及 100% Self-Host 私隱閉環同步至 Root `README.md` 及 `docs/PRD.md`。
+- 已把 PWA 圖片上傳、FastAPI Multipart Upload、Ollama `qwen3:8b` + `bge-m3`、PostgreSQL pgvector及 PWA RESULT 框鎖定為唯一 M1 閉環。
+- 已將兩部 Fujitsu Lifebook U9311X、JOE-DESKTOP 隨身開發／Tailscale RDP、JOE-SERVER C + D 槽及唯一可寫生產資料庫主機拓撲寫入現行文件。
+- 已鎖定 Obsidian 為 Hold、n8n 為 Port 5678 後勤外掛及 `docs/working/` 強制隔離鐵律。
+- 已記錄三輪 Cold Start 分數 68 → 87 → 65 的路徑依賴及 Lost in the Middle 教訓。
+- 下一步：完成現行入口同 Git 同步後執行最新 cold-start 打包及滿分驗證；現階段仍為待驗證，未宣稱已滿分。
+
+## 2026-11-27 — 兩輪 Cold Start 考牌收尾與草稿物理隔離
+
+- 第一次 Cold Start 得 68 分：現有 AI 偏向舊版 Express／Node.js 架構，亦誤判 Obsidian 為核心介面；其後已建立 M1 OVERRIDE 置頂錨點、Root README 60 秒入口及 Working Tree Overlay 打包規範。
+- 第二次 Cold Start 得 87 分（B+）：雙機拓撲、Obsidian Hold、n8n 禁止直連 DB、七份 Canonical Files 一致性均滿分；唯一未滿分係第 1 題受 `docs/working/` 未批准草稿干擾，未精準吐出 M1 唯一閉環。
+- 已確認第二輪根本原因屬 Lost in the Middle／關鍵字檢索干擾；已將已取代的 M1 草稿移入 `docs/archive/`，並已由 D-055 正式決策。
+- 已強化 `.agents/skills/cold-start-pack/cold-start-pack.ps1` 與 `SKILL.md`，打包層強制排除整個 `docs/working/`，不再依賴單一文件提示。
+- 已同步更新 `README.md`、`.github/copilot-instructions.md`、`PRD.md`、`ARCHITECTURE.md`、`GATE.md`、`DECISIONS.md`、`ERRORLOG.md`、`TODO.md`，確保 Server＋Desktop＋Tailscale、Obsidian Hold、n8n 後勤邊界及 M1 唯一閉環一致。
+- 下一步：執行第三次 Cold Start 滿分（100 分）驗證，確認第 1 題精準回覆 FastAPI Multipart Upload → 本地 Ollama qwen3:8b Vision／OCR＋bge-m3 → pgvector 寫入 → PWA 彈出式 RESULT 框。
+
+## 2026-11-27 — Root README M1 冷啟動入口對齊
+
+- 已將 root `README.md` 收斂為 60 秒入口：明確鎖定 M1 階段、唯一閉環為 FastAPI Multipart Upload、Ollama Vision / OCR＋bge-m3、pgvector 寫入及 PWA RESULT 框。
+- 已補齊關鍵邊界：Obsidian 雙向整合設為 Hold；本地 Docker n8n 只作後勤自動化外掛，嚴禁直連或寫入 DB。
+- 已列出七份現行 Canonical Files 入口及 `.agents/skills/cold-start-pack/cold-start-pack.ps1` 冷啟動打包指引。
+- 已重跑 Cold Start 包裝：HEAD `fbdc8d37c099`、`TimeMem-clean.zip` 352 個檔案、0 路徑違規、0 Secret 命中、`SCAN_STATUS=PASS`；ZIP 已核對含最新 README 及 M1／Hold／Working Tree Overlay 關鍵內容。
+
+## 2026-11-26 — Cold Start 考牌除錯、腳本升級及第二次重考準備
+
+- 已完成一次 M1 置頂錨點 Cold Start 考牌除錯；確認舊版架構敘述會造成 Lost in the Middle，新對話需以置頂指令及 TODO 頂部為最高準則。
+- 已升級 `cold-start-pack.ps1`：先匯出當前 HEAD，再疊加工作樹修改及未追蹤受控新檔，重新過濾敏感資料後重建 ZIP。
+- 最新 ZIP 已完成第二次重建及終檔核對：置頂指令、架構 Active Data Flow、PROGRESS 錨點三項均已命中；資安掃描為 352 個檔案、0 路徑違規、0 Secret 命中、SCAN_STATUS=PASS。
+- 已將兩大除錯教訓同步至 `docs/ERRORLOG.md`，並以 D-054 正式記錄置頂錨點機制及工作樹疊加打包規範。
+- 下一步進入第二次 100 分 Cold Start 考牌重考，重點驗證新對話能否自動鎖定 M1 Priority 1、Obsidian Hold、n8n 後勤定位及 FastAPI 核心閉環。
+
+## 2026-11-26 — M1 置頂錨點鎖死完成
+
+- 已將 `.github/copilot-instructions.md` 新對話置頂區塊更新為 `## 🚨 CURRENT ACTIVE DIRECTIVE (M1 OVERRIDE)`，並鎖定 M1 Priority 1、Obsidian Hold 同 n8n 後勤外掛定位。
+- 已明確要求所有新對話優先採用置頂指令及 `docs/TODO.md` 頂部，唔採信 `docs/archive/`、M0 草稿、舊版架構圖或衝突描述。
+- 已喺 `docs/ARCHITECTURE.md` 頂部加入一致嘅 M1 Active Data Flow，並將舊版 Express Gateway 同 Obsidian 雙向橋接標示為 Legacy／Hold。
+- 已修正 `cold-start-pack`，打包時疊加未 commit 嘅工作樹修改，避免新 ZIP 漏載置頂錨點；最終仍依 Rule-SEC-01 敏感資料過濾及 ZIP 掃描。
+- 本次只調整新對話指引及現行架構／進度文件，唔改產品批准範圍或程式碼。
+
+## 2026-11-26 — Cold Start 安全打包 Skill 完成
+
+- 已新增 `.agents/skills/cold-start-pack/SKILL.md`，定義 `cold-start-pack`、打包乾淨 Repo、做 Cold Start Test 等觸發條件。
+- 已新增 `.agents/skills/cold-start-pack/cold-start-pack.ps1`，使用 `git archive HEAD` 建立暫存匯出；強制剔除 Git metadata、全部 `.env*`、`reference/photo/`、`docs/` 圖片、虛擬環境、私鑰及私人資料目錄，並覆蓋 `C:\Project\TimeMem-clean.zip`。
+- 腳本會掃描 ZIP 路徑及文字內容，檔案、真實 Secret 或私鑰命中非零時回報 FAIL；PASS 時回報 HEAD、ZIP 路徑、檔案總數及 0 違規結果。
+- 已提供標準 Cold Start 測試官 Prompt，可直接複製到新聊天室作冷啓動理解測試。
+
+## 2026-11-26 — M1 基底結構與核心主線正式對齊
+
+- 已精簡 `.github/copilot-instructions.md`，保留強制收尾同步、架構決策同步、繁體廣東話 Record 語言、Rule-SEC-01 資安紅線及 Obsidian Vault Hold 狀態。
+- 已確認 M0 已 PASS，現行階段正式鎖定為 M1。
+- 已補齊 `docs/GATE.md` 同 `docs/ERRORLOG.md` 為根目錄 Canonical Files；舊 M0／歷史文件繼續隔離喺 `docs/archive/`。
+- 已將 M1 Priority 1 定為 FastAPI Multipart Upload → 本地 Ollama `qwen3:8b` Vision / OCR → `bge-m3` embedding → PostgreSQL `pgvector` 寫入 → PWA RESULT 框閉環。
+- 已記錄本地 Docker n8n（Port `5678`）只做後勤自動化外掛／外部觸發器；核心業務邏輯繼續留喺 FastAPI。
+
 ## 2026-11-26 — 文件瘦身及腳本導覽完成
 
 - 已完成 `docs/` 根目錄瘦身；保留 `PRD.md`、`TODO.md`、`PROGRESS.md`、`DECISIONS.md`、`ARCHITECTURE.md` 作核心現行文件。

@@ -9,6 +9,10 @@ frontend/dist/
 !.env.docker.example
 npm-debug.log*
 
+# Local deployment credentials and PuTTY
+scripts/deploy_all.bat
+scripts/plink.exe
+
 docs/obsidian/dt.log
 docs/JOE-ANSWERS.md
 docs/owner-private/

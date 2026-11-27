@@ -1,5 +1,7 @@
 # 正式決策紀錄
 
+> **2026-11-27 Canonical Override（D-056）：** 本文件下方歷史決策只保留決策來源及變更痕跡；如與 D-056 或置頂 Canonical 衝突，M1 品牌、願景、單一閉環、雙機硬件、Self-Host 私隱、Obsidian Hold及 n8n 邊界一律以 D-056、Root README及現行 Canonical 為準。舊 Node/Express、Supabase、Cloud POC敘述只作歷史草稿，不可恢復為現役主線。
+
 正式決策以本 Repo 的 `docs/DECISIONS.md` 為準；Obsidian Vault 的 `02-決策-ADR` 只作草稿，不是正式決策位置。
 
 每項決策使用唯一 D-ID，並記錄以下欄位：
@@ -730,3 +732,128 @@
 - 構想上每頁由一個 Agent 配一個 Skill 負責，頁面之間以 Link 串連；例如證書連到相片，相片再連到財務（如 HKT 續約 $88／月），並保留可延展的循環連結方向。具體頁面、連結圖及責任邊界未定。
 - Multi-Agent 只預留為概念，不代表現階段實作；新增頁面應以毋須大改整體設計為方向。
 - 本備註只記錄 IDEA，不批准功能、架構、里程碑或 Finance 分析範圍；D-025 對 Finance statistics/analysis 為 Later、phase TBD 的描述維持不變。S1–S10 及所有已批准決策不變；不授權程式碼、schema 或 migration 工作。
+
+### D-027 — M1 階段多模態圖文閉環測試流向（以興趣班 Schedule 為例）
+
+- 日期: 2026-11-26
+- 狀態: Meta 共識；待正式批准後才展開實作
+- 批准人: 待 Joe 確認
+- 決定方向:
+  - 使用興趣班 Schedule 圖片作 M1 合成多模態閉環測試，不以真實家庭相片或個資做驗證資料。
+  - 透過 Vision / OCR 由圖片萃取人物、活動、時間及地點等欄位；固定使用 `qwen3:8b` 作文字／識別任務判定。
+  - OCR 結果經 `bge-m3` 轉為 embedding；每條行程固定為 1 個 chunk。
+  - embedding 寫入本地 PostgreSQL `pgvector`；M1 測試只使用隔離表 `test_schedules`。
+  - 使用者輸入問題後，先轉 embedding，再由 `test_schedules` 即時檢索最相似的 2 條行程。
+  - PWA 即時彈出 RESULT 框，卡片頂部顯示時間、中部顯示人物及地點、底部顯示活動；無結果時顯示「搵唔到相關行程」。
+- 資安合規（Rule-SEC-01）:
+  - 真實相片、OCR 私人內容、個人資料、credentials、`.env`、embeddings、logs及私人 backup 嚴禁寫入 Git。
+  - 公開設定只依賴脫敏 `.env.example`；測試及 evidence 只使用合成資料及本機受控儲存。
+- 理由: 將 M1 圖片上傳、Vision / OCR、embedding、向量入庫、檢索及 PWA 渲染串成單一可量測閉環，方便以興趣班 Schedule 驗證實際流向。
+- 批准邊界: 本決定只記錄 D-052 框架下嘅多模態測試流向；未取得 Joe 正式批准前，不代表批准圖片上傳實作、schema migration、模型選型、外部 API、Cloud 部署或真實資料處理。
+
+### D-053 — M1 圖片主線與 n8n 後勤分工
+
+- 日期: 2026-11-26
+- 狀態: 正式架構方向；實作仍受 D-052 私密測試邊界約束
+- 決策:
+  - M1 第一 Priority 固定為 FastAPI 圖片上傳主線：`Multipart Upload` → 本地 Ollama `qwen3:8b` Vision / OCR → `bge-m3` embedding → PostgreSQL `pgvector` 寫入／檢索 → PWA 彈出 RESULT 框。
+  - 圖片及 OCR 萃取只限合成 Schedule 資料、本機受控儲存及 M1 隔離表 `test_schedules`；未經批准不得加入真實家庭相片或私人 OCR 內容。
+  - 本地 Docker n8n（Port `5678`）定位為後勤自動化外掛及外部觸發器，可接收 Backend Webhook，負責日曆同步、通知提醒或開發期 API 測試。
+  - 核心業務邏輯包括圖片接收、Vision / OCR、embedding、向量寫入、檢索及結果判定，一律留喺 FastAPI，不放入 n8n。
+- 資安合規（Rule-SEC-01）:
+  - 真實 credentials、`.env`、個人資料、相片、OCR 結果、embedding、log及backup 不得進入 Git、公開分享位置或外部服務。
+  - n8n workflow、測試 payload、Webhook 設定及日誌不得保存敏感內容；外部觸發只使用脫敏合成資料。
+- 理由:
+  - 將可量測的多模態最小閉環集中喺 FastAPI，確保核心資料及模型路徑可審計、可停止及可本機驗證；n8n 只承擔非核心後勤工作。
+- 批准邊界:
+  - 本決定固定 M1 主線及後勤分工；唔代表自動批准 production schema、真實個資、PDF、雲端部署或任何外部服務整合。
+
+### D-054 — 置頂錨點機制及工作樹疊加打包規範
+
+- 日期: 2026-11-26
+- 狀態: Approved
+- 決策:
+  - `.github/copilot-instructions.md` 必須喺最前 25 行保留顯眼嘅 `## 🚨 CURRENT ACTIVE DIRECTIVE (M1 OVERRIDE)`；新對話必須優先採用置頂區塊及 `docs/TODO.md` 頂部為最高準則。
+  - `docs/ARCHITECTURE.md` 頂部必須同步維護 M1 當前有效資料流；舊版 Express Gateway 及 Obsidian 雙向橋接分別標示 Legacy／Hold；`docs/archive/`、舊版 M0 草稿及舊架構圖不可凌駕現行決策。
+  - `cold-start-pack.ps1` 必須先匯出當前 `HEAD`，再疊加未 commit 嘅受控工作樹修改及新檔；疊加後仍執行完整 Rule-SEC-01 路徑及內容過濾。
+  - 重建 ZIP 後，需核對 `.github/copilot-instructions.md`、`docs/ARCHITECTURE.md` 及 `docs/PROGRESS.md` 嘅置頂錨點，以及 ZIP 掃描 0 路徑違規／0 Secret 命中。
+- 理由:
+  - 置頂錨點消除新對話讀取順序造成嘅 Lost in the Middle 與舊文件干擾；工作樹疊加避免打包產出只反映 HEAD 而漏載最新未提交紀錄。
+- 批准邊界:
+  - 本決策只規範 AI 新對話準則、現行架構錨點及 Cold Start 打包完整性；唔改變 M0 PASS 或 M1 product approval 範圍。
+
+### D-055 — docs/working 草稿隔離及 Cold Start 打包強制過濾
+
+- 日期: 2026-11-27
+- 狀態: Approved
+- 決策:
+  - Cold Start 打包必須喺腳本層面強制排除整個 `docs/working/`，不得依靠人工提示、排序或檔案名稱規則作為唯一防線。
+  - 已過時、與 M1 OVERRIDE 衝突或已被正式 Canonical Files 取代嘅草稿，必須物理移入 `docs/archive/`；未批准草稿唔得留喺現役工作目錄。
+  - `.agents/skills/cold-start-pack/SKILL.md` 必須同步記錄相同排除規範，ZIP 重建後仍須由路徑掃描及內容掃描覆核。
+- 理由:
+  - 第二次 Cold Start 得 87 分；第 1 題因 `docs/working/` 未批准草稿干擾，未能精準吐出 M1 唯一閉環。此為 Lost in the Middle／關鍵字檢索干擾風險，需由腳本與目錄治理雙重防重犯。
+- 批准邊界:
+  - 本決策只規範冷啟動資料供給及草稿治理；M1 正式閉環、雙機拓撲及 n8n 邊界仍以 D-052 至 D-054 為準。
+
+### D-056 — Canonical Files 全倉核心規範同步
+
+- 日期: 2026-11-27
+- 狀態: Approved
+- 決策:
+  - 品牌定義固定為中文名「時光管家」、英文名「TimeMem」、主 Slogan「守護每一刻時光」、英文 Slogan「Remember what matters.」。
+  - 專案初心固定為小朋友放長假後忘記默書嘅痛點；願景固定為智能家居總管、個人知識庫、財務管理及具相片隨機移動／縮放與懸停記憶卡片互動嘅記憶時光機。
+  - 商業與私隱閉環固定為 100% Self-Host、資料不出雲；應用層由我們維護，生產資料庫由家庭用戶自行擁有及 Self-Host。
+  - M1 唯一閉環固定為 PWA 圖片上傳 → FastAPI Multipart Upload → 本地 Ollama `qwen3:8b` Vision/OCR + `bge-m3` embedding → PostgreSQL pgvector 寫入／檢索 → PWA 彈出式 RESULT 框。
+  - Node.js / Express Gateway、雲端 Supabase及相關外部 POC 架構只保留為歷史草稿，絕非 M1 現役主資料流。
+  - 雙機硬件固定為 Fujitsu Lifebook U9311X：i7-1165G7 @ 2.80GHz、16 GB RAM、Intel Iris Xe、477 GB NVMe SSD。
+  - JOE-DESKTOP 固定為 Windows 10、僅 C 槽嘅隨身開發／Tailscale RDP 機；JOE-SERVER 固定為 Windows 11、C + D 槽嘅家中主力機及唯一可寫生產資料庫主機。
+  - JOE-SERVER 的 `D:\docker-data\timemem\` 包含 Docker Compose、`pgdata`及 `model`，專責 PostgreSQL + pgvector + Ollama；嚴禁開 Router Port，遠端存取只限 Tailscale。
+  - Obsidian 固定為 Hold，`C:\Project\Obsidian-Hub` 只作設計參考，禁止編寫整合程式碼。
+  - n8n 固定為 Port `5678` 嘅本地 Docker 後勤外掛／外部觸發器，可接收 FastAPI Webhook；嚴禁直連或直接寫入 PostgreSQL。
+  - Root README及七份 docs Canonical 必須相互鎖定；Cold Start 必須強制排除 `docs/working/`，舊草稿只可歸檔至 `docs/archive/`。
+- 理由:
+  - 三輪 Cold Start 得分 68、87、65；未在最高規範固定閉環、雙機拓撲及防污染規則時，AI 容易受舊 Express 架構及 Lost in the Middle 干擾。
+- 批准邊界:
+  - 本決策只同步現行願景、硬件、技術閉環及工程治理，不自動批准真實資料、正式 schema、雲端部署或任何未來功能實作。
+
+### D-057 — Gemini 協同資安打包、舊 Repo 備份及介面方向同步
+
+- 日期: 2026-11-27
+- 狀態: Approved；介面實作仍為未批准工作
+- 決策:
+  - `C:\Project\old\Family\FamilySystem` 已作極度嚴格資安脫敏及清理，產出唯讀參考備份 `C:\Project\FamilySystem-Cleaned.zip`；實測當前壓縮包包含 352 個檔案項目，備份只可用作代碼結構及方向對照，不得直接復用私人相片、credentials、個人資料或未脫敏內容。
+  - `C:\Project\REPO\README.md` 是跨專案標準知識產出物入口；內容只涵蓋牌照、Repo 模板、文件權威次序、廣東話規則、Cold Start 範本及打包流程，不代表批准任何新 project scope 或 TimeMem product code。
+  - Rule-SEC-01 是 TimeMem Cold Start 強制資安門檻：腳本必須排除 `.git/`、`node_modules/`、`.venv/`、`venv/`、`.validation-venv/`、`__pycache__/`、全部 `.env*`、`.pem`、`.key`、`.p12`、`.pfx`、`id_rsa*`、`id_ed25519*`、`reference/photo/`、`docs/` 下私人相片及 `docs/working/`。
+  - 打包腳本需使用 ZIP 串流讀取並對每個可讀文字檔進行內容正則掃描；至少覆蓋 AWS AKIA Key、私鑰標頭、OpenAI／GitHub／Linear／Bearer／通用 Token assignment及 Password assignment。
+  - 最終 ZIP 必須回報 0 路徑違規及 0 真實 Secret 命中才可 PASS；路徑違規、Secret 命中或檔案讀取／掃描無法可靠完成時，腳本必須回報 FAIL並停止，不可偽裝成功。
+  - 未來介面方向保留兩項參考效果：舊 Repo 的背景相片浮動縮放漫遊，以及 TimeMem 班別／PWA 的 ASCII 鯊魚／魚群游動特效；後續要由開發者與 AI 協同融合，並保留無障礙、效能、離線及現行 UI 邊界。
+- 理由:
+  - 將 Gemini 協同確立的資安、備份及介面方向固定為可審計記錄，可避免重新建立壓縮包時漏掉規則、把舊 Repo 私密內容帶回現行專案、或將設計構想誤當已批准程式範圍。
+- 批准邊界:
+  - 本決策批准資安打包規範、脫敏備份參考用途及共享模板入口；未批准還原任何舊產品程式碼、加入真實相片、修改現行 PWA、Schema／資料流或部署設定。介面特效實作須另行按 task 取得方向及驗收批准。
+
+### D-058 — FamilySystem 舊 Repo 歷史資產審查及資安紅線共識
+
+- 日期: 2026-11-27
+- 狀態: Approved；資產搬遷及任何實作仍須逐項批准
+- 決策:
+  - `C:\Project\FamilySystem-Cleaned.zip` 是經嚴格資安脫敏及清理嘅唯讀歷史參考備份，實測包含 352 個檔案項目。其用途只限代碼結構、成熟模式及方向對照；不可直接等同現行 approved scope，也不得帶回私人相片、credentials、個人資料或未脫敏內容。
+  - 可直接利用／搬遷保留嘅資產分為以下類別：
+    - `public/vendor/pdfjs/`：保留完整離線 PDF.js 工具鏈及編碼資源，包括 core、worker、cmaps、standard_fonts 與 WASM 支援，供未來本地文件／PDF 智能解析使用。
+    - `supabase/migrations/` 與 `database/init/`：保留歷次資料庫演進、RLS 政策及初始化架構；可作 TimeMem Local-First 資料安全底座參考。
+    - `20261028000011_family_encryption_real.sql`：保留基於 `pgcrypto` 嘅欄位加密方案作高價值技術參考；實作前仍須進行 schema、KDF、key hierarchy、rotation、restore及審核設計。
+    - `scripts/`：保留經實戰驗證嘅 PowerShell 加密備份、維運及日常檢核腳本；搬遷前須逐項審查相容性、秘密處理及執行權限。
+  - 可作高價值架構參考嘅資產分為以下類別：
+    - `docs/obsidian/`：載入死循環、災難復原及紅隊安全審查等實戰筆記可作除錯手冊與事故復盤參考。
+    - `server/hybrid/` 與 `source/agents/`：analyst、editor、librarian、security 等 Agent 編排設計及 Supabase 兼容層思維可作多 Agent 架構參考。
+  - 以上參考資產均不代表已批准匯入產品代碼、替換現行架構、建立 schema migration、處理真實個資或修改 PWA／部署設定；任何搬遷、復用及功能實作仍需逐項核准。
+- 資安紅線（Rule-SEC-01）:
+  - 任何專案 Cold Start 或備份打包必須強制排除 `.git/`、`node_modules/`、`.venv/`、`venv/`、`.validation-venv/`、`__pycache__/`。
+  - 必須強制排除全部 `.env*`、私鑰、憑證及 `.pem`、`.key`、`.p12`、`.pfx`、`id_rsa*`、`id_ed25519*` 等敏感或金鑰檔案。
+  - 必須強制排除 `reference/photo/`、`docs/` 下私人相片及整個 `docs/working/` 草稿夾；草稿若需保留，只可經正式審核後歸入 `docs/archive/`。
+  - 打包入口必須先匯出當前 HEAD，再疊加受控工作樹修改及未追蹤受控新檔，之後在暫存內容上執行完整路徑及可讀文字內容掃描。
+  - 最終 ZIP 必須回報 0 路徑違規及 0 真實 Secret 命中才可 PASS；路徑違規、Secret 命中、掃描內容無法可靠讀取或掃描失敗一律回報 FAIL並停止，不可偽裝成功。
+- 理由:
+  - 完成舊 Repo Autopsy 後，可將確定可利用資產、只可參考資產及絕對禁止區域分開，避免資產價值被誤解為功能批准、或資安紅線在不同 Cold Start／備份流程中漏失。
+- 批准邊界:
+  - 本決策批准上述歷史資產分類、資料庫／PDF 架構參考用途及打包資安共識；未批准直接復用舊程式碼、遷移密碼資料、處理真實相片、修改現行資料流、建立正式 migration 或更新 UI／部署。

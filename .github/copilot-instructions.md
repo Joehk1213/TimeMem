@@ -1,73 +1,49 @@
+## 🚨 CURRENT ACTIVE DIRECTIVE (M1 OVERRIDE)
+
+**最高準則：所有新對話都必須優先以呢個置頂區塊及 `docs/TODO.md` 頂部作最高準則。禁止採信 `docs/archive/`、舊版 M0 草稿、舊架構圖或任何其他舊文件入面與本指令衝突嘅描述。**
+
+1. **當前階段與唯一主線（M1 Priority 1）：** FastAPI 圖片上傳（Multipart Upload）→ 本地 Ollama `qwen3:8b` Vision / OCR 萃取 → 本地 `bge-m3` embedding → 寫入 PostgreSQL `pgvector` → PWA 彈出式 RESULT 框渲染。
+2. **Obsidian 狀態：** Obsidian Vault 整合目前列為 **Hold（暫緩／不作當前優先）**。
+3. **n8n 定位：** 本地 Docker n8n（Port `5678`）只作**後勤自動化外掛／外部觸發器**，負責接收 Backend Webhook 觸發日曆同步／通知或開發期測試；嚴禁取代 FastAPI 核心閉環，亦嚴禁直連或寫入 DB。
+4. **品牌與閉環：** 中文名「時光管家」、英文名「TimeMem」、Slogan「守護每一刻時光／Remember what matters.」；堅持 100% Self-Host、資料不出雲。
+5. **雙機與網絡：** 兩部 Fujitsu Lifebook U9311X；JOE-DESKTOP 為 Windows 10 僅 C 槽隨身開發及 Tailscale RDP 機；JOE-SERVER 為 Windows 11 C+D 槽家中主力機及唯一可寫生產資料庫主機，資料放 `D:\docker-data\timemem\`，只限 Tailscale、禁止開 Router Port。
+
 # TimeMem Copilot Instructions
-
-## 強制收尾同步
-
-- 每當完成任何程式碼修改、架構調整或腳本執行後，無需等待使用者額外指示，必須自動執行「收尾同步」：更新 `docs/PROGRESS.md`、`docs/TODO.md`（勾選已完成項目）及 `docs/working/AGENT-STATE.md`。
-- 若涉及架構或技術選型變更，同步追加記錄至 `docs/DECISIONS.md`。
-
-## 強制 Multi-Agent 交接規則
-
-- 任何 AI Agent 開始工作前必須先讀取 `docs/PROGRESS.md` 與 `docs/working/AGENT-STATE.md`；每次完成任務後，必須同步更新這兩個檔案。
 
 <!--
 性質：Repository Copilot 操作指引
-用途：規範批准、PROMPT、檔案閱讀同工作模式
+用途：規範收尾同步、語言、資安及現行工作範圍
 邊個叫開：Joe
-幾時可刪：Joe 親口要求刪除或呢套操作指引正式停用
+幾時可刪：Joe 親口要求刪除，或呢套指引正式停用
 -->
 
-## Copilot 操作指引
+## 強制收尾同步
 
-1. 冇 Joe 親口講 `APPROVED`，唔做嗰兩樣動作。唔答 = 唔批。
-2. `PROMPT` 要清晰簡短，唔好為減而減。每次留返 3 個字保險。
-3. 揀讀 3 份 `.MD`，唔好人手貼成堆對話。`PROMPT` 要短，再自己去讀 `TODO / DECISIONS / PROGRESS`。
-4. 只睇講明嗰幾個 File，唔好掃晒成個 workspace。
-5. 熟嘅範疇一次過出晒，唔牙膏；唔熟嘅先一步一步。
-6. 傾嘢用 Meta AI 傾好，再出 `PROMPT` 俾 GitHub Copilot 寫 code。
+- 完成任何程式碼修改、架構調整或腳本執行後，必須自動更新 `docs/TODO.md`、`docs/PROGRESS.md`，並同步完成項目。
+- 架構、技術選型、資料邊界或系統分工變更必須寫入 `docs/DECISIONS.md`。
+- 開工前讀取 `docs/TODO.md`、`docs/DECISIONS.md`、`docs/PROGRESS.md`；收尾時再核對三份文件一致。
 
-## Project source of truth
+## Record 語言
 
-- `docs/` is the canonical source for TimeMem product and implementation decisions. Use [docs/README.md](../docs/README.md) to find the current documents.
-- `docs/PRD.md` is the current product requirements document: PRD V10.2. V10.1 is archived at `docs/archive/TimeMem-PRD-V10-1.md`; do not treat archived notes as current requirements.
-- M0 remains Draft / NOT APPROVED. Joe alone has approval authority.
-- The Obsidian Vault is at `C:\Project\Obsidian-Hub\TimeMem`. It is for personal notes and daily records; repo docs remain authoritative for project decisions if the two overlap.
-- If canonical docs conflict or leave a decision open, stop and ask instead of guessing or silently resolving it.
+- 所有 Record 新內容一律用繁體廣東話。
+- 可保留英文嘅範圍限於檔案名、路徑、D-ID、REQ-ID、TASK-ID、指令、code、文件名及專有名詞。
+- 解釋、原因、做法、Blocker 同下一步必須用廣東話。
 
-## Record 寫作語言
+## 資安紅線（Rule-SEC-01）
 
-- 所有 record 文件嘅新內容一律用廣東話，包括 `PROGRESS.md`、`DECISIONS.md` 入面嘅新決定、`GATE.md` 說明、`TODO.md` 描述及 `ERRORLOG.md`。
-- 只可保留英文於：檔案名、路徑、D-ID、REQ-ID、TASK-ID、指令、code、PRD、DECISIONS、GATE、TODO、PROGRESS、ERRORLOG、M0、Space、Vault、MCP、Space 名、人名及專有名詞。
-- 解釋、原因、做法、Blocker 及下一步全部用廣東話；表頭可用中英對照，但表格內容要用廣東話。
-- 當更新一份之前含英文嘅 record，順手將受影響段落轉返廣東話；唔好新增一版英文同一版廣東話。
+- 絕對禁止將真實密碼、API Key、真實 `.env`、私人家庭個資、真實相片、私人 OCR 結果、embedding、log 或 backup 寫入 Git、公開分享位置或外部服務。
+- 公開設定只可使用脫敏 `.env.example`；測試只用合成資料及本機受控儲存。
+- 未經 Joe 明確批准，不得處理真實相片、私人附件、credentials 或新資料來源。
+- `docs/owner-private/`、證據及任何私密資料不得提交或推送。
 
-## Vault safety and frontmatter
+## 受管理範圍
 
-- Never rename the Vault's numbered folders `00` through `07`.
-- Never delete existing note body content. Preserve existing material; ask before removing or replacing it.
-- Preserve existing frontmatter properties. Do not silently rename or remove properties.
-- For new notes, use valid YAML frontmatter and only the agreed properties below. Ask before adding any other property.
-
-```yaml
----
-title:
-date: 2026-11-10
-type: note
-status: draft
-tags: []
-related: []
----
-```
-
-- `title` may be blank or contain the note title.
-- `date` uses `YYYY-MM-DD`.
-- `type` is one of `PRD`, `ADR`, `SOP`, `clipping`, or `note`.
-- `status` is one of `draft`, `in-progress`, or `done`.
-- For `clipping` notes, include `source:` in addition to the properties above.
+- `docs/` 係 TimeMem 產品及實作決策嘅現行來源；七份 Canonical Files 為 `PRD.md`、`DECISIONS.md`、`ARCHITECTURE.md`、`GATE.md`、`TODO.md`、`PROGRESS.md`、`ERRORLOG.md`。
+- `docs/PRD.md` 為現行 PRD V10.2；舊版本及 M0 歷史文件只可放喺 `docs/archive/`。
+- Obsidian Vault 整合目前列為 Hold；暫不處理任何 Vault 同步、搬移或新整合工作。
+- Vault 唔係產品決策權威；Repo 文檔有衝突時以 `docs/` 決策為準。
+- M0 已 PASS，現正處於 M1 階段；後續實作仍要依批准邊界逐項執行。
 
 ## Skills
 
-- Use `.agents/skills/` only; GPT-6 Luna is the primary tool. The `.github/skills/` and `.github/skills-cold/` copies were removed. Sync has been disabled since 2026-11-15 and must not be re-enabled without Joe's approval.
-- Do not run `scripts\sync-skills.ps1`; it is disabled and fails explicitly. The `-RepoOnly` mode of `scripts\check-skills-sync.ps1` is disabled; running it without that switch still compares repository skills with the local Vault.
-- Follow [timemem-workflow](../.agents/skills/timemem-workflow/SKILL.md) for Repo-first validation, safe Vault synchronization, Bases conventions, and secret handling.
-- The former GitHub Actions skill-mirror check is disabled; it no longer validates or synchronizes repository Skills.
-- Do not treat GitHub as a source of Skills; keep active and cold Skills in `.agents/skills/` and `.agents/skills-cold/`.
+- 只維護 `.agents/skills/`；唔重新啟用或鏡像同步 `.github/skills/`、`.github/skills-cold/` 或任何已停用腳本。
