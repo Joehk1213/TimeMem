@@ -779,3 +779,16 @@
   - 置頂錨點消除新對話讀取順序造成嘅 Lost in the Middle 與舊文件干擾；工作樹疊加避免打包產出只反映 HEAD 而漏載最新未提交紀錄。
 - 批准邊界:
   - 本決策只規範 AI 新對話準則、現行架構錨點及 Cold Start 打包完整性；唔改變 M0 PASS 或 M1 product approval 範圍。
+
+### D-055 — docs/working 草稿隔離及 Cold Start 打包強制過濾
+
+- 日期: 2026-11-27
+- 狀態: Approved
+- 決策:
+  - Cold Start 打包必須喺腳本層面強制排除整個 `docs/working/`，不得依靠人工提示、排序或檔案名稱規則作為唯一防線。
+  - 已過時、與 M1 OVERRIDE 衝突或已被正式 Canonical Files 取代嘅草稿，必須物理移入 `docs/archive/`；未批准草稿唔得留喺現役工作目錄。
+  - `.agents/skills/cold-start-pack/SKILL.md` 必須同步記錄相同排除規範，ZIP 重建後仍須由路徑掃描及內容掃描覆核。
+- 理由:
+  - 第二次 Cold Start 得 87 分；第 1 題因 `docs/working/` 未批准草稿干擾，未能精準吐出 M1 唯一閉環。此為 Lost in the Middle／關鍵字檢索干擾風險，需由腳本與目錄治理雙重防重犯。
+- 批准邊界:
+  - 本決策只規範冷啟動資料供給及草稿治理；M1 正式閉環、雙機拓撲及 n8n 邊界仍以 D-052 至 D-054 為準。

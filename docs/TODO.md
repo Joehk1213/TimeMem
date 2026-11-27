@@ -8,7 +8,9 @@
 - [x] 已建立 `.agents/skills/cold-start-pack/`，提供 `cold-start-pack` 觸發、Git archive、安全過濾及壓縮包掃描流程；完成證據及操作記錄見 [PROGRESS.md](PROGRESS.md)。
 - [x] 已鎖定 `.github/copilot-instructions.md` 同 `docs/ARCHITECTURE.md` 嘅 M1 置頂錨點，舊 Express Gateway 標示 Legacy、Obsidian 雙向橋接標示 Hold。
 - [x] 已升級 `.agents/skills/cold-start-pack/cold-start-pack.ps1`，打包時疊加未 commit 工作樹修改並重跑 Rule-SEC-01 掃描；第二次 ZIP 已以 0 路徑違規、0 Secret 命中 PASS。
-- [ ] 執行第二次 100 分 Cold Start 考牌重考；要求新對話由置頂錨點／TODO 頂部鎖定 M1 Priority 1、Obsidian Hold 同 n8n 後勤定位。
+- [x] 已完成第一次 68 分及第二次 87 分（B+）Cold Start 考牌；兩輪證據均同步至 PROGRESS／ERRORLOG。
+- [x] 已物理歸檔 `docs/working/` 下已取代嘅 M1 草稿，並強制 cold-start-pack 腳本排除整個 `docs/working/`。
+- [ ] 執行第三次 Cold Start 滿分（100 分）驗證測試；要求新對話精準吐出唯一 M1 閉環、雙機＋Tailscale 拓撲、Obsidian Hold、n8n 唯後勤邊界及七份 Canonical Files。
 
 ## M1 下一階段
 

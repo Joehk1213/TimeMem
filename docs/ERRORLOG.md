@@ -5,6 +5,13 @@
 幾時可刪：Joe 批准清除完整歷史紀錄，或紀錄正式由新系統取代
 -->
 
+# 2026-11-27 — 第二輪 Cold Start docs/working 草稿污染及物理隔離
+
+- **問題：** 兩次冷啟動考牌由 68 分提升至 87 分（B+）；第二輪仍未精準吐出 M1 唯一閉環。第 1 題受 `docs/working/` 下未批准的舊草稿干擾，將歷史設計、Vault／Obsidian 或舊架構片段混入現行答案。
+- **根本原因：** 多份未批准草稿與現行 Canonical Files 共同存在，形成 Lost in the Middle／關鍵字檢索干擾；打包腳本雖疊加工作樹且掃描 Secret，但未強制排除 `docs/working/`，所以未批准草稿可進入冷啟動壓縮包。
+- **處理：** 將已過時或被 M1 OVERRIDE取代嘅 M1 Draft 物理移入 `docs/archive/`；強化 `.agents/skills/cold-start-pack/cold-start-pack.ps1` 與 `SKILL.md`，腳本層強制排除整個 `docs/working/`。
+- **防重犯機制：** 任何重新打包均需覆核 ZIP 沒有 `docs/working/`；每次草稿取代後立即歸檔；第三次滿分（100 分）驗證需確認 Server＋Desktop＋Tailscale、Obsidian Hold、n8n 禁直連 DB及唯一 M1 關鍵閉環均準確。
+
 # 2026-11-26 — 新對話 Cold Start 置頂錨點及打包除錯
 
 - **問題 1：** 新舊文件打架（Lost in the Middle）令舊版 `ARCHITECTURE.md` 描述可干擾新對話判斷；舊版 Express Gateway、Obsidian 雙向橋接及 M0 草稿與現行 M1 主線並列時，AI 有機會採信過時資料。

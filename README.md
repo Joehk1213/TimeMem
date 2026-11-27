@@ -35,5 +35,6 @@ TimeMem 係一個以家庭為本、優先本機託管嘅時間與記憶系統。
 ## 冷啟動與快速開始
 
 - 執行 `.agents/skills/cold-start-pack/cold-start-pack.ps1` 建立最新 `TimeMem-clean.zip`；腳本支援 Working Tree Overlay，不得只依賴 `git archive HEAD`。
+- 冷啟動打包會強制排除整個 `docs/working/`；未批准草稿只可歸檔至 `docs/archive/`，不得流入 ZIP。
 - 本機環境先複製 `.env.docker.example` 成 `.env`，再用 `docker compose config` 檢查設定。
 - 不提交 `.env`、真密碼、API key 或其他 secret。

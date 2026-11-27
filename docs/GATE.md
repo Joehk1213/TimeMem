@@ -19,6 +19,9 @@ status: PASS
 - M1 Priority 1：FastAPI Multipart Upload → 本地 Ollama `qwen3:8b` Vision / OCR → `bge-m3` embedding → PostgreSQL `pgvector` → PWA RESULT 框。
 - 先完成合成資料最小閉環並 PASS，再考慮 PDF、更多行程或更多人物；未批准前不得擴展真實資料、schema 或雲端範圍。
 - 本地 Docker n8n（Port `5678`）只係後勤外掛／外部觸發器，核心業務邏輯仍留喺 FastAPI。
+- 雙機拓撲：JOE-SERVER 為唯一可寫服務／資料庫主機，JOE-DESKTOP 為開發／算力支援節點，兩機經 Tailscale VPN 內網互通。
+- Obsidian 已 Hold，唔作 M1 主介面；n8n 嚴禁直連或寫入 PostgreSQL。
+- 冷啟動打包必須排除整個 `docs/working/`，未批准草稿歸檔至 `docs/archive/` 後先可由歷史流程引用。
 
 # TimeMem M0 準備與通過閘口
 

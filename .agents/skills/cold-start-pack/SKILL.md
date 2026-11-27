@@ -30,6 +30,7 @@ description: "Use when the user asks to pack a clean repository, run a Cold Star
 - 不可包含 `venv/`、`.venv/`、`.validation-venv/`、`node_modules/` 或 Python cache。
 - 不可包含私鑰、憑證或敏感個人資料目錄。
 - 不可讀取、輸出或複製任何真實 Secret；只允許保留無值的變數名稱範例。
+- 不可包含 `docs/working/` 整個目錄；內部草稿必須歸檔至 `docs/archive/`。
 
 ## Execution
 
@@ -54,6 +55,7 @@ powershell -ExecutionPolicy Bypass -File C:\Project\TimeMem\.agents\skills\cold-
    - `venv/`、`.venv/`、`.validation-venv/`、`node_modules/`、`__pycache__/`
    - `.pem`、`.key`、`.p12`、`.pfx`、`id_rsa*`、`id_ed25519*`
    - `docs/evidence/`、`docs/owner-private/`、`personal-data/`、`private-data/`
+   - `docs/working/`（未批准草稿不得進入任何冷啟動壓縮包）
 5. 直接覆蓋 `C:\Project\TimeMem-clean.zip`。
 6. 探測 ZIP 中的每個檔案路徑及可讀文字內容。
 7. 掃描時必須同時檢查路徑違規及以下內容：

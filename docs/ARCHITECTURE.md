@@ -24,6 +24,15 @@ PWA / HTTP 圖片上傳
 - **n8n：** 本地 Docker n8n（Port `5678`）只係 **後勤自動化外掛／外部觸發器**，可接收 Backend Webhook 作日曆同步、通知或開發期測試；不可取代 FastAPI 核心閉環、不可直連 DB、亦不可成為資料寫入權威。
 - **Legacy 狀態：** 下文及舊圖中嘅 Node / Express Gateway / DAO 配置只保留為 **Legacy** 技術草案；Express Gateway 唔係 M1 FastAPI 圖片上傳閉環嘅主資料流。舊版 Obsidian 雙向橋接／同步構想亦標記為 **Hold**，唔作現行依據。
 
+## 雙機拓撲與冷啟動邊界
+
+- **JOE-SERVER：** 唯一可寫核心服務與本機模型／資料庫主機；FastAPI、PostgreSQL `pgvector`、Ollama 及 PWA 服務部署／運行於此。
+- **JOE-DESKTOP：** Desktop 算力、開發、回收／備份及終端操作節點；只同步 Repo，不同步生產 DB，不得成為第二個可寫 Primary。
+- **Tailscale VPN：** 嚴格限於授權裝置之間嘅 tailnet 內網互通；不可開 router port，亦唔代表繞過 TimeMem 應用層授權。
+- **Obsidian：** Hold，不參與 M1 關鍵閉環。
+- **n8n：** 僅後勤外掛／外部觸發器；可接收 FastAPI Webhook 做日曆／通知／測試，**嚴禁直連或寫入 PostgreSQL**。
+- **Cold Start 隔離：** 打包腳本必須排除整個 `docs/working/`，未批准草稿須移入 `docs/archive/`，避免 Lost in the Middle 與關鍵字污染。
+
 # TimeMem 現行系統架構
 
 ## 範圍與依據

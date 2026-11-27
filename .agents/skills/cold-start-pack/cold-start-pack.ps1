@@ -48,10 +48,12 @@ try {
         '.git', '.venv', 'venv', '.validation-venv', 'node_modules',
         '__pycache__', 'evidence', 'owner-private', 'personal-data', 'private-data'
     )
+    $forbiddenRelativeDirs = @('docs/working')
 
     Get-ChildItem -LiteralPath $stage -Directory -Recurse -Force |
         Where-Object {
-            $forbiddenDirs -contains $_.Name
+            $relativePath = $_.FullName.Substring($stage.Length).TrimStart('\') -replace '\\', '/'
+            ($forbiddenDirs -contains $_.Name) -or ($forbiddenRelativeDirs -contains $relativePath)
         } |
         Sort-Object FullName -Descending |
         ForEach-Object { Remove-Item -LiteralPath $_.FullName -Recurse -Force }
@@ -104,6 +106,7 @@ try {
         '(?i)(^|/)\.env([^/]*)(/|$|$)',
         '(?i)(^|/)reference/photo(/|$)',
         '(?i)(^|/)(docs/evidence|docs/owner-private|personal-data|private-data)(/|$)',
+        '(?i)(^|/)docs/working(/|$)',
         '(?i)(^|/)(id_rsa[^/]*|id_ed25519[^/]*|[^/]*\.(pem|key|p12|pfx))$',
         '(?i)(^|/)docs/[^/]*\.(png|jpg|jpeg|gif|bmp|tif|tiff|webp|jfif|heic|heif)$'
     )

@@ -6,6 +6,14 @@ Version: 10.2
 > 基於 V10.1，只按 CR-004 / D-025 對齊雙軌、Cloud 資料邊界、概念資料類型、MCP / Space 狀態及架構圖引用。  
 > S1–S10、口號、提醒痛點及 M0 內容保留；V10 Final / V10.1 原檔不覆寫。
 
+## 🚨 M1 當前有效範圍（M1 OVERRIDE）
+
+- **唯一閉環：** `PWA 圖片上傳 ➔ FastAPI Multipart Upload ➔ 本地 Ollama qwen3:8b Vision / OCR ➔ 本地 bge-m3 embedding ➔ PostgreSQL pgvector 寫入／檢索 ➔ PWA 彈出式 RESULT 框`。
+- **雙機拓撲：** JOE-SERVER 為唯一可寫核心服務主機；JOE-DESKTOP 提供開發及算力／操作支援；兩機經 Tailscale VPN 內網互通，不開 router port。
+- **Obsidian：** Hold，暫不作 M1 核心介面或資料權威。
+- **n8n：** 僅後勤外掛及外部觸發器；可接收 Backend Webhook，嚴禁直連或寫入 DB、亦不得取代 FastAPI 核心閉環。
+- **Cold Start：** 打包必須物理排除 `docs/working/`；舊草稿只可放 `docs/archive/`，不得干擾新對話對 M1 的認知。
+
 ## 口號
 
 **Remember what matters。**

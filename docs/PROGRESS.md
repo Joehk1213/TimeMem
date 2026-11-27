@@ -1,5 +1,14 @@
 # PROGRESS — 已完成事項
 
+## 2026-11-27 — 兩輪 Cold Start 考牌收尾與草稿物理隔離
+
+- 第一次 Cold Start 得 68 分：現有 AI 偏向舊版 Express／Node.js 架構，亦誤判 Obsidian 為核心介面；其後已建立 M1 OVERRIDE 置頂錨點、Root README 60 秒入口及 Working Tree Overlay 打包規範。
+- 第二次 Cold Start 得 87 分（B+）：雙機拓撲、Obsidian Hold、n8n 禁止直連 DB、七份 Canonical Files 一致性均滿分；唯一未滿分係第 1 題受 `docs/working/` 未批准草稿干擾，未精準吐出 M1 唯一閉環。
+- 已確認第二輪根本原因屬 Lost in the Middle／關鍵字檢索干擾；已將已取代的 M1 草稿移入 `docs/archive/`，並已由 D-055 正式決策。
+- 已強化 `.agents/skills/cold-start-pack/cold-start-pack.ps1` 與 `SKILL.md`，打包層強制排除整個 `docs/working/`，不再依賴單一文件提示。
+- 已同步更新 `README.md`、`.github/copilot-instructions.md`、`PRD.md`、`ARCHITECTURE.md`、`GATE.md`、`DECISIONS.md`、`ERRORLOG.md`、`TODO.md`，確保 Server＋Desktop＋Tailscale、Obsidian Hold、n8n 後勤邊界及 M1 唯一閉環一致。
+- 下一步：執行第三次 Cold Start 滿分（100 分）驗證，確認第 1 題精準回覆 FastAPI Multipart Upload → 本地 Ollama qwen3:8b Vision／OCR＋bge-m3 → pgvector 寫入 → PWA 彈出式 RESULT 框。
+
 ## 2026-11-27 — Root README M1 冷啟動入口對齊
 
 - 已將 root `README.md` 收斂為 60 秒入口：明確鎖定 M1 階段、唯一閉環為 FastAPI Multipart Upload、Ollama Vision / OCR＋bge-m3、pgvector 寫入及 PWA RESULT 框。
