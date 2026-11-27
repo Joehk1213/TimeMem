@@ -5,6 +5,15 @@
 幾時可刪：Joe 批准清除完整歷史紀錄，或紀錄正式由新系統取代
 -->
 
+# 2026-11-27 — Canonical Files 全倉同步及三輪 Cold Start 教訓
+
+- **問題：** 三輪 Cold Start 分別取得 68 分、87 分及 65 分；只有在所有現行規範明確鎖死 M1 閉環、真實雙機拓撲及防污染邊界時，AI 才有機會穩定輸出正確架構。
+- **路徑依賴：** 未受 Prompt 強制約束時，AI 容易受舊 Node.js / Express Gateway、雲端 Supabase 草稿及舊架構敘述影響，跌回錯誤主資料流。
+- **Lost in the Middle：** `docs/working/` 草稿曾與 Canonical Files 同時被讀取，將未批准設計混入現役答案，令冷啟動理解受干擾。
+- **處理：** 已確認 D-055；`cold-start-pack.ps1` 強制排除整個 `docs/working/`，未批准草稿只可物理歸檔至 `docs/archive/`。
+- **硬件防差：** Canonical 必須固定兩部 Fujitsu Lifebook U9311X、JOE-DESKTOP（Windows 10、僅 C 槽、Tailscale RDP）及 JOE-SERVER（Windows 11、C + D 槽、`D:\docker-data\timemem\`）為唯一部署事實。
+- **防重犯：** 每次新會話及打包後，先核對 README、七份 Canonical Files、唯一 M1 閉環、Obsidian Hold、n8n 禁直連 DB及零 Router Port；不得再由歷史草稿決定現役答案。
+
 # 2026-11-27 — 第二輪 Cold Start docs/working 草稿污染及物理隔離
 
 - **問題：** 兩次冷啟動考牌由 68 分提升至 87 分（B+）；第二輪仍未精準吐出 M1 唯一閉環。第 1 題受 `docs/working/` 下未批准的舊草稿干擾，將歷史設計、Vault／Obsidian 或舊架構片段混入現行答案。

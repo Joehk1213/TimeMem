@@ -103,6 +103,7 @@ try {
         '(?i)(^|/)\.git(/|$)',
         '(?i)(^|/)node_modules(/|$)',
         '(?i)(^|/)(\.venv|venv|\.validation-venv)(/|$)',
+        '(?i)(^|/)__pycache__(/|$)',
         '(?i)(^|/)\.env([^/]*)(/|$|$)',
         '(?i)(^|/)reference/photo(/|$)',
         '(?i)(^|/)(docs/evidence|docs/owner-private|personal-data|private-data)(/|$)',

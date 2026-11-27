@@ -5,6 +5,8 @@
 1. **當前階段與唯一主線（M1 Priority 1）：** FastAPI 圖片上傳（Multipart Upload）→ 本地 Ollama `qwen3:8b` Vision / OCR 萃取 → 本地 `bge-m3` embedding → 寫入 PostgreSQL `pgvector` → PWA 彈出式 RESULT 框渲染。
 2. **Obsidian 狀態：** Obsidian Vault 整合目前列為 **Hold（暫緩／不作當前優先）**。
 3. **n8n 定位：** 本地 Docker n8n（Port `5678`）只作**後勤自動化外掛／外部觸發器**，負責接收 Backend Webhook 觸發日曆同步／通知或開發期測試；嚴禁取代 FastAPI 核心閉環，亦嚴禁直連或寫入 DB。
+4. **品牌與閉環：** 中文名「時光管家」、英文名「TimeMem」、Slogan「守護每一刻時光／Remember what matters.」；堅持 100% Self-Host、資料不出雲。
+5. **雙機與網絡：** 兩部 Fujitsu Lifebook U9311X；JOE-DESKTOP 為 Windows 10 僅 C 槽隨身開發及 Tailscale RDP 機；JOE-SERVER 為 Windows 11 C+D 槽家中主力機及唯一可寫生產資料庫主機，資料放 `D:\docker-data\timemem\`，只限 Tailscale、禁止開 Router Port。
 
 # TimeMem Copilot Instructions
 

@@ -1,6 +1,13 @@
 # TODO — 未完成事項
 
-> 以下只列未完成工作。原有 Family Calendar System MVP + AI Co-Pilot 清單中的已完成項目已移至 [PROGRESS.md](PROGRESS.md)；該清單的雲端／舊架構工作須先對照現行 PRD V10.2（V10.1 已移至 `docs/archive/TimeMem-PRD-V10-1.md`），不能直接視為已批准的 TimeMem 方向。
+> 以下只列未完成工作。原有 Family Calendar System MVP + AI Co-Pilot 清單中的已完成項目已移至 [PROGRESS.md](PROGRESS.md)；該清單的雲端／舊架構工作須先對照現行 PRD V10.3，不能直接視為已批准的 TimeMem 方向。
+
+## Canonical Files 收尾及最新 Cold Start
+
+- [ ] 完成 `README.md`及七份 Canonical Files 的最終一致性覆核；確認品牌、雙機硬體、M1 閉環、Obsidian Hold、n8n 邊界及資料不出雲規則毫無矛盾。
+- [ ] 執行 `scripts/check-docs-sync.ps1`；修正任何 Canonical 差異及驗證失敗。
+- [ ] 完成 Git Commit；Commit 後執行 `.agents/skills/cold-start-pack/cold-start-pack.ps1`，重新生成 `C:\Project\TimeMem-clean.zip`。
+- [ ] 最新一輪 Cold Start 必須滿分覆核：精準重申唯一 M1 閉環、JOE-DESKTOP＋JOE-SERVER 雙機拓撲、Tailscale RDP／尾網安全、Obsidian Hold、n8n 禁直連 DB及七份 Canonical Files。
 
 ## 已完成嘅 Cold Start 包裝工作
 
@@ -26,6 +33,12 @@
   - [ ] PWA 彈出 RESULT 框顯示行程卡；無結果顯示「搵唔到相關行程」。
 - [ ] 按 D-052 固定 PASS 標準驗證：只喺指定星期一／星期四或星期二／星期六問題組合答中指定 2 條行程。
 - [ ] PASS 後先加 PDF、加多啲行程、加多啲人。
+
+## 介面特效及舊 Repo 對照
+
+- [ ] 只在另行批准後，協同檢視脫敏備份 `C:\Project\FamilySystem-Cleaned.zip` 的介面結構及現行 TimeMem UI 差異；不得直接匯入未經審核的代碼、資產或私人資料。
+- [ ] 另行批准後，規劃並實作背景相片浮動縮放漫遊；初版須保留離線、安全相片來源、效能、可見性及無動畫偏好處理。
+- [ ] 另行批准後，規劃並實作 ASCII 鯊魚／魚群游動特效與動態背景融合；不得改動 M1 Priority 1、PWA RESULT 及現行核心資料流。
 
 ## n8n 後勤定位
 

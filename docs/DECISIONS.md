@@ -1,5 +1,7 @@
 # 正式決策紀錄
 
+> **2026-11-27 Canonical Override（D-056）：** 本文件下方歷史決策只保留決策來源及變更痕跡；如與 D-056 或置頂 Canonical 衝突，M1 品牌、願景、單一閉環、雙機硬件、Self-Host 私隱、Obsidian Hold及 n8n 邊界一律以 D-056、Root README及現行 Canonical 為準。舊 Node/Express、Supabase、Cloud POC敘述只作歷史草稿，不可恢復為現役主線。
+
 正式決策以本 Repo 的 `docs/DECISIONS.md` 為準；Obsidian Vault 的 `02-決策-ADR` 只作草稿，不是正式決策位置。
 
 每項決策使用唯一 D-ID，並記錄以下欄位：
@@ -792,3 +794,66 @@
   - 第二次 Cold Start 得 87 分；第 1 題因 `docs/working/` 未批准草稿干擾，未能精準吐出 M1 唯一閉環。此為 Lost in the Middle／關鍵字檢索干擾風險，需由腳本與目錄治理雙重防重犯。
 - 批准邊界:
   - 本決策只規範冷啟動資料供給及草稿治理；M1 正式閉環、雙機拓撲及 n8n 邊界仍以 D-052 至 D-054 為準。
+
+### D-056 — Canonical Files 全倉核心規範同步
+
+- 日期: 2026-11-27
+- 狀態: Approved
+- 決策:
+  - 品牌定義固定為中文名「時光管家」、英文名「TimeMem」、主 Slogan「守護每一刻時光」、英文 Slogan「Remember what matters.」。
+  - 專案初心固定為小朋友放長假後忘記默書嘅痛點；願景固定為智能家居總管、個人知識庫、財務管理及具相片隨機移動／縮放與懸停記憶卡片互動嘅記憶時光機。
+  - 商業與私隱閉環固定為 100% Self-Host、資料不出雲；應用層由我們維護，生產資料庫由家庭用戶自行擁有及 Self-Host。
+  - M1 唯一閉環固定為 PWA 圖片上傳 → FastAPI Multipart Upload → 本地 Ollama `qwen3:8b` Vision/OCR + `bge-m3` embedding → PostgreSQL pgvector 寫入／檢索 → PWA 彈出式 RESULT 框。
+  - Node.js / Express Gateway、雲端 Supabase及相關外部 POC 架構只保留為歷史草稿，絕非 M1 現役主資料流。
+  - 雙機硬件固定為 Fujitsu Lifebook U9311X：i7-1165G7 @ 2.80GHz、16 GB RAM、Intel Iris Xe、477 GB NVMe SSD。
+  - JOE-DESKTOP 固定為 Windows 10、僅 C 槽嘅隨身開發／Tailscale RDP 機；JOE-SERVER 固定為 Windows 11、C + D 槽嘅家中主力機及唯一可寫生產資料庫主機。
+  - JOE-SERVER 的 `D:\docker-data\timemem\` 包含 Docker Compose、`pgdata`及 `model`，專責 PostgreSQL + pgvector + Ollama；嚴禁開 Router Port，遠端存取只限 Tailscale。
+  - Obsidian 固定為 Hold，`C:\Project\Obsidian-Hub` 只作設計參考，禁止編寫整合程式碼。
+  - n8n 固定為 Port `5678` 嘅本地 Docker 後勤外掛／外部觸發器，可接收 FastAPI Webhook；嚴禁直連或直接寫入 PostgreSQL。
+  - Root README及七份 docs Canonical 必須相互鎖定；Cold Start 必須強制排除 `docs/working/`，舊草稿只可歸檔至 `docs/archive/`。
+- 理由:
+  - 三輪 Cold Start 得分 68、87、65；未在最高規範固定閉環、雙機拓撲及防污染規則時，AI 容易受舊 Express 架構及 Lost in the Middle 干擾。
+- 批准邊界:
+  - 本決策只同步現行願景、硬件、技術閉環及工程治理，不自動批准真實資料、正式 schema、雲端部署或任何未來功能實作。
+
+### D-057 — Gemini 協同資安打包、舊 Repo 備份及介面方向同步
+
+- 日期: 2026-11-27
+- 狀態: Approved；介面實作仍為未批准工作
+- 決策:
+  - `C:\Project\old\Family\FamilySystem` 已作極度嚴格資安脫敏及清理，產出唯讀參考備份 `C:\Project\FamilySystem-Cleaned.zip`；實測當前壓縮包包含 352 個檔案項目，備份只可用作代碼結構及方向對照，不得直接復用私人相片、credentials、個人資料或未脫敏內容。
+  - `C:\Project\REPO\README.md` 是跨專案標準知識產出物入口；內容只涵蓋牌照、Repo 模板、文件權威次序、廣東話規則、Cold Start 範本及打包流程，不代表批准任何新 project scope 或 TimeMem product code。
+  - Rule-SEC-01 是 TimeMem Cold Start 強制資安門檻：腳本必須排除 `.git/`、`node_modules/`、`.venv/`、`venv/`、`.validation-venv/`、`__pycache__/`、全部 `.env*`、`.pem`、`.key`、`.p12`、`.pfx`、`id_rsa*`、`id_ed25519*`、`reference/photo/`、`docs/` 下私人相片及 `docs/working/`。
+  - 打包腳本需使用 ZIP 串流讀取並對每個可讀文字檔進行內容正則掃描；至少覆蓋 AWS AKIA Key、私鑰標頭、OpenAI／GitHub／Linear／Bearer／通用 Token assignment及 Password assignment。
+  - 最終 ZIP 必須回報 0 路徑違規及 0 真實 Secret 命中才可 PASS；路徑違規、Secret 命中或檔案讀取／掃描無法可靠完成時，腳本必須回報 FAIL並停止，不可偽裝成功。
+  - 未來介面方向保留兩項參考效果：舊 Repo 的背景相片浮動縮放漫遊，以及 TimeMem 班別／PWA 的 ASCII 鯊魚／魚群游動特效；後續要由開發者與 AI 協同融合，並保留無障礙、效能、離線及現行 UI 邊界。
+- 理由:
+  - 將 Gemini 協同確立的資安、備份及介面方向固定為可審計記錄，可避免重新建立壓縮包時漏掉規則、把舊 Repo 私密內容帶回現行專案、或將設計構想誤當已批准程式範圍。
+- 批准邊界:
+  - 本決策批准資安打包規範、脫敏備份參考用途及共享模板入口；未批准還原任何舊產品程式碼、加入真實相片、修改現行 PWA、Schema／資料流或部署設定。介面特效實作須另行按 task 取得方向及驗收批准。
+
+### D-058 — FamilySystem 舊 Repo 歷史資產審查及資安紅線共識
+
+- 日期: 2026-11-27
+- 狀態: Approved；資產搬遷及任何實作仍須逐項批准
+- 決策:
+  - `C:\Project\FamilySystem-Cleaned.zip` 是經嚴格資安脫敏及清理嘅唯讀歷史參考備份，實測包含 352 個檔案項目。其用途只限代碼結構、成熟模式及方向對照；不可直接等同現行 approved scope，也不得帶回私人相片、credentials、個人資料或未脫敏內容。
+  - 可直接利用／搬遷保留嘅資產分為以下類別：
+    - `public/vendor/pdfjs/`：保留完整離線 PDF.js 工具鏈及編碼資源，包括 core、worker、cmaps、standard_fonts 與 WASM 支援，供未來本地文件／PDF 智能解析使用。
+    - `supabase/migrations/` 與 `database/init/`：保留歷次資料庫演進、RLS 政策及初始化架構；可作 TimeMem Local-First 資料安全底座參考。
+    - `20261028000011_family_encryption_real.sql`：保留基於 `pgcrypto` 嘅欄位加密方案作高價值技術參考；實作前仍須進行 schema、KDF、key hierarchy、rotation、restore及審核設計。
+    - `scripts/`：保留經實戰驗證嘅 PowerShell 加密備份、維運及日常檢核腳本；搬遷前須逐項審查相容性、秘密處理及執行權限。
+  - 可作高價值架構參考嘅資產分為以下類別：
+    - `docs/obsidian/`：載入死循環、災難復原及紅隊安全審查等實戰筆記可作除錯手冊與事故復盤參考。
+    - `server/hybrid/` 與 `source/agents/`：analyst、editor、librarian、security 等 Agent 編排設計及 Supabase 兼容層思維可作多 Agent 架構參考。
+  - 以上參考資產均不代表已批准匯入產品代碼、替換現行架構、建立 schema migration、處理真實個資或修改 PWA／部署設定；任何搬遷、復用及功能實作仍需逐項核准。
+- 資安紅線（Rule-SEC-01）:
+  - 任何專案 Cold Start 或備份打包必須強制排除 `.git/`、`node_modules/`、`.venv/`、`venv/`、`.validation-venv/`、`__pycache__/`。
+  - 必須強制排除全部 `.env*`、私鑰、憑證及 `.pem`、`.key`、`.p12`、`.pfx`、`id_rsa*`、`id_ed25519*` 等敏感或金鑰檔案。
+  - 必須強制排除 `reference/photo/`、`docs/` 下私人相片及整個 `docs/working/` 草稿夾；草稿若需保留，只可經正式審核後歸入 `docs/archive/`。
+  - 打包入口必須先匯出當前 HEAD，再疊加受控工作樹修改及未追蹤受控新檔，之後在暫存內容上執行完整路徑及可讀文字內容掃描。
+  - 最終 ZIP 必須回報 0 路徑違規及 0 真實 Secret 命中才可 PASS；路徑違規、Secret 命中、掃描內容無法可靠讀取或掃描失敗一律回報 FAIL並停止，不可偽裝成功。
+- 理由:
+  - 完成舊 Repo Autopsy 後，可將確定可利用資產、只可參考資產及絕對禁止區域分開，避免資產價值被誤解為功能批准、或資安紅線在不同 Cold Start／備份流程中漏失。
+- 批准邊界:
+  - 本決策批准上述歷史資產分類、資料庫／PDF 架構參考用途及打包資安共識；未批准直接復用舊程式碼、遷移密碼資料、處理真實相片、修改現行資料流、建立正式 migration 或更新 UI／部署。
