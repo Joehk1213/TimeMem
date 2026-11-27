@@ -1,25 +1,39 @@
 # TimeMem
 
-TimeMem 係一個以家庭為本、自家託管嘅時間與記憶系統；現行產品要求以 [PRD](docs/PRD.md)（Version: 10.2）為準。V10.1 已移至 `docs/archive/TimeMem-PRD-V10-1.md` 作歷史版本。
+TimeMem 係一個以家庭為本、優先本機託管嘅時間與記憶系統。
 
-**M0 仍為 Draft / NOT APPROVED；批准權只在 Joe 手上。**
+## 目前階段與核心閉環
 
-## 入門
+**現行階段：M1。** 唯一主線閉環為：
 
-1. 先讀 [PRD](docs/PRD.md) 了解產品範圍及要求。
-2. 開工前查看 [TODO](docs/TODO.md)；已完成事項見 [PROGRESS](docs/PROGRESS.md)。
-3. 文件入口見 [docs/README.md](docs/README.md)；正式決策記錄在 [docs/DECISIONS.md](docs/DECISIONS.md)。
-4. 設定時可參考 [.env.example](.env.example)，填入本機值前先複製成 `.env`；唔好提交 `.env` 或真密碼/API key。
+`FastAPI Multipart 上傳 ➔ 本地 Ollama (qwen3:8b Vision/OCR + bge-m3) ➔ pgvector 寫入 ➔ PWA 彈出式 RESULT 框`
 
-正式決策以 Repo `docs/DECISIONS.md` 為準；Vault `02-決策-ADR` 只作草稿。
+- M1 只完成上述最小閉環：FastAPI 負責上傳、OCR / embedding、向量檢索、判定及資料寫入。
+- 未經 Owner批准前，不擴展真實資料、雲端範圍、schema 或產品功能。
+- `docs/archive/`、舊 M0 草稿、Legacy Express Gateway 圖或其他衝突描述一律唔凌駕現行 M1 錨點。
 
-2026-11-22 嘅 Space、MCP direction、Vault、reminder、model benchmark 及文件 workflow 已分別記入現行 PRD、DECISIONS、TODO、PROGRESS、ARCHITECTURE 及 gate。呢批記錄唔改 M0 NOT APPROVED 狀態。
+## 關鍵邊界
 
-## Hybrid 5 Docker stack
+- **Obsidian 雙向整合：Hold（暫緩）**；Vault 唔係現行 M1 主線，亦唔凌駕 Repo 決策。
+- **本地 Docker n8n：僅後勤自動化外掛**；可接收 Backend Webhook 作日曆同步、通知或開發期測試。
+- n8n **嚴禁直連寫入資料庫**、取代 FastAPI 核心閉環或成為資料權威。
 
-1. 將 `.env.docker.example` 複製成 `.env`，設定隨機 `TIMEMEM_DB_PASSWORD` 及 `TIMEMEM_SESSION_SECRET`。
-2. 如需建立初始 Owner，臨時設定 6 位數 `TIMEMEM_BOOTSTRAP_PIN`；建立後應移除該值。
-3. 執行 `docker compose config` 做設定檢查，再執行 `docker compose up -d --build`。
+## 權威文件入口
 
-唯一主機入口是 `127.0.0.1:444`。Compose 只包含 `frontend`、`backend`、`database`；
-PostgreSQL 資料保存在獨立 named volume `timemem_hybrid5_postgres_data`，不會因重建容器而刪除。
+冷啟動要先讀置頂指令，再依下列七份 Canonical Files 執行：
+
+1. [PRD](docs/PRD.md) — 現行產品需求及驗收範圍。
+2. [DECISIONS](docs/DECISIONS.md) — 已批准決策及取代關係。
+3. [GATE](docs/GATE.md) — 目前 Gate、批准狀態及驗收準則。
+4. [TODO](docs/TODO.md) — 現役未完成工作。
+5. [PROGRESS](docs/PROGRESS.md) — 已完成工作、驗證及 evidence。
+6. [ERRORLOG](docs/ERRORLOG.md) — 系統衝突、工具鏈漏洞、根本原因及防重犯測試。
+7. [ARCHITECTURE](docs/ARCHITECTURE.md) — 現行系統架構及 M1 資料流。
+
+新對話亦應先讀 `.github/copilot-instructions.md` 同置頂錨點；詳細索引見 [docs/README.md](docs/README.md)。
+
+## 冷啟動與快速開始
+
+- 執行 `.agents/skills/cold-start-pack/cold-start-pack.ps1` 建立最新 `TimeMem-clean.zip`；腳本支援 Working Tree Overlay，不得只依賴 `git archive HEAD`。
+- 本機環境先複製 `.env.docker.example` 成 `.env`，再用 `docker compose config` 檢查設定。
+- 不提交 `.env`、真密碼、API key 或其他 secret。

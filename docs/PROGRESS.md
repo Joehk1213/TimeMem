@@ -1,5 +1,12 @@
 # PROGRESS — 已完成事項
 
+## 2026-11-27 — Root README M1 冷啟動入口對齊
+
+- 已將 root `README.md` 收斂為 60 秒入口：明確鎖定 M1 階段、唯一閉環為 FastAPI Multipart Upload、Ollama Vision / OCR＋bge-m3、pgvector 寫入及 PWA RESULT 框。
+- 已補齊關鍵邊界：Obsidian 雙向整合設為 Hold；本地 Docker n8n 只作後勤自動化外掛，嚴禁直連或寫入 DB。
+- 已列出七份現行 Canonical Files 入口及 `.agents/skills/cold-start-pack/cold-start-pack.ps1` 冷啟動打包指引。
+- 已重跑 Cold Start 包裝：HEAD `fbdc8d37c099`、`TimeMem-clean.zip` 352 個檔案、0 路徑違規、0 Secret 命中、`SCAN_STATUS=PASS`；ZIP 已核對含最新 README 及 M1／Hold／Working Tree Overlay 關鍵內容。
+
 ## 2026-11-26 — Cold Start 考牌除錯、腳本升級及第二次重考準備
 
 - 已完成一次 M1 置頂錨點 Cold Start 考牌除錯；確認舊版架構敘述會造成 Lost in the Middle，新對話需以置頂指令及 TODO 頂部為最高準則。

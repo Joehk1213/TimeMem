@@ -4,6 +4,7 @@
 
 ## 已完成嘅 Cold Start 包裝工作
 
+- [x] 已將 root `README.md` 收斂為 60 秒入口，明確鎖定 M1 Priority 1、Obsidian Hold、n8n 後勤邊界及七份 Canonical Files。
 - [x] 已建立 `.agents/skills/cold-start-pack/`，提供 `cold-start-pack` 觸發、Git archive、安全過濾及壓縮包掃描流程；完成證據及操作記錄見 [PROGRESS.md](PROGRESS.md)。
 - [x] 已鎖定 `.github/copilot-instructions.md` 同 `docs/ARCHITECTURE.md` 嘅 M1 置頂錨點，舊 Express Gateway 標示 Legacy、Obsidian 雙向橋接標示 Hold。
 - [x] 已升級 `.agents/skills/cold-start-pack/cold-start-pack.ps1`，打包時疊加未 commit 工作樹修改並重跑 Rule-SEC-01 掃描；第二次 ZIP 已以 0 路徑違規、0 Secret 命中 PASS。
