@@ -61,6 +61,17 @@ PWA 圖片上傳
 | n8n | Port `5678` 本地 Docker 後勤外掛／外部觸發器；可接收 FastAPI Webhook，嚴禁直連或直接寫入 PostgreSQL。 |
 | Obsidian | Hold（暫緩）；`C:\Project\Obsidian-Hub` 只作設計參考；禁止編寫 M1 整合程式碼。 |
 
+## 部署與自動化邊界
+
+- **Direct Mode 部署主線**：`JOE-DESKTOP` 嘅 `scripts\deploy_all.bat`負責程式碼與 Docker 部署，先由本機檢查 Git 狀態並執行 Commit／Push，再透過 `plink.exe`連線 `joe-server`，於遠端執行 `git pull origin main`及 `docker compose up -d`。
+- 腳本使用 `%USERPROFILE%\.ssh\joe-server.ppk` 私鑰做 PuTTY/Plink 授權；私鑰不得寫入 Repo、環境紀錄或任何公開位置。Host Key 指紋只在本機受控環境確認。
+- JOE-SERVER 嘅 Docker Desktop 及 Linux Engine 必須保持常駐；唔再透過批次腳本背景執行 `net stop/start` 或其他遠端 daemon 重啟，亦唔將遠端 Docker 崩潰當成可盲目自癒嘅條件。
+- 遠端 daemon 失效、認證失敗、npipe／Docker engine 無法連線或容器異常時，腳本停止後須由 Joe 人手登入 JOE-SERVER 排查；自動化不得繞過狀態判斷直接改遠端設定。
+- **雙軌定位**：TimeMem Repo 負責程式碼、PWA及 Docker 部署；`C:\Project\REPO`只負責跨專案知識、Cold Start 範本及 Prompt 模板。兩者應保持分開，唔混合成單一產品資料庫或部署主線。
+- **n8n 關閉環設計**：雲端可用 Google Drive Trigger 偵測由 Gemini 產生嘅 `latest_summary.md`，再路由至本地 TimeMem 或 REPO 並呼叫本地腳本；執行後將來源檔移入 Archive 並按香港時間重新命名。此設計係知識同步／部署觸發閉環，唔可令 n8n 進入 M1 核心業務閉環、直連 DB或處理原始私人資料。
+- n8n 自動執行批次檔時應支援靜默參數；手動雙擊仍保留可讀結果及 `pause`。現有 `sync_consensus.bat` 及 Workflow 配置若未實作靜默或香港時間命名，須視為待完成，不得在架構文件補寫成已存在。
+- 歷史 Summary 名稱使用香港時區格式 `YYYYMMDDHHMM_latest_summary.md`；Luxon 範例為 `{{ $now.setZone('Asia/Hong_Kong').toFormat('yyyyMMddHHmm') }}_latest_summary.md`。
+
 ## Legacy 防污染
 
 - Node.js / Express Gateway、Express API Gateway、DAO 及雲端 Supabase 架構構想僅屬歷史 POC 草稿。
