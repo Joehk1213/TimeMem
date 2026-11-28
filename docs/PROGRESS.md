@@ -1,5 +1,9 @@
 # PROGRESS — 已完成事項
 
+## 2026-11-28 18:18 — 自動化共識同步
+
+- 透過自動化流水線成功同步最新對話共識摘要。
+
 ## 2026-11-28 — Direct Mode、雙軌雙庫及部署資安共識落檔
 
 - 已核實 `scripts\deploy_all.bat`係現行 Direct Mode 入口：本機先執行 Git 狀態檢查、Commit／Push，再透過 `plink.exe -i %USERPROFILE%\.ssh\joe-server.ppk`連至 `joe-server`，遠端執行 `git pull origin main && docker compose up -d`。

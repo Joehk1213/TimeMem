@@ -1,0 +1,1 @@
+CreateObject("Wscript.Shell").Run "python C:\Project\TimeMem\scripts\n8n_receiver.py", 0, False
