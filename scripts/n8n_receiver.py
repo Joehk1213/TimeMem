@@ -5,15 +5,49 @@ import os
 import re
 import subprocess
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 SUMMARY_DIR = r"C:\Project\TimeMem\docs\Summary"
 SCRIPTS_DIR = r"C:\Project\TimeMem\scripts"
 TIMESTAMPED_SUMMARY_RE = re.compile(r"^\d{12}_latest_summary\.md$")
+HKT = timezone(timedelta(hours=8))
+CONTROLLABLE_BINARY_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 
 def md5_hex(content):
     return hashlib.md5(content).hexdigest()
+
+
+def validate_text_payload(raw_body):
+    if not raw_body:
+        raise ValueError("empty payload")
+
+    content = raw_body
+    try:
+        data = json.loads(raw_body.decode("utf-8"))
+        if isinstance(data, dict) and "content" in data:
+            val = data["content"]
+            if not isinstance(val, str):
+                raise ValueError("JSON content field is not text")
+            content = val.encode("utf-8")
+    except json.JSONDecodeError:
+        content = raw_body
+
+    try:
+        text = content.decode("utf-8", errors="strict")
+    except UnicodeDecodeError as error:
+        raise ValueError("payload is not valid UTF-8") from error
+
+    if not text.strip():
+        raise ValueError("payload contains no readable text")
+    if CONTROLLABLE_BINARY_RE.search(text):
+        raise ValueError("payload contains binary control characters")
+
+    printable = sum(character.isprintable() or character in "\r\n\t" for character in text)
+    if len(text) == 0 or printable / len(text) < 0.95:
+        raise ValueError("payload is not readable text")
+
+    return content
 
 
 def find_previous_summary_hash():
@@ -64,35 +98,29 @@ class Handler(BaseHTTPRequestHandler):
         try:
             length = int(self.headers.get("Content-Length", 0))
             raw_body = self.rfile.read(length)
-
-            content = raw_body
             try:
-                data = json.loads(raw_body.decode("utf-8", errors="ignore"))
-                if isinstance(data, dict) and "content" in data:
-                    val = data["content"]
-                    if isinstance(val, str):
-                        content = val.encode("utf-8")
-            except:
-                pass
+                content = validate_text_payload(raw_body)
+            except ValueError as validation_error:
+                print(f"[ERROR] Invalid binary/corrupted payload received: {validation_error}")
+                self.send_response(400)
+                self.send_header("Content-Type", "text/plain; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(b"Invalid binary/corrupted payload")
+                return
 
             os.makedirs(SUMMARY_DIR, exist_ok=True)
             incoming_hash = md5_hex(content)
-            
-            # 【優化重點】放寬去重限制：如果距離上一次收到的時間小於 10 秒且 Hash 完全一樣先至 Skip
-            # 或者直接比對「最新落盤檔案的名稱是不是剛才那分鐘」
-            # 這裡我們保留去重機制，但若果你想手動測試，可以留意 Log
             previous_hash = find_previous_summary_hash()
-
-            # 為了讓你能夠順利做連續實測，我們加入一個「強制時間間隔或檔名獨立」防線
-            # 如果內容真的一模一樣，但距離上次請求超過一定時間，我們當作「定時心跳/強制覆蓋測試」放行！
-            # 這裡先保留嚴格 MD5 檢查，但印出 Hash 方便你對比
             print(f"[DEBUG] Incoming MD5: {incoming_hash} | Previous MD5: {previous_hash}")
 
             if previous_hash is not None and incoming_hash == previous_hash:
-                # 為了測試順利，如果真係相同，我們仍然允許寫入帶有當前秒數的時間戳檔案，確保流水線行到尾！
-                print("Content matches previous, but forcing timestamped backup to ensure pipeline test passes.")
+                print("[INFO] Duplicate payload skipped by MD5 deduplication.")
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"OK_DUPLICATE")
+                return
 
-            timestamp = datetime.now().strftime("%Y%m%d%H%M%S") # 精確到秒，確保檔案不覆蓋
+            timestamp = datetime.now(HKT).strftime("%Y%m%d%H%M")
             filename = f"{timestamp}_latest_summary.md"
             target_path = os.path.join(SUMMARY_DIR, filename)
 
