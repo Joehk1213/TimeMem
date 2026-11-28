@@ -37,3 +37,27 @@ Applied autostash.
 ?? docs/Summary/202611282234_latest_summary.md
 ?? scripts/Install-TimeMemReceiver-Startup.ps1
 ?? scripts/pipeline_last_run.log
+warning: in the working copy of 'scripts/pipeline_last_run.log', LF will be replaced by CRLF the next time Git touches it
+[main 241c498] docs: full sync consensus summaries, core canonical docs, and automation scripts
+ 22 files changed, 210 insertions(+), 145 deletions(-)
+ delete mode 100644 docs/Summary/202611272318_latest_summary.md
+ delete mode 100644 docs/Summary/202611272346_latest_summary.md
+ delete mode 100644 docs/Summary/202611280058_latest_summary.md
+ delete mode 100644 docs/Summary/202611281233_latest_summary.md
+ delete mode 100644 docs/Summary/202611281251_latest_summary.md
+ delete mode 100644 docs/Summary/202611281358_latest_summary.md
+ delete mode 100644 docs/Summary/202611281430_latest_summary.md
+ delete mode 100644 docs/Summary/202611281437_latest_summary.md
+ delete mode 100644 docs/Summary/202611281442_latest_summary.md
+ delete mode 100644 docs/Summary/202611281839_latest_summary.md
+ delete mode 100644 docs/Summary/20261128220821_latest_summary.md
+ delete mode 100644 docs/Summary/202611282208_latest_summary.md
+ rename docs/Summary/{202611281818_latest_summary.md => 20261128223421_latest_summary.md} (100%)
+ rename docs/Summary/{20261128183959_latest_summary.md => 202611282234_latest_summary.md} (100%)
+ delete mode 100644 "docs/Summary/latest_summary - \350\244\207\350\243\275.md"
+ create mode 100644 scripts/Install-TimeMemReceiver-Startup.ps1
+ create mode 100644 scripts/pipeline_last_run.log
+To https://github.com/Joehk1213/TimeMem.git
+   74930a0..241c498  main -> main
+[SUCCESS] 全面共識與文檔同步完成！
+[週六 28/11/2026 22:34:28.46] sync_consensus.bat end
